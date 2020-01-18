@@ -1,0 +1,155 @@
+﻿<Window x:Class="LayoutGridTest.TestComplexLayout_LayoutGrid"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayoutGridTest"
+        mc:Ignorable="d"
+        Title="TestComplexLayout_LayoutGrid" Height="500" Width="800">
+	<Grid Margin="12,12,12,12" Name="gridMain">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="1*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Name="top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Label Grid.Row="0" Grid.Column="0" Content="Sele_ct:"/>
+			<ComboBox Grid.Row="0" Grid.Column="1" Name="cboSelect" />
+			<Button Grid.Row="0" Grid.Column="2" Content="Savepqg" Margin="10,0,0,0" Name="btnSave" Width="70" HorizontalAlignment="Left" VerticalAlignment="Top" IsDefault="True"/>
+			<Button Grid.Row="0" Grid.Column="3" Content="Cancel" Margin="10,0,0,0" Name="btnCancel" Width="70"/>
+			<Button Grid.Row="0" Grid.Column="4" Content="_New" Margin="10,0,0,0" Name="btnNew" Width="70"/>
+			<Button Grid.Row="0" Grid.Column="5" Content="Delete" Margin="10,0,0,0" Width="70"/>
+		</Grid>
+		<Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition/>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Separator  Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="8"  Margin="0,8,0,0"/>
+			<Label Grid.Row="1" Grid.Column="0" Content="_Name:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<TextBox Grid.Row="1" Grid.Column="1" x:Name="txtName" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" VerticalAlignment="Stretch"/>
+			<Label Grid.Row="2" Grid.Column="0" Content="Name2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="2" Grid.Column="1" Name="cboName2y" Margin="0,8,0,0"/>
+			<Label Grid.Row="3" Grid.Column="0" Content="Name3:" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="3" Grid.Column="1" Name="cboName3" Margin="0,8,0,0"/>
+			<Label Grid.Row="4" Grid.Column="0" Content="Name4:" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="4" Grid.Column="1" Name="cboName4" Margin="0,8,0,0"/>
+			<CheckBox Grid.Row="1" Grid.Column="2" Name="chkIsASomething" Content="Is a something" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
+			<CheckBox Grid.Row="2" Grid.Column="2" Name="chkIsASomething2" Content="Is _a something 2" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
+			<CheckBox Grid.Row="3" Grid.Column="2" Name="chkInactive" Content="Inactive" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
+			<Label Grid.Row="4" Grid.Column="2" Content="This is a long label text:" HorizontalAlignment="Stretch" Margin="14,8,0,0"/>
+			<Button Grid.Row="1" Grid.Column="3" Content="Button _Content..." Margin="0,8,0,0" MinWidth="70" Padding="5"/>
+			<Button Grid.Row="2" Grid.Column="3" Content="_Button _Content2..." Margin="0,8,0,0" MinWidth="70" Padding="5"/>
+			<Button Grid.Row="1" Grid.Column="4" Content="Button _Content3..." Margin="10,8,0,0" MinWidth="70" Padding="5"/>
+			<Button x:Name="btnStuff" Grid.Row="2" Grid.Column="4" Content="_Button Stuff..." Margin="10,8,0,0" MinWidth="70" Padding="5"/>
+			<Button x:Name="btnMoreStuff" Grid.Row="3" Grid.Column="4" Content="_More Stuff..." Margin="10,8,0,0" MinWidth="70" Padding="5"/>
+			<TextBox Grid.Row="4" Grid.Column="3"  Grid.ColumnSpan="2" TextWrapping="NoWrap" AcceptsReturn="False" Width="190" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Left"/>
+			<Border Name="border2" Grid.Row="3" Grid.Column="3" BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" SnapsToDevicePixels="true">
+				<ContentPresenter x:Name="contentPresenter2" Focusable="False" HorizontalAlignment="Center" Margin="3,2,3,3" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" Content="contentjgpq"/>
+			</Border>
+		</Grid>
+		<Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
+				<ColumnDefinition Width="14" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition/>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,13,0,0"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0" Text="Header A" HorizontalAlignment="Center" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" FontWeight="Bold"/>
+			<Label Grid.Row="1" Grid.Column="0" Content="A stuff 1:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"/>
+			<Label Grid.Row="2" Grid.Column="0" Content="A stuff 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<Grid x:Name="gridx" Grid.Row="2" Grid.Column="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*" MinWidth="50" MaxWidth="200" />
+					<ColumnDefinition Width=".001*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*" />
+				</Grid.RowDefinitions>
+				<TextBox Grid.Row="0" Grid.Column="0" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Stretch" MinWidth="40" MaxWidth="200"/>
+			</Grid>
+			<Label Grid.Row="3" Grid.Column="0" Content="A stuff 3:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<TextBox Grid.Row="3" Grid.Column="1" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Left" Width="200"/>
+			<Label Grid.Row="4" Grid.Column="0" Content="A stuff 4:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="4" Grid.Column="1"  Margin="0,8,0,0"/>
+			<Label Grid.Row="5" Grid.Column="0" Content="A stuff 5:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="5" Grid.Column="1" Margin="0,8,0,0"/>
+
+			<Separator Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2" Margin="0,13,0,0"/>
+			<TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2" Margin="0,8,0,0" Text="Header B" HorizontalAlignment="Center" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" FontWeight="Bold"/>
+			<Label Grid.Row="1" Grid.Column="3" Content="B stuff:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="1" Grid.Column="4" Margin="0,8,0,0"/>
+			<Label Grid.Row="2" Grid.Column="3" Content="B stuff 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<TextBox Grid.Row="2" Grid.Column="4"  Grid.ColumnSpan="2" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Left" Width="200"/>
+			<Label Grid.Row="3" Grid.Column="3" Content="B stuff 3:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<TextBox Grid.Row="3" Grid.Column="4"  Grid.ColumnSpan="2" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Left" Width="200"/>
+			<Label Grid.Row="4" Grid.Column="3" Content="B stuff 4:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="4" Grid.Column="4" Margin="0,8,0,0"/>
+			<Label Grid.Row="5" Grid.Column="3" Content="B stuff 5:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="5" Grid.Column="4" Margin="0,8,0,0"/>
+		</Grid>
+		<Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Name="bottom">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="70" MaxWidth="300"/>
+				<ColumnDefinition Width="14" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="20" MaxWidth="50"/>
+				<ColumnDefinition Width="14" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="1*" MinWidth="70" MaxWidth="300"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,13,0,0"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,8,0,0" Text="Bottom Header" HorizontalAlignment="Center" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" FontWeight="Bold"/>
+			<Label Grid.Row="1" Grid.Column="0" Content="Bottom 1:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"/>
+			<Label Grid.Row="1" Grid.Column="3" Content="Bottom 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<TextBox Grid.Row="1" Grid.Column="4" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
+			<Label Grid.Row="1" Grid.Column="6" Content="Bottom 3:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="1" Grid.Column="7" Margin="0,8,0,0"/>
+		</Grid>
+	</Grid>
+</Window>

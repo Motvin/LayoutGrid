@@ -1,0 +1,49 @@
+﻿<Window x:Class="LayoutGridTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayoutGridTest"
+        mc:Ignorable="d"
+        Title="Test LayoutGrid" Height="450" Width="800">
+    <Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Label Grid.Row="0" Grid.Column="0" Content="Test Random LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Button Grid.Row="0" Grid.Column="1" Content="_All" Margin="5" Padding="4,0,4,0" Name="btnRandAll" MinWidth="70" Click="btnRandAll_Click"/>
+		<Button Grid.Row="0" Grid.Column="2" Content="_Many Children" Margin="5" Padding="4,0,4,0" Name="btnRandManyChildren" MinWidth="70" Click="btnRandManyChildren_Click"/>
+		<Button Grid.Row="0" Grid.Column="3" Content="_Spans" Margin="5" Padding="4" Name="btnRandSpans" MinWidth="70" Click="btnRandSpans_Click"/>
+		<Button Grid.Row="0" Grid.Column="4" Content="_Infinite" Margin="5" Padding="4" Name="btnRandInfinite" MinWidth="70" Click="btnRandInfinite_Click"/>
+		<Label Grid.Row="1" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
+		<Button Grid.Row="1" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn2" MinWidth="70"/>
+		<Button Grid.Row="1" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn3" MinWidth="70"/>
+		<Button Grid.Row="1" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn4" MinWidth="70"/>
+		<Label Grid.Row="2" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid 2:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
+		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>
+		<Button Grid.Row="2" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn23" MinWidth="70"/>
+		<Button Grid.Row="2" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn24" MinWidth="70"/>
+		<Label Grid.Row="3" Grid.Column="0" Content="Performance LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Button Grid.Row="3" Grid.Column="1" Content="Perf 1" Margin="5" Padding="4,0,4,0" Name="btnPerf1" MinWidth="70" Click="btnPerf1_Click"/>
+		<Button Grid.Row="3" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn32" MinWidth="70"/>
+		<Button Grid.Row="3" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn33" MinWidth="70"/>
+		<Button Grid.Row="3" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn34" MinWidth="70"/>
+	</Grid>
+</Window>
