@@ -100,7 +100,7 @@ namespace LayoutGridTest
 				)
 				{
 					seed++;
-					continue; // these are cases where we are correct and the existing Grid is wrong
+					continue; // these are cases where we are correct and Grid is wrong
 				}
 
 				if (seed == 1183)
@@ -146,7 +146,7 @@ namespace LayoutGridTest
 
 						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
 
-						string fileName = @"e:\proj\SpreadsheetOut\SectionGridRand.xlsx";
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
 						wb.SaveAs(fileName);
 
@@ -248,7 +248,7 @@ namespace LayoutGridTest
 				)
 				{
 					seed++;
-					continue; // these are cases where we are correct and the existing Grid is wrong
+					continue; // these are cases where we are correct and Grid is wrong
 				}
 
 				if (seed == 1030)
@@ -299,7 +299,7 @@ namespace LayoutGridTest
 
 						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
 
-						string fileName = @"e:\proj\SpreadsheetOut\SectionGridRand.xlsx";
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
 						wb.SaveAs(fileName);
 
@@ -358,14 +358,17 @@ namespace LayoutGridTest
 
 		public static void RunRandInfinite(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
-			int seed = 1;
+			int seed = 754;
 			while (true)
 			{
 				if (
 					seed == 49 || // span expands pixel sized col/row for Grid, it should not
 					seed == 268 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 358 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
+					//seed == 412 || // we constrain the available to the max, where Grid does not
 					seed == 425 || // Grid is correct and we are wrong.  We use the Min size as the constrained and this causes an uneven extra for span cols???
+					//seed == 457 || // we constrain the available to the max, where Grid does not
+					seed == 674 || // this is strange in that Grid somehow increases a column from a spanned col (but there is a star col in the span) and also the increase is completely unnecessary
 					seed == 668 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 1057 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 1457 || // we correctly distribute the extra evenly, where Grid does not
@@ -373,8 +376,9 @@ namespace LayoutGridTest
 				)
 				{
 					seed++;
-					continue; // these are cases where we are correct and the existing Grid is wrong
+					continue; // these are cases where we are correct and Grid is wrong
 				}
+
 				if (seed == 1458)
 				{
 					break;
@@ -418,7 +422,7 @@ namespace LayoutGridTest
 
 						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
 
-						string fileName = @"e:\proj\SpreadsheetOut\SectionGridRand.xlsx";
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
 						wb.SaveAs(fileName);
 
@@ -477,17 +481,17 @@ namespace LayoutGridTest
 			double gridMeasureNanoSecs = 0;
 			double gridArrangeNanoSecs = 0;
 
-			double sectionGridMeasureNanoSecs = 0;
-			double sectionGridArrangeNanoSecs = 0;
+			double layoutGridMeasureNanoSecs = 0;
+			double layoutGridArrangeNanoSecs = 0;
 
 			int gridMeasureCount = 0;
 			int gridArrangeCount = 0;
 
-			int sectionGridMeasureCount = 0;
-			int sectionGridArrangeCount = 0;
+			int layoutGridMeasureCount = 0;
+			int layoutGridArrangeCount = 0;
 
 			double gridConstructorNanoSecsTotal = 0;
-			double sectionGridConstructorNanoSecsTotal = 0;
+			double layoutGridConstructorNanoSecsTotal = 0;
 
 			double preMeasureNanoSecsTotal = 0;
 			double measureNanoSecsTotal = 0;
@@ -546,14 +550,14 @@ namespace LayoutGridTest
 				PerfStatic.DoGCCollect();
 				startTicks = Stopwatch.GetTimestamp();
 
-				PerfSectionGrid g2 = new PerfSectionGrid();
+				PerfLayoutGrid g2 = new PerfLayoutGrid();
 
 				endTicks = Stopwatch.GetTimestamp();
 
 				ticks = (double)(endTicks - startTicks);
 
 				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(ticks, Stopwatch.Frequency);
-				sectionGridConstructorNanoSecsTotal += nanoSecs;
+				layoutGridConstructorNanoSecsTotal += nanoSecs;
 
 				g1.Name = "grd";
 				GridLog.SetupRandomGrid(g1, seed);
@@ -631,10 +635,10 @@ namespace LayoutGridTest
 				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(ticks, Stopwatch.Frequency);
 				gridConstructorNanoSecsTotal += nanoSecs;
 
-				sectionGridMeasureNanoSecs += g2.measureNanoSecsTotal;
-				sectionGridArrangeNanoSecs += g2.arrangeNanoSecsTotal;
-				sectionGridMeasureCount += g2.measureCount;
-				sectionGridArrangeCount += g2.arrangeCount;
+				layoutGridMeasureNanoSecs += g2.measureNanoSecsTotal;
+				layoutGridArrangeNanoSecs += g2.arrangeNanoSecsTotal;
+				layoutGridMeasureCount += g2.measureCount;
+				layoutGridArrangeCount += g2.arrangeCount;
 				win2.Close();
 
 				PerfStatic.DoGCCollect();
@@ -655,38 +659,38 @@ namespace LayoutGridTest
 					string contents = "";
 
 					contents += "Grid1 Contructor Nano Secs=" + gridConstructorNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Contructor Nano Secs=" + sectionGridConstructorNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Contructor Nano Secs=" + layoutGridConstructorNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Measure Nano Secs=" + gridMeasureNanoSecs.ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Measure Nano Secs=" + sectionGridMeasureNanoSecs.ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Measure Nano Secs=" + layoutGridMeasureNanoSecs.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Arrange Nano Secs=" + gridArrangeNanoSecs.ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Arrange Nano Secs=" + sectionGridArrangeNanoSecs.ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Arrange Nano Secs=" + layoutGridArrangeNanoSecs.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Measure Count=" + gridMeasureCount.ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Measure Count=" + sectionGridMeasureCount.ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Measure Count=" + layoutGridMeasureCount.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Arrange Count=" + gridArrangeCount.ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Arrange Count=" + sectionGridArrangeCount.ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Arrange Count=" + layoutGridArrangeCount.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "showCount=" + showCount.ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Constructor Nano Secs Avg=" + (gridConstructorNanoSecsTotal / Math.Max(showCount, 1)).ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Constructor Nano Secs Avg=" + (sectionGridConstructorNanoSecsTotal / Math.Max(showCount, 1)).ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Constructor Nano Secs Avg=" + (layoutGridConstructorNanoSecsTotal / Math.Max(showCount, 1)).ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Measure Nano Secs Avg=" + (gridMeasureNanoSecs / Math.Max(gridMeasureCount, 1)).ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Measure Nano Secs Avg=" + (sectionGridMeasureNanoSecs / Math.Max(sectionGridMeasureCount, 1)).ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Measure Nano Secs Avg=" + (layoutGridMeasureNanoSecs / Math.Max(layoutGridMeasureCount, 1)).ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					contents += "Grid1 Arrange Nano Secs Avg=" + (gridArrangeNanoSecs / Math.Max(gridArrangeCount, 1)).ToString("#,##0") + Environment.NewLine;
-					contents += "Grid2 Arrange Nano Secs Avg=" + (sectionGridArrangeNanoSecs / Math.Max(sectionGridArrangeCount, 1)).ToString("#,##0") + Environment.NewLine;
+					contents += "Grid2 Arrange Nano Secs Avg=" + (layoutGridArrangeNanoSecs / Math.Max(layoutGridArrangeCount, 1)).ToString("#,##0") + Environment.NewLine;
 					contents += Environment.NewLine;
 
 					double nonChildMeasureNanoSecsTotal = preMeasureNanoSecsTotal + measureNanoSecsTotal + postMeasureNanoSecsTotal + shortMeasureNanoSecsTotal - childMeasureNanoSecsTotal;

@@ -54,7 +54,7 @@ namespace LayoutGridTest
 		}
 	}
 
-	public class PerfSectionGrid : LayoutGrid
+	public class PerfLayoutGrid : LayoutGrid
 	{
 		public double measureNanoSecsTotal = 0;
 		public double arrangeNanoSecsTotal = 0;
