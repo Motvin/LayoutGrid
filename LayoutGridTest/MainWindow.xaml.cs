@@ -358,7 +358,7 @@ namespace LayoutGridTest
 
 		public static void RunRandInfinite(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
-			int seed = 754;
+			int seed = 1;
 			while (true)
 			{
 				if (
