@@ -48,7 +48,8 @@ namespace LayoutGridTest
 		{
 			RunRandManyChildren();
 			RunRandSpans();
-			RunRandInfinite();
+			RunRand2();
+			RunRandStars();
 		}
 
 		private void btnRandManyChildren_Click(object sender, RoutedEventArgs e)
@@ -61,9 +62,14 @@ namespace LayoutGridTest
 			RunRandSpans();
 		}
 
-		private void btnRandInfinite_Click(object sender, RoutedEventArgs e)
+		private void btnRand2_Click(object sender, RoutedEventArgs e)
 		{
-			RunRandInfinite();
+			RunRand2();
+		}
+
+		private void btnRandStars_Click(object sender, RoutedEventArgs e)
+		{
+			RunRandStars();
 		}
 
 		private void btnPerf1_Click(object sender, RoutedEventArgs e)
@@ -71,7 +77,7 @@ namespace LayoutGridTest
 			RunPerformanceTest();
 		}
 
-		public static void RunRandManyChildren()
+		public static void RunRandManyChildren(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
 			int seed = 1;
 			while (true)
@@ -118,11 +124,11 @@ namespace LayoutGridTest
 				GridLog.CopyGridSetup(g1, g2);
 				g2.Name = "grd";
 
-				WindowPlain win1 = new WindowPlain(g1);
+				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
 				win1.Title = "Grid 1 Many Children";
 				win1.Show();
 
-				WindowPlain win2 = new WindowPlain(g2);
+				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
 				win2.Title = "Test Grid 2 Many Children";
 				win2.Show();
 
@@ -197,31 +203,24 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void RunRandSpans()
+		public static void RunRandSpans(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
 			int seed = 1;
 			while (true)
 			{
-				if (seed == 2 || // Grid is wrong, it doesn't distribute to auto rows equally because of a min, but min should have no bearing on this
-					seed == 4 ||
-					//seed == 22 || // Grid adds extra to a min constrained row where we take this min amount to be the extra, so we add more to the last row than Grid does - I think this makes more sense
-					//seed == 25 || // Grid adds extra to a min constrained col/row where we take this min amount to be the extra, so we add more to the other col/row s in the span than Grid does - I think this makes more sense
-					seed == 88 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed
-					seed == 94 ||
-					seed == 106 ||
-					seed == 157 ||
-					seed == 163 ||
-					seed == 167 ||
-					seed == 190 ||
-					seed == 228 ||
-					seed == 245 || // auto span ordering
-					seed == 255 ||
+				if (seed == 88 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed - this is because of resolving spans in a different order and possibly also not resolving the col width of children with rowspans before the width of any colspan children
+					seed == 94 || // span order
+					seed == 157 || // we are correct, Grid does not respect max size and goes past it for a colspan
+					seed == 163 || // span order
+					seed == 167 || // span order
+					seed == 190 || // Grid does not evenly expand auto cols for a colspan for some reason
+					seed == 245 || // span order
+					seed == 255 || // span order
 					seed == 324 || // this is an auto width that goes beyond the max, we constrain the desired/rendered size to max, but Grid does not, which chops off the border
 					seed == 348 || // this is 0* treated like pixel sizing
 					seed == 367 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed
 					seed == 371 || // this is 0* treated like pixel sizing
-					seed == 381 || // auto span ordering
-								   //seed == 383 || //*** min and auto span ordering
+					seed == 381 || // span order
 					seed == 384 || // this is 0* treated like pixel sizing
 					seed == 433 || // span order
 					seed == 450 || // this is 0* treated like pixel sizing
@@ -239,8 +238,8 @@ namespace LayoutGridTest
 					seed == 599 || // Grid is wrong.  Some Auto cols have controls that have desired width and rendered width > max
 					seed == 689 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed
 					seed == 729 || // Grid is wrong.  We use the extra space to not distribute more extra if not needed when overlapping spans.
-					seed == 808 || // both are wrong, there are some things that should be fixed???
-					seed == 835 || // probably different order of dealing with spans causes the difference
+					seed == 808 || // There is a rowspan(no colspan) with a higher cellgroup than the colspan that overlaps this col, the colspan is done first, although you could do the rowspan (only the single col width part of it) first - but it's probably not a big deal and we don't want to be calling measure more times than 1 per child when we don't have to
+					seed == 835 || // span order
 					seed == 856 || // we are correct in that we expand the auto cols equally, and Grid doesn't for some reason
 					seed == 944 || // different ordering, but if we have spanextra and then we set a width/height without a span, then this should be subtracted from the extra (down to 0)???
 					seed == 1029 || // we are correct, Grid does not respect max size and goes past it
@@ -271,11 +270,11 @@ namespace LayoutGridTest
 				GridLog.CopyGridSetup(g1, g2);
 				g2.Name = "grd";
 
-				WindowPlain win1 = new WindowPlain(g1);
+				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
 				win1.Title = "Grid 1 Spans";
 				win1.Show();
 
-				WindowPlain win2 = new WindowPlain(g2);
+				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
 				win2.Title = "Test Grid 2 Spans";
 				win2.Show();
 
@@ -356,7 +355,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void RunRandInfinite(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		public static void RunRand2(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
 			int seed = 1;
 			while (true)
@@ -365,9 +364,7 @@ namespace LayoutGridTest
 					seed == 49 || // span expands pixel sized col/row for Grid, it should not
 					seed == 268 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 358 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
-					//seed == 412 || // we constrain the available to the max, where Grid does not
-					seed == 425 || // Grid is correct and we are wrong.  We use the Min size as the constrained and this causes an uneven extra for span cols???
-					//seed == 457 || // we constrain the available to the max, where Grid does not
+					//seed == 425 || // Grid is correct and we are wrong.  We use the Min size as the constrained and this causes an uneven extra for span cols???
 					seed == 674 || // this is strange in that Grid somehow increases a column from a spanned col (but there is a star col in the span) and also the increase is completely unnecessary
 					seed == 668 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 1057 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
@@ -395,11 +392,11 @@ namespace LayoutGridTest
 				g2.Name = "grd";
 
 				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
-				win1.Title = "Grid 1 Infinite";
+				win1.Title = "Grid 1 Rand 2";
 				win1.Show();
 
 				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
-				win2.Title = "Test Grid 2 Infinite";
+				win2.Title = "Test Grid 2 Rand 2";
 				win2.Show();
 
 				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
@@ -471,6 +468,165 @@ namespace LayoutGridTest
 				}
 				seed++;
 			}
+		}
+
+		public static void RunRandStars(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		{
+			int seed = 1;
+			while (true)
+			{
+				if (seed == 611 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 3216 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 4931 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 5266 || // Grid has a .01 difference in a star col, we are correct since we add up to the width
+					seed == 10269 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 10577 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 10614 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+					seed == 10721 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 11540 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
+
+					1 == 0
+				)
+				{
+					seed++;
+					continue; // these are cases where we are correct and Grid is wrong
+				}
+
+				if (seed == 11541)
+				{
+					break;
+				}
+
+				Grid g1 = new Grid();
+
+				g1.Name = "grd";
+				GridLog.SetupRandomGridStars(g1, seed);
+
+				LayoutGrid g2 = new LayoutGrid();
+
+				GridLog.CopyGridSetup(g1, g2);
+				g2.Name = "grd";
+
+				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.Title = "Grid 1 Stars";
+				win1.Show();
+
+				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.Title = "Test Grid 2 Stars";
+				win2.Show();
+
+				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
+				StringBuilder sb2 = GridLog.CreateGridString(g2, seed);
+
+				string s1 = sb1.ToString();
+				string s2 = sb2.ToString();
+
+				if (string.Equals(s1, s2, StringComparison.Ordinal))
+				{
+					win1.Close();
+					win2.Close();
+				}
+				else
+				{
+					Workbook wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
+
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.ToString(), ex.Message);
+					}
+					finally
+					{
+						if (wb != null)
+						{
+							wb.Close();
+						}
+					}
+
+					wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1);
+
+						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.ToString(), ex.Message);
+					}
+					finally
+					{
+						if (wb != null)
+						{
+							wb.Close();
+						}
+					}
+
+					break;
+				}
+				seed++;
+			}
+		}
+
+		//??? compare the result of this with the grids actual width/height and flag any differences 
+		public static double SumColWidthsOrRowHeights(LayoutGrid g, bool getCol, out double starCount)
+		{
+			double sumLength = 0;
+
+			starCount = 0;
+
+			if (getCol)
+			{
+				for (int i = 0; i < g.ColumnDefinitions.Count; i++)
+				{
+					sumLength += g.GetColWidth(i);
+
+					ColumnDefinition c = g.ColumnDefinitions[i];
+					if (c.Width.IsStar)
+					{
+						starCount += c.Width.Value;
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < g.RowDefinitions.Count; i++)
+				{
+					sumLength += g.GetRowHeight(i);
+
+					RowDefinition c = g.RowDefinitions[i];
+					if (c.Height.IsStar)
+					{
+						starCount += c.Height.Value;
+					}
+				}
+			}
+
+			return sumLength;
 		}
 
 		public static void RunPerformanceTest()

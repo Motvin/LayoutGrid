@@ -275,7 +275,10 @@ namespace Motvin.LayoutGrid
 			public double minPixelLength;
 			public double maxPixelLength;
 
+			//??? remove this, or if more efficient keep it and remove stars
 			public double starLengthPercent; // this is the star length provided by the user and then later converted to total star length percent (i.e. if 1 originally and total stars = 4, then this becomes 1/4 = .25)
+
+			public double stars;
 
 			public LayoutGridUnitType unitType;
 			public LayoutGridUnitType effectiveUnitType; // star unit types can become auto if the available width or height is infinite - this can be set again in MeasureOverride - probably we can remove this and just make the logic slightly more complicated???
@@ -300,25 +303,41 @@ namespace Motvin.LayoutGrid
 			public ushort rowFlags; // 2 bytes
 		}
 
-		private struct LengthAndIndex
+		//??? remove this
+		//private struct ColRowGlobals
+		//{
+		//	public double totalMinStarLength; // either col width or row height
+		//	public double totalMaxStarLength; // either col width or row height
+
+		//	public StarMinMax[] starMinDescArray;
+		//	public int starMinDescArrayCount;
+
+		//	public StarMinMax[] starMaxAscArray;
+		//	public int starMaxAscArrayCount;
+
+		//	public GridColRowInfo[] colRowInfoArray;
+		//	public int colRowInfoArrayCount;
+		//}
+
+		private struct StarMinMax
 		{
-			public double length;
-			public int index;
+			public int index; // the col or row index
+			public double minOrMaxPerStar; // this is minPixelLength or maxPixelLength divided by # of stars for the col/row
 		}
 
-		private class CompareLengthAndIndexByLength : IComparer<LengthAndIndex>
+		private class CompareStarMinMaxByPerStar : IComparer<StarMinMax>
 		{
-			public int Compare(LengthAndIndex x, LengthAndIndex y)
+			public int Compare(StarMinMax x, StarMinMax y)
 			{
-				return x.length.CompareTo(y.length);
+				return x.minOrMaxPerStar.CompareTo(y.minOrMaxPerStar);
 			}
 		}
 
-		private class CompareLengthAndIndexByLengthDesc : IComparer<LengthAndIndex>
+		private class CompareStarMinMaxByPerStarDesc : IComparer<StarMinMax>
 		{
-			public int Compare(LengthAndIndex x, LengthAndIndex y)
+			public int Compare(StarMinMax x, StarMinMax y)
 			{
-				return -x.length.CompareTo(y.length);
+				return -x.minOrMaxPerStar.CompareTo(y.minOrMaxPerStar);
 			}
 		}
 
@@ -377,8 +396,8 @@ namespace Motvin.LayoutGrid
 		public int shortArrangeCount;
 #endif
 
-		private CompareLengthAndIndexByLength compareLengthAndIndexByLength = new CompareLengthAndIndexByLength(); //??? maybe create only if needed
-		private CompareLengthAndIndexByLengthDesc compareLengthAndIndexByLengthDesc = new CompareLengthAndIndexByLengthDesc(); //??? maybe create only if needed
+		private CompareStarMinMaxByPerStar compareStarMinMaxByPerStar = new CompareStarMinMaxByPerStar(); //??? maybe create only if needed
+		private CompareStarMinMaxByPerStarDesc compareStarMinMaxByPerStarDesc = new CompareStarMinMaxByPerStarDesc(); //??? maybe create only if needed
 		private CompareChildInfoByCellGroup compareChildInfoByCellGroup;
 
 		private bool haveColsChanged;
@@ -420,17 +439,17 @@ namespace Motvin.LayoutGrid
 		private GridColRowInfo[] rowInfoArray;
 		private int rowInfoArrayCount;
 
-		private LengthAndIndex[] starColIndexesOrderedByMaxAsc; // this gets set even if there aren't any max or a single max just so we don't have to loop through all cols when looping through star cols
-		private int starColIndexesOrderedByMaxAscCount;
+		private StarMinMax[] starColMinArray;
+		private int starColMinArrayCount;
 
-		private LengthAndIndex[] starColIndexesOrderedByMinDesc;
-		private int starColIndexesOrderedByMinDescCount;
+		private StarMinMax[] starColMaxArray;
+		private int starColMaxArrayCount;
 
-		private LengthAndIndex[] starRowIndexesOrderedByMaxAsc; // this gets set even if there aren't any max or a single max just so we don't have to loop through all rows when looping through star rows
-		private int starRowIndexesOrderedByMaxAscCount;
+		private StarMinMax[] starRowMinArray;
+		private int starRowMinArrayCount;
 
-		private LengthAndIndex[] starRowIndexesOrderedByMinDesc;
-		private int starRowIndexesOrderedByMinDescCount;
+		private StarMinMax[] starRowMaxArray;
+		private int starRowMaxArrayCount;
 
 		internal ChildInfo[] childInfoArray;
 		internal int childInfoArrayCount; // the # of elems in the array that are being used
@@ -496,6 +515,7 @@ namespace Motvin.LayoutGrid
 					cr.effectiveUnitType = LayoutGridUnitType.Star;
 				}
 
+				cr.stars = 1.0;
 				cr.starLengthPercent = 1.0;
 				cr.maxPixelLength = double.PositiveInfinity;
 
@@ -583,6 +603,7 @@ namespace Motvin.LayoutGrid
 								}
 
 								starColCount++;
+								cr.stars = c.Width.Value;
 								cr.starLengthPercent = c.Width.Value;
 								if (cr.minPixelLength != 0)
 								{
@@ -597,21 +618,22 @@ namespace Motvin.LayoutGrid
 				}
 			}
 
-			starColIndexesOrderedByMaxAscCount = starColCount;
-			starColIndexesOrderedByMinDescCount = starColCountMinNotZero;
+			starColMaxArrayCount = starColCount;
+			starColMinArrayCount = starColCountMinNotZero;
+
 			if (starColCount > 0)
 			{
-				if (starColIndexesOrderedByMaxAsc == null || starColIndexesOrderedByMaxAsc.Length < starColIndexesOrderedByMaxAscCount)
+				if (starColMaxArray == null || starColMaxArray.Length < starColMaxArrayCount)
 				{
-					starColIndexesOrderedByMaxAsc = new LengthAndIndex[starColIndexesOrderedByMaxAscCount];
+					starColMaxArray = new StarMinMax[starColMaxArrayCount];
 				}
 
-				if (starColIndexesOrderedByMinDescCount > 0 && (starColIndexesOrderedByMinDesc == null || starColIndexesOrderedByMinDesc.Length < starColIndexesOrderedByMinDescCount))
+				if (starColMinArrayCount > 0 && (starColMinArray == null || starColMinArray.Length < starColMinArrayCount))
 				{
-					starColIndexesOrderedByMinDesc = new LengthAndIndex[starColIndexesOrderedByMinDescCount];
+					starColMinArray = new StarMinMax[starColMinArrayCount];
 				}
 
-				LengthAndIndex x;
+				StarMinMax s;
 				int starIndexMax = 0;
 				int starIndexMin = 0;
 				for (int i = 0; i < colInfoArrayCount; i++)
@@ -622,47 +644,35 @@ namespace Motvin.LayoutGrid
 					{
 						cr.starLengthPercent /= totalStarsInCols; // convert from star length to star length percent
 
-						x.index = i;
+						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
 						{
-							x.length = double.PositiveInfinity;
+							s.minOrMaxPerStar = double.PositiveInfinity;
 						}
 						else
 						{
-							x.length = cr.maxPixelLength / cr.starLengthPercent;
+							s.minOrMaxPerStar = cr.maxPixelLength / cr.stars;
 						}
 
-						starColIndexesOrderedByMaxAsc[starIndexMax++] = x;
+						starColMaxArray[starIndexMax++] = s;
 
-						if (starColIndexesOrderedByMinDescCount > 0 && cr.minPixelLength > 0)
+						if (starColMinArrayCount > 0 && cr.minPixelLength > 0)
 						{
-							x.length = cr.minPixelLength / cr.starLengthPercent;
+							s.minOrMaxPerStar = cr.minPixelLength / cr.stars;
 
-							starColIndexesOrderedByMinDesc[starIndexMin++] = x;
+							starColMinArray[starIndexMin++] = s;
 						}
 					}
 				}
 
-				if (starColIndexesOrderedByMaxAscCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelColWidth))
+				if (starColMaxArrayCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelColWidth))
 				{
-					Array.Sort(starColIndexesOrderedByMaxAsc, 0, starColIndexesOrderedByMaxAscCount, compareLengthAndIndexByLength);
+					Array.Sort(starColMaxArray, 0, starColMaxArrayCount, compareStarMinMaxByPerStar);
 				}
 
-				if (starColIndexesOrderedByMinDescCount > 1 && largestStarMinPixelColWidth > 0)
+				if (starColMinArrayCount > 1 && largestStarMinPixelColWidth > 0)
 				{
-					Array.Sort(starColIndexesOrderedByMinDesc, 0, starColIndexesOrderedByMinDescCount, compareLengthAndIndexByLengthDesc);
-				}
-
-				double availableStarPercent;
-				double len;
-
-				availableStarPercent = 1.0; // 1.0 means 100% is available
-				for (int i = 0; i < starColIndexesOrderedByMinDescCount; i++)
-				{
-					ref LengthAndIndex t = ref starColIndexesOrderedByMinDesc[i];
-					len = colInfoArray[t.index].starLengthPercent;
-					t.length = len / availableStarPercent;
-					availableStarPercent -= len;
+					Array.Sort(starColMinArray, 0, starColMinArrayCount, compareStarMinMaxByPerStarDesc);
 				}
 			}
 
@@ -708,6 +718,7 @@ namespace Motvin.LayoutGrid
 					cr.effectiveUnitType = LayoutGridUnitType.Star;
 				}
 
+				cr.stars = 1.0;
 				cr.starLengthPercent = 1.0;
 				cr.maxPixelLength = double.PositiveInfinity;
 
@@ -752,8 +763,8 @@ namespace Motvin.LayoutGrid
 					switch (cr.unitType) // use unitType instead of effectiveUnitType here
 					{
 						//case LayoutGridUnitType.Auto:
-						//	cr.constrainedPixelLength = cr.minPixelLength;
-						//	totalAutoRowHeight += cr.constrainedPixelLength; //??? don't do this because it messes up distributing spans evenly
+						//	cr.constrainedPixelLength = cr.minPixelLength; //??? don't do this because it messes up distributing spans evenly
+						//	totalAutoRowHeight += cr.constrainedPixelLength;
 						//	break;
 						case LayoutGridUnitType.Pixel:
 							if (c.Height.Value > cr.maxPixelLength)
@@ -795,6 +806,7 @@ namespace Motvin.LayoutGrid
 								}
 
 								starRowCount++;
+								cr.stars = c.Height.Value;
 								cr.starLengthPercent = c.Height.Value;
 								if (cr.minPixelLength != 0)
 								{
@@ -809,21 +821,22 @@ namespace Motvin.LayoutGrid
 				}
 			}
 
-			starRowIndexesOrderedByMaxAscCount = starRowCount;
-			starRowIndexesOrderedByMinDescCount = starRowCountMinNotZero;
+			starRowMaxArrayCount = starRowCount;
+			starRowMinArrayCount = starRowCountMinNotZero;
+
 			if (starRowCount > 0)
 			{
-				if (starRowIndexesOrderedByMaxAsc == null || starRowIndexesOrderedByMaxAsc.Length < starRowIndexesOrderedByMaxAscCount)
+				if (starRowMaxArray == null || starRowMaxArray.Length < starRowMaxArrayCount)
 				{
-					starRowIndexesOrderedByMaxAsc = new LengthAndIndex[starRowIndexesOrderedByMaxAscCount];
+					starRowMaxArray = new StarMinMax[starRowMaxArrayCount];
 				}
 
-				if (starRowIndexesOrderedByMinDescCount > 0 && (starRowIndexesOrderedByMinDesc == null || starRowIndexesOrderedByMinDesc.Length < starRowIndexesOrderedByMinDescCount))
+				if (starRowMinArrayCount > 0 && (starRowMinArray == null || starRowMinArray.Length < starRowMinArrayCount))
 				{
-					starRowIndexesOrderedByMinDesc = new LengthAndIndex[starRowIndexesOrderedByMinDescCount];
+					starRowMinArray = new StarMinMax[starRowMinArrayCount];
 				}
 
-				LengthAndIndex x;
+				StarMinMax s;
 				int starIndexMax = 0;
 				int starIndexMin = 0;
 				for (int i = 0; i < rowInfoArrayCount; i++)
@@ -834,47 +847,35 @@ namespace Motvin.LayoutGrid
 					{
 						cr.starLengthPercent /= totalStarsInRows; // convert from star length to star length percent
 
-						x.index = i;
+						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
 						{
-							x.length = double.PositiveInfinity;
+							s.minOrMaxPerStar = double.PositiveInfinity;
 						}
 						else
 						{
-							x.length = cr.maxPixelLength / cr.starLengthPercent;
+							s.minOrMaxPerStar = cr.maxPixelLength / cr.stars;
 						}
 
-						starRowIndexesOrderedByMaxAsc[starIndexMax++] = x;
+						starRowMaxArray[starIndexMax++] = s;
 
-						if (starRowIndexesOrderedByMinDescCount > 0 && cr.minPixelLength > 0)
+						if (starRowMinArrayCount > 0 && cr.minPixelLength > 0)
 						{
-							x.length = cr.minPixelLength / cr.starLengthPercent;
+							s.minOrMaxPerStar = cr.minPixelLength / cr.stars;
 
-							starRowIndexesOrderedByMinDesc[starIndexMin++] = x;
+							starRowMinArray[starIndexMin++] = s;
 						}
 					}
 				}
 
-				if (starRowIndexesOrderedByMaxAscCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelRowHeight))
+				if (starRowMaxArrayCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelRowHeight))
 				{
-					Array.Sort(starRowIndexesOrderedByMaxAsc, 0, starRowIndexesOrderedByMaxAscCount, compareLengthAndIndexByLength);
+					Array.Sort(starRowMaxArray, 0, starRowMaxArrayCount, compareStarMinMaxByPerStar);
 				}
 
-				if (starRowIndexesOrderedByMinDescCount > 1 && largestStarMinPixelRowHeight > 0)
+				if (starRowMinArrayCount > 1 && largestStarMinPixelRowHeight > 0)
 				{
-					Array.Sort(starRowIndexesOrderedByMinDesc, 0, starRowIndexesOrderedByMinDescCount, compareLengthAndIndexByLengthDesc);
-				}
-
-				double availableStarPercent;
-				double len;
-
-				availableStarPercent = 1.0; // 1.0 means 100% is available
-				for (int i = 0; i < starRowIndexesOrderedByMinDescCount; i++)
-				{
-					ref LengthAndIndex t = ref starRowIndexesOrderedByMinDesc[i];
-					len = rowInfoArray[t.index].starLengthPercent;
-					t.length = len / availableStarPercent;
-					availableStarPercent -= len;
+					Array.Sort(starRowMinArray, 0, starRowMinArrayCount, compareStarMinMaxByPerStarDesc);
 				}
 			}
 
@@ -1134,26 +1135,28 @@ namespace Motvin.LayoutGrid
 			}
 		}
 
-		private void DistributeStarColWidth(double starColWidth)
+		private void DistributeStarColWidth(double starLength)
 		{
 			int idx;
-			if (starColWidth < totalMinStarColWidth)
+			int j;
+
+			if (starLength <= totalMinStarColWidth)
 			{
 				// just assign min to all star cols
-				for (int i = 0; i < starColIndexesOrderedByMaxAscCount; i++)
+				for (int i = 0; i < starColMaxArrayCount; i++)
 				{
-					idx = starColIndexesOrderedByMaxAsc[i].index;
+					idx = starColMaxArray[i].index;
 
 					ref GridColRowInfo cr = ref colInfoArray[idx];
 					cr.constrainedPixelLength = cr.minPixelLength;
 				}
 			}
-			else if (starColWidth > totalMaxStarColWidth)
+			else if (starLength >= totalMaxStarColWidth)
 			{
 				// just assign max to all star cols
-				for (int i = 0; i < starColIndexesOrderedByMaxAscCount; i++)
+				for (int i = 0; i < starColMaxArrayCount; i++)
 				{
-					idx = starColIndexesOrderedByMaxAsc[i].index;
+					idx = starColMaxArray[i].index;
 
 					ref GridColRowInfo cr = ref colInfoArray[idx];
 					cr.constrainedPixelLength = cr.maxPixelLength;
@@ -1161,34 +1164,35 @@ namespace Motvin.LayoutGrid
 			}
 			else
 			{
-				double availableForMaxLoop = starColWidth;
-				double availablePercentForMaxLoop = 1.0;
+				double availablePixels = starLength;
+				double availableStars = totalStarsInCols;
 
-				double pixels;
+				double pixelsPerStar;
+				pixelsPerStar = availablePixels / availableStars;
 
-				// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-				for (int i = 0; i < starColIndexesOrderedByMaxAscCount; i++)
+				int lastMinConstrainedIndex = -1;
+
+				int unresolvedCount = starColMaxArrayCount;
+
+				// loop through mins (if any)
+				for (int i = 0; i < starColMinArrayCount; i++)
 				{
-					ref LengthAndIndex t = ref starColIndexesOrderedByMaxAsc[i];
+					ref StarMinMax t = ref starColMinArray[i];
 
 					ref GridColRowInfo cr = ref colInfoArray[t.index];
 
-					cr.constrainedPixelLength = 0;
-				}
-
-				// loop through mins (if any) and subtract from availableForMaxLoop
-				for (int i = 0; i < starColIndexesOrderedByMinDescCount; i++)
-				{
-					ref LengthAndIndex t = ref starColIndexesOrderedByMinDesc[i];
-
-					ref GridColRowInfo cr = ref colInfoArray[t.index];
-
-					pixels = availableForMaxLoop * t.length;
-					if (pixels < cr.minPixelLength)
+					if (pixelsPerStar < t.minOrMaxPerStar)
 					{
-						availableForMaxLoop -= cr.minPixelLength;
-						availablePercentForMaxLoop -= cr.starLengthPercent;
+						availablePixels -= cr.minPixelLength;
+						availableStars -= cr.stars;
+
+						pixelsPerStar = availablePixels / availableStars;
+
 						cr.constrainedPixelLength = cr.minPixelLength;
+
+						lastMinConstrainedIndex = i;
+
+						unresolvedCount--;
 					}
 					else
 					{
@@ -1196,76 +1200,92 @@ namespace Motvin.LayoutGrid
 					}
 				}
 
-				for (int i = 0; i < starColIndexesOrderedByMaxAscCount; i++)
+				// loop through maxs - this includes everything even if the col/row doens't have a max - it will have infinity as max
+				for (int i = 0; i < starColMaxArrayCount; i++)
 				{
-					ref LengthAndIndex t = ref starColIndexesOrderedByMaxAsc[i];
+					ref StarMinMax t = ref starColMaxArray[i];
 
 					ref GridColRowInfo cr = ref colInfoArray[t.index];
 
-					if (cr.constrainedPixelLength > 0)
+					if (pixelsPerStar > t.minOrMaxPerStar)
 					{
-						// this means the col/row was already min constrained
-						// see if any recalculation can change it past the constrained (which = min)
+						availablePixels -= cr.maxPixelLength;
+						availableStars -= cr.stars;
 
-						pixels = (availableForMaxLoop + cr.constrainedPixelLength) * (cr.starLengthPercent / (availablePercentForMaxLoop + cr.starLengthPercent));
-						if (pixels > cr.constrainedPixelLength)
+						pixelsPerStar = availablePixels / availableStars;
+
+						cr.constrainedPixelLength = cr.maxPixelLength;
+
+						unresolvedCount--;
+
+						j = lastMinConstrainedIndex;
+						while (j >= 0)
 						{
-							if (pixels > cr.maxPixelLength)
-							{
-								availableForMaxLoop -= (cr.maxPixelLength - cr.constrainedPixelLength);
+							ref StarMinMax tMin = ref starColMinArray[j];
 
-								cr.constrainedPixelLength = cr.maxPixelLength;
+							ref GridColRowInfo crMin = ref colInfoArray[tMin.index];
+
+							if (pixelsPerStar > tMin.minOrMaxPerStar)
+							{
+								availablePixels += crMin.minPixelLength;
+								availableStars += crMin.stars;
+
+								pixelsPerStar = availablePixels / availableStars;
+
+								crMin.constrainedPixelLength = 0; // this will get reprocessed in the outer max loop
+
+								lastMinConstrainedIndex = --j;
+
+								unresolvedCount++;
 							}
 							else
 							{
-								availableForMaxLoop -= (pixels - cr.constrainedPixelLength);
-
-								cr.constrainedPixelLength = pixels;
+								break;
 							}
 						}
 					}
-					else
+					else if (cr.constrainedPixelLength == 0)
 					{
-						pixels = availableForMaxLoop * (cr.starLengthPercent / availablePercentForMaxLoop);
-						if (pixels > cr.maxPixelLength)
+						if (unresolvedCount == 1)
 						{
-							availableForMaxLoop -= cr.maxPixelLength;
+							cr.constrainedPixelLength = availablePixels; // the last col/row takes all remaining pixels
 
-							cr.constrainedPixelLength = cr.maxPixelLength;
-						}
-						else
-						{
-							availableForMaxLoop -= pixels;
-
-							cr.constrainedPixelLength = pixels;
+							break;
 						}
 
-						availablePercentForMaxLoop -= cr.starLengthPercent;
+						cr.constrainedPixelLength = cr.stars * pixelsPerStar;
+
+						availablePixels -= cr.constrainedPixelLength;
+						availableStars -= cr.stars;
+
+						unresolvedCount--;
 					}
 				}
 			}
 		}
 
-		private void DistributeStarRowHeight(double starRowHeight)
+		private void DistributeStarRowHeight(double starLength)
 		{
 			int idx;
-			if (starRowHeight < totalMinStarRowHeight)
+			int j;
+
+			if (starLength <= totalMinStarRowHeight)
 			{
 				// just assign min to all star rows
-				for (int i = 0; i < starRowIndexesOrderedByMaxAscCount; i++)
+				for (int i = 0; i < starRowMaxArrayCount; i++)
 				{
-					idx = starRowIndexesOrderedByMaxAsc[i].index;
+					idx = starRowMaxArray[i].index;
 
 					ref GridColRowInfo cr = ref rowInfoArray[idx];
 					cr.constrainedPixelLength = cr.minPixelLength;
 				}
 			}
-			else if (starRowHeight > totalMaxStarRowHeight)
+			else if (starLength >= totalMaxStarRowHeight)
 			{
 				// just assign max to all star rows
-				for (int i = 0; i < starRowIndexesOrderedByMaxAscCount; i++)
+				for (int i = 0; i < starRowMaxArrayCount; i++)
 				{
-					idx = starRowIndexesOrderedByMaxAsc[i].index;
+					idx = starRowMaxArray[i].index;
 
 					ref GridColRowInfo cr = ref rowInfoArray[idx];
 					cr.constrainedPixelLength = cr.maxPixelLength;
@@ -1273,24 +1293,35 @@ namespace Motvin.LayoutGrid
 			}
 			else
 			{
-				double availableForMaxLoop = starRowHeight;
-				double availablePercentForMaxLoop = 1.0;
+				double availablePixels = starLength;
+				double availableStars = totalStarsInRows;
 
-				double pixels;
+				double pixelsPerStar;
+				pixelsPerStar = availablePixels / availableStars;
 
-				// loop through mins (if any) and subtract from availableForMaxLoop
-				for (int i = 0; i < starRowIndexesOrderedByMinDescCount; i++)
+				int lastMinConstrainedIndex = -1;
+
+				int unresolvedCount = starRowMaxArrayCount;
+
+				// loop through mins (if any)
+				for (int i = 0; i < starRowMinArrayCount; i++)
 				{
-					ref LengthAndIndex t = ref starRowIndexesOrderedByMinDesc[i];
+					ref StarMinMax t = ref starRowMinArray[i];
 
 					ref GridColRowInfo cr = ref rowInfoArray[t.index];
 
-					pixels = availableForMaxLoop * t.length;
-					if (pixels < cr.minPixelLength)
+					if (pixelsPerStar < t.minOrMaxPerStar)
 					{
-						availableForMaxLoop -= cr.minPixelLength;
-						availablePercentForMaxLoop -= cr.starLengthPercent;
+						availablePixels -= cr.minPixelLength;
+						availableStars -= cr.stars;
+
+						pixelsPerStar = availablePixels / availableStars;
+
 						cr.constrainedPixelLength = cr.minPixelLength;
+
+						lastMinConstrainedIndex = i;
+
+						unresolvedCount--;
 					}
 					else
 					{
@@ -1298,51 +1329,65 @@ namespace Motvin.LayoutGrid
 					}
 				}
 
-				for (int i = 0; i < starRowIndexesOrderedByMaxAscCount; i++)
+				// loop through maxs - this includes everything even if the row/row doens't have a max - it will have infinity as max
+				for (int i = 0; i < starRowMaxArrayCount; i++)
 				{
-					ref LengthAndIndex t = ref starRowIndexesOrderedByMaxAsc[i];
+					ref StarMinMax t = ref starRowMaxArray[i];
 
 					ref GridColRowInfo cr = ref rowInfoArray[t.index];
 
-					if (cr.constrainedPixelLength > 0)
+					if (pixelsPerStar > t.minOrMaxPerStar)
 					{
-						// this means the row/row was already min constrained
-						// see if any recalculation can change it past the constrained (which = min)
+						availablePixels -= cr.maxPixelLength;
+						availableStars -= cr.stars;
 
-						pixels = (availableForMaxLoop + cr.constrainedPixelLength) * (cr.starLengthPercent / (availablePercentForMaxLoop + cr.starLengthPercent));
-						if (pixels > cr.constrainedPixelLength)
+						pixelsPerStar = availablePixels / availableStars;
+
+						cr.constrainedPixelLength = cr.maxPixelLength;
+
+						unresolvedCount--;
+
+						j = lastMinConstrainedIndex;
+						while (j >= 0)
 						{
-							if (pixels > cr.maxPixelLength)
-							{
-								availableForMaxLoop -= (cr.maxPixelLength - cr.constrainedPixelLength);
+							ref StarMinMax tMin = ref starRowMinArray[j];
 
-								cr.constrainedPixelLength = cr.maxPixelLength;
+							ref GridColRowInfo crMin = ref rowInfoArray[tMin.index];
+
+							if (pixelsPerStar > tMin.minOrMaxPerStar)
+							{
+								availablePixels += crMin.minPixelLength;
+								availableStars += crMin.stars;
+
+								pixelsPerStar = availablePixels / availableStars;
+
+								crMin.constrainedPixelLength = 0; // this will get reprocessed in the outer max loop
+
+								lastMinConstrainedIndex = --j;
+
+								unresolvedCount++;
 							}
 							else
 							{
-								availableForMaxLoop -= (pixels - cr.constrainedPixelLength);
-
-								cr.constrainedPixelLength = pixels;
+								break;
 							}
 						}
 					}
-					else
+					else if (cr.constrainedPixelLength == 0)
 					{
-						pixels = availableForMaxLoop * (cr.starLengthPercent / availablePercentForMaxLoop);
-						if (pixels > cr.maxPixelLength)
+						if (unresolvedCount == 1)
 						{
-							availableForMaxLoop -= cr.maxPixelLength;
+							cr.constrainedPixelLength = availablePixels; // the last row/row takes all remaining pixels
 
-							cr.constrainedPixelLength = cr.maxPixelLength;
-						}
-						else
-						{
-							availableForMaxLoop -= pixels;
-
-							cr.constrainedPixelLength = pixels;
+							break;
 						}
 
-						availablePercentForMaxLoop -= cr.starLengthPercent;
+						cr.constrainedPixelLength = cr.stars * pixelsPerStar;
+
+						availablePixels -= cr.constrainedPixelLength;
+						availableStars -= cr.stars;
+
+						unresolvedCount--;
 					}
 				}
 			}
@@ -1512,9 +1557,7 @@ namespace Motvin.LayoutGrid
 
 					if (minWidth > maxWidth)
 					{
-						double temp = minWidth;
-						minWidth = maxWidth;
-						maxWidth = temp;
+						maxWidth = minWidth; // don't swap these, just set the max = min, which is the greater of the 2
 					}
 
 					if (colUnitType == LayoutGridUnitType.Auto)
@@ -1576,9 +1619,7 @@ namespace Motvin.LayoutGrid
 
 					if (minHeight > maxHeight)
 					{
-						double temp = minHeight;
-						minHeight = maxHeight;
-						maxHeight = temp;
+						maxHeight = minHeight; // don't swap these, just set the max = min, which is the greater of the 2
 					}
 
 					if (rowUnitType == LayoutGridUnitType.Auto)
@@ -2460,9 +2501,9 @@ namespace Motvin.LayoutGrid
 				if (starColWidth != totalStarColWidth)
 				{
 					// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-					for (int i = 0; i < starColIndexesOrderedByMaxAscCount; i++)
+					for (int i = 0; i < starColMaxArrayCount; i++)
 					{
-						ref LengthAndIndex t = ref starColIndexesOrderedByMaxAsc[i];
+						ref StarMinMax t = ref starColMaxArray[i];
 
 						ref GridColRowInfo cr = ref colInfoArray[t.index];
 
@@ -2480,9 +2521,9 @@ namespace Motvin.LayoutGrid
 				if (starRowHeight != totalStarRowHeight)
 				{
 					// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-					for (int i = 0; i < starRowIndexesOrderedByMaxAscCount; i++)
+					for (int i = 0; i < starRowMaxArrayCount; i++)
 					{
-						ref LengthAndIndex t = ref starRowIndexesOrderedByMaxAsc[i];
+						ref StarMinMax t = ref starRowMaxArray[i];
 
 						ref GridColRowInfo cr = ref rowInfoArray[t.index];
 

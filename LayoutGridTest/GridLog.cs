@@ -288,6 +288,126 @@ namespace LayoutGridTest
 			}
 		}
 
+		public static void SetupRandomGridStars(Grid g, int seed)
+		{
+			Random rand = new Random(seed);
+
+			int colCnt = rand.NextInc(1, 5);
+			int rowCnt = rand.NextInc(1, 5);
+
+			g.ColumnDefinitions.Clear();
+			for (int i = 0; i < colCnt; i++)
+			{
+				ColumnDefinition c = new ColumnDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 20);
+
+				if (unitTypeInt <= 3)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Width = len;
+				}
+				else if (unitTypeInt >= 10)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 50), GridUnitType.Star);
+					c.Width = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Width = len;
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MinWidth = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MaxWidth = rand.NextInc(0, 300);
+				}
+
+				g.ColumnDefinitions.Add(c);
+			}
+
+			g.RowDefinitions.Clear();
+			for (int i = 0; i < rowCnt; i++)
+			{
+				RowDefinition c = new RowDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt <= 3)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Height = len;
+				}
+				else if (unitTypeInt >= 10)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 50), GridUnitType.Star);
+					c.Height = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Height = len;
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MinHeight = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MaxHeight = rand.NextInc(0, 300);
+				}
+
+				g.RowDefinitions.Add(c);
+			}
+
+			HashSet<long> colAndRowSet = new HashSet<long>();
+			int childTryCnt = rand.NextInc(1, ((colCnt + 1) * rowCnt));
+			int childCnt = 0;
+			for (int i = 0; i < childTryCnt; i++)
+			{
+				int col = rand.NextInc(0, colCnt - 1);
+				int row = rand.NextInc(0, rowCnt - 1);
+
+				if (colAndRowSet.Add(CombineIntsIntoLong(col, row)) || rand.NextInc(1, 20) == 1)
+				{
+					int colSpan = 1;
+
+					//if (rand.NextInc(0, 20) == 0)
+					//{
+					//	colSpan = rand.NextInc(2, 10);
+					//	colSpan = Math.Min(colSpan, colCnt - col);
+					//}
+
+					int rowSpan = 1;
+
+					//if (rand.NextInc(0, 20) == 0)
+					//{
+					//	rowSpan = rand.NextInc(2, 10);
+					//	rowSpan = Math.Min(rowSpan, rowCnt - row);
+					//}
+
+					Button b = new Button();
+					b.Name = "btn" + childCnt.ToString("0");
+					b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+
+					Grid.SetColumn(b, col);
+					Grid.SetRow(b, row);
+
+					Grid.SetColumnSpan(b, colSpan);
+					Grid.SetRowSpan(b, rowSpan);
+					g.Children.Add(b);
+					childCnt++;
+				}
+			}
+		}
+
 		public static void SetupRandomGridSpans(Grid g, int seed, bool putChildrenOnSeparateRows, out bool hasZeroStars)
 		{
 			hasZeroStars = false;
