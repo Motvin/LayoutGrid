@@ -31,6 +31,7 @@
 		<Button Grid.Row="0" Grid.Column="3" Content="_Spans" Margin="5" Padding="4" Name="btnRandSpans" MinWidth="70" Click="btnRandSpans_Click"/>
 		<Button Grid.Row="0" Grid.Column="4" Content="Rand 2" Margin="5" Padding="4" Name="btnRand2" MinWidth="70" Click="btnRand2_Click"/>
 		<Button Grid.Row="0" Grid.Column="5" Content="S_tars" Margin="5" Padding="4" Name="btnRandStars" MinWidth="70" Click="btnRandStars_Click"/>
+		<Button Grid.Row="0" Grid.Column="6" Content="S_tars 2" Margin="5" Padding="4" Name="btnRandStars2" MinWidth="70" Click="btnRandStars2_Click"/>
 		<Label Grid.Row="1" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
 		<Button Grid.Row="1" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn2" MinWidth="70"/>
@@ -40,7 +41,7 @@
 		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn23" MinWidth="70"/>
-		<Button Grid.Row="2" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn24" MinWidth="70"/>
+		<Button Grid.Row="2" Grid.Column="4" Content="GC Collect" Margin="5" Padding="4" Name="btnGCCollect" MinWidth="70" Click="btnGCCollect_Click"/>
 		<Label Grid.Row="3" Grid.Column="0" Content="Performance LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="3" Grid.Column="1" Content="Perf 1" Margin="5" Padding="4,0,4,0" Name="btnPerf1" MinWidth="70" Click="btnPerf1_Click"/>
 		<Button Grid.Row="3" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn32" MinWidth="70"/>

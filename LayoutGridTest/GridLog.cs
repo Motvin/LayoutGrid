@@ -288,7 +288,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void SetupRandomGridStars(Grid g, int seed)
+		public static void SetupRandomGridStars(Grid g, int seed, bool allowZeroMax = true)
 		{
 			Random rand = new Random(seed);
 
@@ -325,7 +325,14 @@ namespace LayoutGridTest
 
 				if (rand.NextInc(0, 4) >= 3)
 				{
-					c.MaxWidth = rand.NextInc(0, 300);
+					if (allowZeroMax)
+					{
+						c.MaxWidth = rand.NextInc(0, 300);
+					}
+					else
+					{
+						c.MaxWidth = rand.NextInc(1, 300);
+					}
 				}
 
 				g.ColumnDefinitions.Add(c);
@@ -906,7 +913,7 @@ namespace LayoutGridTest
 			return sb;
 		}
 
-		public static void WriteGridToExcelCreateWorksheet(Workbook wb, Grid g, bool showChildGrids = true)
+		public static void WriteGridToExcelCreateWorksheet(Workbook wb, Grid g, int decimalPlaces, bool showChildGrids = true)
 		{
 			string gridName;
 			if (string.IsNullOrEmpty(g.Name))
@@ -922,10 +929,10 @@ namespace LayoutGridTest
 			Worksheet ws = wb.AddWorksheet();
 			ws.SetWorksheetNameSafe(gridNamePlusSize);
 
-			WriteGridToExcel(ws, g, 0, 0, showChildGrids);
+			WriteGridToExcel(ws, g, decimalPlaces, 0, 0, showChildGrids);
 		}
 
-		public static int WriteGridToExcel(Worksheet ws, Grid g, int startCol, int startRow, bool showChildGrids = true, bool showChildSize = true)
+		public static int WriteGridToExcel(Worksheet ws, Grid g, int decimalPlaces, int startCol, int startRow, bool showChildGrids = true, bool showChildSize = true)
 		{
 			int row = startRow;
 			int col = startCol;
@@ -939,6 +946,9 @@ namespace LayoutGridTest
 			{
 				gridName = g.Name;
 			}
+			
+			string dblFmt = CreateDoubleFormatStr(decimalPlaces);
+
 			string gridNamePlusSize = gridName + " " + g.ActualWidth.ToString(dblFmt) + ',' + g.ActualHeight.ToString(dblFmt);
 			ws.SetValue(row, col++, gridNamePlusSize);
 
@@ -1130,7 +1140,7 @@ namespace LayoutGridTest
 			{
 				foreach (Grid grd in childGridList)
 				{
-					maxRow = WriteGridToExcel(ws, grd, startCol + 1, maxRow + 2, showChildGrids);
+					maxRow = WriteGridToExcel(ws, grd, decimalPlaces, startCol + 1, maxRow + 2, showChildGrids);
 				}
 			}
 			ws.AutoSizeColumns(startCol, maxCol);
@@ -1138,7 +1148,7 @@ namespace LayoutGridTest
 			return maxRow;
 		}
 
-		public static int WriteGridToExcelCreateWorksheet(Workbook wb, LayoutGrid g, bool showChildGrids = true)
+		public static int WriteGridToExcelCreateWorksheet(Workbook wb, LayoutGrid g, int decimalPlaces, bool showChildGrids = true)
 		{
 			string gridName;
 			if (string.IsNullOrEmpty(g.Name))
@@ -1155,10 +1165,16 @@ namespace LayoutGridTest
 			Worksheet ws = wb.AddWorksheet();
 			ws.SetWorksheetNameSafe(gridNamePlusSize);
 
-			return WriteGridToExcel(ws, g, 0, 0, showChildGrids);
+			return WriteGridToExcel(ws, g, decimalPlaces, 0, 0, showChildGrids);
 		}
 
-		public static int WriteGridToExcel(Worksheet ws, LayoutGrid g, int startCol, int startRow, bool showChildGrids = true, bool showChildSize = true, bool showCellGroup = true)
+		public static string CreateDoubleFormatStr(int decimalPlaces)
+		{
+			string fmt =  "###0." + new string('#', decimalPlaces);
+			return fmt;
+		}
+
+		public static int WriteGridToExcel(Worksheet ws, LayoutGrid g, int decimalPlaces, int startCol, int startRow, bool showChildGrids = true, bool showChildSize = true, bool showCellGroup = true)
 		{
 			int row = startRow;
 			int col = startCol;
@@ -1172,6 +1188,9 @@ namespace LayoutGridTest
 			{
 				gridName = g.Name;
 			}
+			
+			string dblFmt = CreateDoubleFormatStr(decimalPlaces);
+
 			string gridNamePlusSize = gridName + " " + g.ActualWidth.ToString(dblFmt) + ',' + g.ActualHeight.ToString(dblFmt);
 			ws.SetValue(row, col++, gridNamePlusSize);
 
@@ -1352,8 +1371,10 @@ namespace LayoutGridTest
 
 					if (showCellGroup)
 					{
+					#if DEBUG
 						int cellGroup = g.GetChildCellGroup(child);
 						additionalStr += " ; grp=" + cellGroup.ToString("N0");
+					#endif
 					}
 
 					colAndRowToChildrenStringDict[n] = existingStr + additionalStr;
@@ -1370,7 +1391,7 @@ namespace LayoutGridTest
 			{
 				foreach (LayoutGrid grd in childGridList)
 				{
-					maxRow = WriteGridToExcel(ws, grd, startCol + 1, maxRow + 2, showChildGrids);
+					maxRow = WriteGridToExcel(ws, grd, decimalPlaces, startCol + 1, maxRow + 2, showChildGrids);
 				}
 			}
 			ws.AutoSizeColumns(startCol, maxCol);

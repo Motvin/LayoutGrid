@@ -1,34 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using Motvin.LayoutGrid;
 using SpreadsheetUtil;
 
@@ -50,6 +28,7 @@ namespace LayoutGridTest
 			RunRandSpans();
 			RunRand2();
 			RunRandStars();
+			RunRandStarsNoZeroMax();
 		}
 
 		private void btnRandManyChildren_Click(object sender, RoutedEventArgs e)
@@ -72,16 +51,29 @@ namespace LayoutGridTest
 			RunRandStars();
 		}
 
+		private void btnRandStars2_Click(object sender, RoutedEventArgs e)
+		{
+			RunRandStarsNoZeroMax();
+		}
+
 		private void btnPerf1_Click(object sender, RoutedEventArgs e)
 		{
 			RunPerformanceTest();
 		}
 
-		public static void RunRandManyChildren(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		public static int RunRandManyChildren(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
+			int testCount = 0;
 			int seed = 1;
 			while (true)
 			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
 				if (seed == 15 || // span expands pixel sized col/row for Grid, it should not
 					seed == 45 || // span expands pixel sized col/row for Grid, it should not
 					seed == 87 || // span expands pixel sized col/row for Grid, it should not
@@ -125,10 +117,12 @@ namespace LayoutGridTest
 				g2.Name = "grd";
 
 				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win1.Title = "Grid 1 Many Children";
 				win1.Show();
 
 				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Many Children";
 				win2.Show();
 
@@ -142,15 +136,17 @@ namespace LayoutGridTest
 				{
 					win1.Close();
 					win2.Close();
+					testCount++;
 				}
 				else
 				{
+					int decPlaces = 2;
 					Workbook wb = null;
 					try
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
@@ -176,7 +172,7 @@ namespace LayoutGridTest
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g1);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
 
@@ -201,13 +197,22 @@ namespace LayoutGridTest
 				}
 				seed++;
 			}
+			return testCount;
 		}
 
-		public static void RunRandSpans(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		public static int RunRandSpans(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
+			int testCount = 0;
 			int seed = 1;
 			while (true)
 			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
 				if (seed == 88 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed - this is because of resolving spans in a different order and possibly also not resolving the col width of children with rowspans before the width of any colspan children
 					seed == 94 || // span order
 					seed == 157 || // we are correct, Grid does not respect max size and goes past it for a colspan
@@ -271,10 +276,12 @@ namespace LayoutGridTest
 				g2.Name = "grd";
 
 				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win1.Title = "Grid 1 Spans";
 				win1.Show();
 
 				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Spans";
 				win2.Show();
 
@@ -288,15 +295,17 @@ namespace LayoutGridTest
 				{
 					win1.Close();
 					win2.Close();
+					testCount++;
 				}
 				else
 				{
 					Workbook wb = null;
+					int decPlaces = 2;
 					try
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
@@ -325,7 +334,7 @@ namespace LayoutGridTest
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g1);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
 
@@ -353,13 +362,22 @@ namespace LayoutGridTest
 				}
 				seed++;
 			}
+			return testCount;
 		}
 
-		public static void RunRand2(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		public static int RunRand2(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
+			int testCount = 0;
 			int seed = 1;
 			while (true)
 			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
 				if (
 					seed == 49 || // span expands pixel sized col/row for Grid, it should not
 					seed == 268 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
@@ -392,10 +410,12 @@ namespace LayoutGridTest
 				g2.Name = "grd";
 
 				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win1.Title = "Grid 1 Rand 2";
 				win1.Show();
 
 				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Rand 2";
 				win2.Show();
 
@@ -409,15 +429,17 @@ namespace LayoutGridTest
 				{
 					win1.Close();
 					win2.Close();
+					testCount++;
 				}
 				else
 				{
+					int decPlaces = 2;
 					Workbook wb = null;
 					try
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
@@ -443,7 +465,7 @@ namespace LayoutGridTest
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g1);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
 
@@ -468,13 +490,38 @@ namespace LayoutGridTest
 				}
 				seed++;
 			}
+			return testCount;
 		}
 
-		public static void RunRandStars(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		//[SecurityPermissionAttribute(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+		public static void DoEvents()
 		{
+			DispatcherFrame frame = new DispatcherFrame();
+			Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
+				new DispatcherOperationCallback(ExitFrame), frame);
+			Dispatcher.PushFrame(frame);
+		}
+
+		public static object ExitFrame(object f)
+		{
+			((DispatcherFrame)f).Continue = false;
+
+			return null;
+		}
+
+		public static int RunRandStars(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		{
+			int testCount = 0;
 			int seed = 1;
 			while (true)
 			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
 				if (seed == 611 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
 					seed == 3216 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
 					seed == 4931 || // Grid is wrong when a star col has a max of 0, it doesn't proportionately space out the other star cols
@@ -497,6 +544,11 @@ namespace LayoutGridTest
 					break;
 				}
 
+				StringBuilder sb1;
+				StringBuilder sb2;
+				WindowPlain win1;
+				WindowPlain win2;
+
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
@@ -507,33 +559,37 @@ namespace LayoutGridTest
 				GridLog.CopyGridSetup(g1, g2);
 				g2.Name = "grd";
 
-				WindowPlain win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win1.Title = "Grid 1 Stars";
 				win1.Show();
 
-				WindowPlain win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.ShowInTaskbar = false;
 				win2.Title = "Test Grid 2 Stars";
 				win2.Show();
 
-				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
-				StringBuilder sb2 = GridLog.CreateGridString(g2, seed);
+				sb1 = GridLog.CreateGridString(g1, seed);
+				sb2 = GridLog.CreateGridString(g2, seed);
 
 				string s1 = sb1.ToString();
 				string s2 = sb2.ToString();
 
 				if (string.Equals(s1, s2, StringComparison.Ordinal))
 				{
+					testCount++;
 					win1.Close();
 					win2.Close();
 				}
 				else
 				{
+					int decPlaces = 2;
 					Workbook wb = null;
 					try
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g2);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
 
@@ -562,7 +618,7 @@ namespace LayoutGridTest
 					{
 						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
 
-						GridLog.WriteGridToExcelCreateWorksheet(wb, g1);
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
 
 						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
 
@@ -590,6 +646,145 @@ namespace LayoutGridTest
 				}
 				seed++;
 			}
+
+			return testCount;
+		}
+
+		public static int RunRandStarsNoZeroMax(bool useInfinitWidth = false, bool useInfiniteHeight = false)
+		{
+			int testCount = 0;
+			int seed = 16724;
+			while (true)
+			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
+				if (
+					seed == 5266 || // Grid has a .01 difference in a star col, we are correct since we add up to the width
+					seed == 5764 || // Grid has a .01 difference in a star col, we are correct since we add up to the width, Grid uses 99.2249999999999 instead of 99.225
+					seed == 10721 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 12877 || // Grid has a .01 difference in a star col, we are correct since we add up to the width, Grid uses 51.7249999999999
+					seed == 16724 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					1 == 0
+				)
+				{
+					seed++;
+					continue; // these are cases where we are correct and Grid is wrong
+				}
+
+				if (seed == 40000)
+				{
+					break;
+				}
+
+				StringBuilder sb1;
+				StringBuilder sb2;
+				WindowPlain win1;
+				WindowPlain win2;
+
+				Grid g1 = new Grid();
+
+				g1.Name = "grd";
+				GridLog.SetupRandomGridStars(g1, seed, false);
+
+				LayoutGrid g2 = new LayoutGrid();
+
+				GridLog.CopyGridSetup(g1, g2);
+				g2.Name = "grd";
+
+				win1 = new WindowPlain(g1, useInfinitWidth, useInfiniteHeight);
+				win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
+				win1.Title = "Grid 1 Stars";
+				win1.Show();
+
+				win2 = new WindowPlain(g2, useInfinitWidth, useInfiniteHeight);
+				win2.ShowInTaskbar = false;
+				win2.Title = "Test Grid 2 Stars";
+				win2.Show();
+
+				sb1 = GridLog.CreateGridString(g1, seed);
+				sb2 = GridLog.CreateGridString(g2, seed);
+
+				string s1 = sb1.ToString();
+				string s2 = sb2.ToString();
+
+				if (string.Equals(s1, s2, StringComparison.Ordinal))
+				{
+					testCount++;
+					win1.Close();
+					win2.Close();
+				}
+				else
+				{
+					int decPlaces = 14;
+					Workbook wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.ToString(), ex.Message);
+					}
+					finally
+					{
+						if (wb != null)
+						{
+							wb.Close();
+						}
+					}
+
+					wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.ToString(), ex.Message);
+					}
+					finally
+					{
+						if (wb != null)
+						{
+							wb.Close();
+						}
+					}
+
+					break;
+				}
+				seed++;
+			}
+
+			return testCount;
 		}
 
 		//??? compare the result of this with the grids actual width/height and flag any differences 
@@ -892,6 +1087,11 @@ namespace LayoutGridTest
 
 			TestComplexLayout_Grid win = new TestComplexLayout_Grid();
 			win.Show();
+		}
+
+		private void btnGCCollect_Click(object sender, RoutedEventArgs e)
+		{
+			PerfStatic.DoGCCollect();
 		}
 	}
 }
