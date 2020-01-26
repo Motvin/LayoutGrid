@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
         Title="TestComplexLayout_Grid" Height="500" Width="800">
-	<Grid Margin="12,12,12,12" Name="gridMain">
+	<Grid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="1*" />
@@ -30,9 +30,9 @@
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
-			<Label Grid.Row="0" Grid.Column="0" Content="Sele_ct:"/>
-			<ComboBox Grid.Row="0" Grid.Column="1" Name="cboSelect" />
-			<Button Grid.Row="0" Grid.Column="2" Content="Savepqg" Margin="10,0,0,0" Name="btnSave" Width="70" HorizontalAlignment="Left" VerticalAlignment="Top" IsDefault="True"/>
+			<Label Grid.Row="0" Grid.Column="0" Content="Combo:"/>
+			<ComboBox Grid.Row="0" Grid.Column="1" Name="cbo2" />
+			<Button Grid.Row="0" Grid.Column="2" Content="abcdefg" Margin="10,0,0,0" Name="btnSave" Width="70" HorizontalAlignment="Left" VerticalAlignment="Top" IsDefault="True"/>
 			<Button Grid.Row="0" Grid.Column="3" Content="Cancel" Margin="10,0,0,0" Name="btnCancel" Width="70"/>
 			<Button Grid.Row="0" Grid.Column="4" Content="_New" Margin="10,0,0,0" Name="btnNew" Width="70"/>
 			<Button Grid.Row="0" Grid.Column="5" Content="Delete" Margin="10,0,0,0" Width="70"/>
@@ -63,7 +63,7 @@
 			<ComboBox Grid.Row="4" Grid.Column="1" Name="cboName4" Margin="0,8,0,0"/>
 			<CheckBox Grid.Row="1" Grid.Column="2" Name="chkIsASomething" Content="Is a something" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
 			<CheckBox Grid.Row="2" Grid.Column="2" Name="chkIsASomething2" Content="Is _a something 2" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
-			<CheckBox Grid.Row="3" Grid.Column="2" Name="chkInactive" Content="Inactive" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
+			<CheckBox Grid.Row="3" Grid.Column="2" Name="chk2" Content="is something 3" VerticalContentAlignment="Center" Margin="16,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="4,-1,2,0"/>
 			<Label Grid.Row="4" Grid.Column="2" Content="This is a long label text:" HorizontalAlignment="Stretch" Margin="14,8,0,0"/>
 			<Button Grid.Row="1" Grid.Column="3" Content="Button _Content..." Margin="0,8,0,0" MinWidth="70" Padding="5"/>
 			<Button Grid.Row="2" Grid.Column="3" Content="_Button _Content2..." Margin="0,8,0,0" MinWidth="70" Padding="5"/>

@@ -28,7 +28,7 @@ namespace LayoutGridTest
 			RunRandSpans();
 			RunRand2();
 			RunRandStars();
-			RunRandStarsNoZeroMax();
+			//RunRandStarsNoZeroMax();
 		}
 
 		private void btnRandManyChildren_Click(object sender, RoutedEventArgs e)
@@ -653,7 +653,7 @@ namespace LayoutGridTest
 		public static int RunRandStarsNoZeroMax(bool useInfinitWidth = false, bool useInfiniteHeight = false)
 		{
 			int testCount = 0;
-			int seed = 16724;
+			int seed = 1;
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -669,6 +669,11 @@ namespace LayoutGridTest
 					seed == 10721 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
 					seed == 12877 || // Grid has a .01 difference in a star col, we are correct since we add up to the width, Grid uses 51.7249999999999
 					seed == 16724 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 19375 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 22903 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 23142 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 23611 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
+					seed == 25171 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
 					1 == 0
 				)
 				{
@@ -676,7 +681,7 @@ namespace LayoutGridTest
 					continue; // these are cases where we are correct and Grid is wrong
 				}
 
-				if (seed == 40000)
+				if (seed > 25171)
 				{
 					break;
 				}
@@ -712,7 +717,14 @@ namespace LayoutGridTest
 				string s1 = sb1.ToString();
 				string s2 = sb2.ToString();
 
-				if (string.Equals(s1, s2, StringComparison.Ordinal))
+				double starCountCol;
+				double starCountRow;
+				double g2Width = SumColWidthsOrRowHeights(g2, true, out starCountCol);
+				double g2Height = SumColWidthsOrRowHeights(g2, false, out starCountRow);
+
+				if (string.Equals(s1, s2, StringComparison.Ordinal)
+					//&& (starCountCol == 0 || g2Width == g2.ActualWidth) && (starCountRow == 0 || g2Height == g2.ActualHeight)
+					)
 				{
 					testCount++;
 					win1.Close();
@@ -787,12 +799,12 @@ namespace LayoutGridTest
 			return testCount;
 		}
 
-		//??? compare the result of this with the grids actual width/height and flag any differences 
-		public static double SumColWidthsOrRowHeights(LayoutGrid g, bool getCol, out double starCount)
+		//??? compare the result of this with the grid's actual width/height and flag any differences 
+		public static double SumColWidthsOrRowHeights(LayoutGrid g, bool getCol, out double starCountNoMax)
 		{
 			double sumLength = 0;
 
-			starCount = 0;
+			starCountNoMax = 0;
 
 			if (getCol)
 			{
@@ -801,9 +813,9 @@ namespace LayoutGridTest
 					sumLength += g.GetColWidth(i);
 
 					ColumnDefinition c = g.ColumnDefinitions[i];
-					if (c.Width.IsStar)
+					if (c.Width.IsStar && double.IsPositiveInfinity(c.MaxWidth))
 					{
-						starCount += c.Width.Value;
+						starCountNoMax += c.Width.Value;
 					}
 				}
 			}
@@ -816,7 +828,7 @@ namespace LayoutGridTest
 					RowDefinition c = g.RowDefinitions[i];
 					if (c.Height.IsStar)
 					{
-						starCount += c.Height.Value;
+						starCountNoMax += c.Height.Value;
 					}
 				}
 			}
@@ -845,6 +857,7 @@ namespace LayoutGridTest
 			double layoutGridConstructorNanoSecsTotal = 0;
 
 			double preMeasureNanoSecsTotal = 0;
+			double childSortNanoSecsTotal = 0;
 			double measureNanoSecsTotal = 0;
 			double childMeasureNanoSecsTotal = 0;
 			double postMeasureNanoSecsTotal = 0;
@@ -879,6 +892,12 @@ namespace LayoutGridTest
 				{
 					seed++;
 					continue; // these are cases where we are correct and the existing Grid is wrong
+				}
+
+				if (seed % 100 == 0)
+				{
+					DoEvents();
+					PerfStatic.DoGCCollect();
 				}
 
 				long startTicks;
@@ -920,6 +939,7 @@ namespace LayoutGridTest
 
 				PerfStatic.DoGCCollect();
 				WindowPlain win2 = new WindowPlain(g2);
+				win2.ShowInTaskbar = false;
 				win2.Show();
 
 				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(g2.preMeasureTicks, Stopwatch.Frequency);
@@ -957,6 +977,9 @@ namespace LayoutGridTest
 				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(g2.preMeasureTicks, Stopwatch.Frequency);
 				preMeasureNanoSecsTotal += nanoSecs;
 
+				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(g2.childSortTicks, Stopwatch.Frequency);
+				childSortNanoSecsTotal += nanoSecs;
+				
 				nanoSecs = PerfStatic.GetNanoSecondsFromTicks(g2.measureTicks, Stopwatch.Frequency);
 				measureNanoSecsTotal += nanoSecs;
 
@@ -994,6 +1017,7 @@ namespace LayoutGridTest
 
 				PerfStatic.DoGCCollect();
 				WindowPlain win1 = new WindowPlain(g1);
+				win1.ShowInTaskbar = false;
 				win1.Show();
 				win1.Width = winWidth; // does this change the grid's width?
 				win1.Height = winHeight;
@@ -1046,6 +1070,7 @@ namespace LayoutGridTest
 
 					double nonChildMeasureNanoSecsTotal = preMeasureNanoSecsTotal + measureNanoSecsTotal + postMeasureNanoSecsTotal + shortMeasureNanoSecsTotal - childMeasureNanoSecsTotal;
 					contents += "Pre-Measure Nano Secs=" + preMeasureNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
+					contents += "Child Sort Nano Secs=" + childSortNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
 					contents += "Measure Nano Secs=" + measureNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
 					contents += "Child-Measure Nano Secs=" + childMeasureNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
 					contents += "Non-Child-Measure Nano Secs=" + nonChildMeasureNanoSecsTotal.ToString("#,##0") + Environment.NewLine;
