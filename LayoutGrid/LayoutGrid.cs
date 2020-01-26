@@ -304,22 +304,6 @@ namespace Motvin.LayoutGrid
 			public ushort rowFlags; // 2 bytes
 		}
 
-		//??? remove this
-		//private struct ColRowGlobals
-		//{
-		//	public double totalMinStarLength; // either col width or row height
-		//	public double totalMaxStarLength; // either col width or row height
-
-		//	public StarMinMax[] starMinDescArray;
-		//	public int starMinDescArrayCount;
-
-		//	public StarMinMax[] starMaxAscArray;
-		//	public int starMaxAscArrayCount;
-
-		//	public GridColRowInfo[] colRowInfoArray;
-		//	public int colRowInfoArrayCount;
-		//}
-
 		private struct StarMinMax
 		{
 			public int index; // the col or row index
@@ -371,7 +355,7 @@ namespace Motvin.LayoutGrid
 			}
 		}
 
-		//??? add a few more groups and start at 0 and increment by 1 - have pixelcol pixelrow and that with span
+		//??? add a few more groups - do we actually need the WithSpan groups if s
 		private const int CellGroup_PixelOrAutoColRow = 0;
 		private const int CellGroup_PixelOrAutoColRowWithSpan = 1; // maybe make 2 one with a col span and the ones with just rowspan and no colspan aren't in it???
 		private const int CellGroup_AutoColStarRow = 2;
@@ -409,16 +393,13 @@ namespace Motvin.LayoutGrid
 
 		private bool haveStarColAndAutoRowChildren; // this doesn't need to change if infinite width forces star
 
-		private bool haveColAutoSpans;
-		private bool haveRowAutoSpans;
-
 		private bool wasInfiniteWidth;
 		private bool wasInfiniteHeight;
 
 		private int starColCount;
 		private int starRowCount;
 
-		private double totalStarsInCols; // is this needed if we have starColCount??? - maybe it can be a local variable instead
+		private double totalStarsInCols;
 		private double totalStarsInRows;
 
 		private double totalPixelColWidth; // this is the total width (constrained) for all Pixel (absolute) sized cols
@@ -442,17 +423,17 @@ namespace Motvin.LayoutGrid
 		private StarMinMax[] starColMinArray;
 		private int starColMinArrayCount;
 
-		private StarMinMax[] starColMaxArray;
-		private int starColMaxArrayCount;
+		private StarMinMax[] starColMaxArray; // the # of elements for this is starColCount
 
 		private StarMinMax[] starRowMinArray;
 		private int starRowMinArrayCount;
 
-		private StarMinMax[] starRowMaxArray;
-		private int starRowMaxArrayCount;
+		private StarMinMax[] starRowMaxArray; // the # of elemens for this is starRowCount
 
 		internal ChildInfo[] childInfoArray;
 		internal int childInfoArrayCount; // the # of elems in the array that are being used
+
+		int firstIndexForOtherCellGroups; // the first index of childInfoArray of cell groups > 0
 
 		double desiredWidth;
 		double desiredHeight;
@@ -559,10 +540,6 @@ namespace Motvin.LayoutGrid
 
 					switch (cr.unitType) // use unitType instead of effectiveUnitType here
 					{
-						//case LayoutGridUnitType.Auto:
-						//	cr.constrainedPixelLength = cr.minPixelLength; //??? don't do this because it messes up distributing spans evenly
-						//	totalAutoColWidth += cr.constrainedPixelLength;
-						//	break;
 						case LayoutGridUnitType.Pixel:
 							if (c.Width.Value > cr.maxPixelLength)
 							{
@@ -618,14 +595,13 @@ namespace Motvin.LayoutGrid
 				}
 			}
 
-			starColMaxArrayCount = starColCount;
 			starColMinArrayCount = starColCountMinNotZero;
 
 			if (starColCount > 0)
 			{
-				if (starColMaxArray == null || starColMaxArray.Length < starColMaxArrayCount)
+				if (starColMaxArray == null || starColMaxArray.Length < starColCount)
 				{
-					starColMaxArray = new StarMinMax[starColMaxArrayCount];
+					starColMaxArray = new StarMinMax[starColCount];
 				}
 
 				if (starColMinArrayCount > 0 && (starColMinArray == null || starColMinArray.Length < starColMinArrayCount))
@@ -665,9 +641,9 @@ namespace Motvin.LayoutGrid
 					}
 				}
 
-				if (starColMaxArrayCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelColWidth))
+				if (starColCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelColWidth))
 				{
-					Array.Sort(starColMaxArray, 0, starColMaxArrayCount, compareStarMinMaxByPerStar);
+					Array.Sort(starColMaxArray, 0, starColCount, compareStarMinMaxByPerStar);
 				}
 
 				if (starColMinArrayCount > 1 && largestStarMinPixelColWidth > 0)
@@ -821,14 +797,13 @@ namespace Motvin.LayoutGrid
 				}
 			}
 
-			starRowMaxArrayCount = starRowCount;
 			starRowMinArrayCount = starRowCountMinNotZero;
 
 			if (starRowCount > 0)
 			{
-				if (starRowMaxArray == null || starRowMaxArray.Length < starRowMaxArrayCount)
+				if (starRowMaxArray == null || starRowMaxArray.Length < starRowCount)
 				{
-					starRowMaxArray = new StarMinMax[starRowMaxArrayCount];
+					starRowMaxArray = new StarMinMax[starRowCount];
 				}
 
 				if (starRowMinArrayCount > 0 && (starRowMinArray == null || starRowMinArray.Length < starRowMinArrayCount))
@@ -868,9 +843,9 @@ namespace Motvin.LayoutGrid
 					}
 				}
 
-				if (starRowMaxArrayCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelRowHeight))
+				if (starRowCount > 1 && !double.IsPositiveInfinity(smallestStarMaxPixelRowHeight))
 				{
-					Array.Sort(starRowMaxArray, 0, starRowMaxArrayCount, compareStarMinMaxByPerStar);
+					Array.Sort(starRowMaxArray, 0, starRowCount, compareStarMinMaxByPerStar);
 				}
 
 				if (starRowMinArrayCount > 1 && largestStarMinPixelRowHeight > 0)
@@ -941,14 +916,12 @@ namespace Motvin.LayoutGrid
 		private void CreateChildInfo(int childrenCnt, bool isInfiniteWidth, bool isInfiniteHeight)
 		{
 			haveStarColAndAutoRowChildren = false;
-			haveColAutoSpans = false;
-			haveRowAutoSpans = false;
 
 			int maxCol = colInfoArrayCount - 1;
 			int maxRow = rowInfoArrayCount - 1;
 
 			int nextIndexForCellGroup0 = 0;
-			int firstIndexForOtherCellGroups = childrenCnt - 1;
+			firstIndexForOtherCellGroups = childrenCnt - 1;
 			int lastIndexForOtherCellGroups = childrenCnt - 1;
 
 			for (int i = 0; i < childrenCnt; i++)
@@ -1082,7 +1055,6 @@ namespace Motvin.LayoutGrid
 						if ((colFlags & ChildFlag_SpanHasAuto) != 0 && ((colFlags & ChildFlag_SpanHasStar) == 0 || isInfiniteWidth))
 						{
 							colFlags |= ChildFlag_SpanHasAutoNoStar;
-							haveColAutoSpans = true;
 						}
 					}
 					//colFlags = autoStarFlags;
@@ -1105,7 +1077,6 @@ namespace Motvin.LayoutGrid
 						if ((rowFlags & ChildFlag_SpanHasAuto) != 0 && ((rowFlags & ChildFlag_SpanHasStar) == 0 || isInfiniteHeight))
 						{
 							rowFlags |= ChildFlag_SpanHasAutoNoStar;
-							haveRowAutoSpans = true;
 						}
 					}
 					//rowFlags = autoStarFlags;
@@ -1144,14 +1115,10 @@ namespace Motvin.LayoutGrid
 				}
 			}
 			childInfoArrayCount = lastIndexForOtherCellGroups + 1;
-			childInfoArray[childInfoArrayCount] = new ChildInfo();
 			childInfoArray[childInfoArrayCount].cellGroup = CellGroup_AfterLast;
 			childInfoArrayCount++;
 
-			//??? instead of sorting the array, could just add all ChildInfo items to one of N linked lists (where N is a cellGroup)
-			// this might be faster than sort, but probably not faster once the sort is done
-			// could use some type of bucket sort instead of Sort - cell group 0's could be added to the front and all others added to the end
-			// then sort all of the other groups 1, 2, 3 since we know their counts/end indices
+			Debug.Assert(nextIndexForCellGroup0 == firstIndexForOtherCellGroups + 1);
 
 			if (firstIndexForOtherCellGroups < lastIndexForOtherCellGroups)
 			{
@@ -1173,7 +1140,6 @@ namespace Motvin.LayoutGrid
 				childSortTicks += Stopwatch.GetTimestamp() - startTicksChildSort;
 #endif
 
-				//??? later start after the first cell group and when there is a last bogus item, then don't need to the i > childInfoArrayCount check
 				int childInfoArrayCountMinusOne = childInfoArrayCount - 1;
 				int childInfoArrayCountMinusTwo = childInfoArrayCount - 2;
 				for (int i = firstIndexForOtherCellGroups; i < childInfoArrayCountMinusOne; i++)
@@ -1196,7 +1162,7 @@ namespace Motvin.LayoutGrid
 			if (starLength <= totalMinStarColWidth)
 			{
 				// just assign min to all star cols
-				for (int i = 0; i < starColMaxArrayCount; i++)
+				for (int i = 0; i < starColCount; i++)
 				{
 					idx = starColMaxArray[i].index;
 
@@ -1207,7 +1173,7 @@ namespace Motvin.LayoutGrid
 			else if (starLength >= totalMaxStarColWidth)
 			{
 				// just assign max to all star cols
-				for (int i = 0; i < starColMaxArrayCount; i++)
+				for (int i = 0; i < starColCount; i++)
 				{
 					idx = starColMaxArray[i].index;
 
@@ -1225,7 +1191,7 @@ namespace Motvin.LayoutGrid
 
 				int lastMinConstrainedIndex = -1;
 
-				int unresolvedCount = starColMaxArrayCount;
+				int unresolvedCount = starColCount;
 
 				// loop through mins (if any)
 				for (int i = 0; i < starColMinArrayCount; i++)
@@ -1254,7 +1220,7 @@ namespace Motvin.LayoutGrid
 				}
 
 				// loop through maxs - this includes everything even if the col/row doens't have a max - it will have infinity as max
-				for (int i = 0; i < starColMaxArrayCount; i++)
+				for (int i = 0; i < starColCount; i++)
 				{
 					ref StarMinMax t = ref starColMaxArray[i];
 
@@ -1325,7 +1291,7 @@ namespace Motvin.LayoutGrid
 			if (starLength <= totalMinStarRowHeight)
 			{
 				// just assign min to all star rows
-				for (int i = 0; i < starRowMaxArrayCount; i++)
+				for (int i = 0; i < starRowCount; i++)
 				{
 					idx = starRowMaxArray[i].index;
 
@@ -1336,7 +1302,7 @@ namespace Motvin.LayoutGrid
 			else if (starLength >= totalMaxStarRowHeight)
 			{
 				// just assign max to all star rows
-				for (int i = 0; i < starRowMaxArrayCount; i++)
+				for (int i = 0; i < starRowCount; i++)
 				{
 					idx = starRowMaxArray[i].index;
 
@@ -1354,7 +1320,7 @@ namespace Motvin.LayoutGrid
 
 				int lastMinConstrainedIndex = -1;
 
-				int unresolvedCount = starRowMaxArrayCount;
+				int unresolvedCount = starRowCount;
 
 				// loop through mins (if any)
 				for (int i = 0; i < starRowMinArrayCount; i++)
@@ -1383,7 +1349,7 @@ namespace Motvin.LayoutGrid
 				}
 
 				// loop through maxs - this includes everything even if the row/row doens't have a max - it will have infinity as max
-				for (int i = 0; i < starRowMaxArrayCount; i++)
+				for (int i = 0; i < starRowCount; i++)
 				{
 					ref StarMinMax t = ref starRowMaxArray[i];
 
@@ -1827,14 +1793,14 @@ namespace Motvin.LayoutGrid
 
 			//??? maybe only do this block of code below if we didn't already call CreateRowInfo - sould need to pass in isInfiniteHeight to CreateRowInfo and deal with that?
 
-			if (childInfoArray == null || childInfoArray.Length < childrenCount)
+			if (childInfoArray == null || childInfoArray.Length < childrenCount + 1)
 			{
 				childInfoArray = new ChildInfo[childrenCount + 1]; // need to add 1 because we are storing a Last bogus item in this array to make the loop through the items easier
 				CreateChildInfo(childrenCount, isInfiniteWidth, isInfiniteHeight);
 			}
-			else if (childInfoArray.Length != childrenCount || haveChildrenChanged)
+			else if (childInfoArray.Length != childrenCount + 1 || haveChildrenChanged)
 			{
-				Array.Clear(childInfoArray, 0, childInfoArrayCount); // clear the array so that we don't have to set default values
+				Array.Clear(childInfoArray, 0, childrenCount); // clear the array so that we don't have to set default values - don't need to clear the Last item
 				CreateChildInfo(childrenCount, isInfiniteWidth, isInfiniteHeight);
 			}
 			else
@@ -2218,7 +2184,6 @@ namespace Motvin.LayoutGrid
 
 					if (cellGroup > CellGroup_StarColPixelOrAutoRowWithSpan && firstChildIndexOfAutoColStarRowCellGroup != -1)
 					{
-						// sort pixel/pixel first and instead of starting at 0, start after these???
 						for (int j = firstChildIndexOfAutoColStarRowCellGroup; j < childInfoArrayCount; j++) // loop one past so that the cell group change logic can be in one place
 						{
 							ref ChildInfo n2 = ref childInfoArray[j];
@@ -2237,20 +2202,7 @@ namespace Motvin.LayoutGrid
 							colSpan = n2.colSpan;
 							rowSpan = n2.rowSpan;
 
-							//??? maybe put things like c.effectiveUnitType into local variables - or are these values just put into registers anyway and not reloaded?
-							// would have to look at il code to see this
-
-							//??? do we need effectiveUnitType?  is it possible to have star with infinite width or height?  using if (c.effectiveUnitType == GridUnitType.Auto) it is possible, but could this maybe be the unit type instead?
-
 							availableChildWidth = double.PositiveInfinity;
-							//if (colSpan > 1)
-							//{
-							//	availableChildWidth = GetSpanLength(colInfoArray, col, colSpan);
-							//}
-							//else
-							//{
-							//	availableChildWidth = c2.constrainedPixelLength + c2.spanExtraLengthOrPosition;
-							//}
 
 							if (rowSpan > 1)
 							{
@@ -2448,24 +2400,6 @@ namespace Motvin.LayoutGrid
 			startTicks = Stopwatch.GetTimestamp();
 #endif
 
-			//if (haveColAutoSpans)
-			//{
-			//	i = 0;
-			//	do
-			//	{
-			//		colInfoArray[i].constrainedPixelLength += colInfoArray[i].spanExtraLengthOrPosition;
-			//	} while (++i < colInfoArrayCount);
-			//}
-
-			//if (haveRowAutoSpans)
-			//{
-			//	i = 0;
-			//	do
-			//	{
-			//		rowInfoArray[i].constrainedPixelLength += rowInfoArray[i].spanExtraLengthOrPosition;
-			//	} while (++i < rowInfoArrayCount);
-			//}
-
 			if (isInfiniteWidth)
 			{
 				// infinite width means return the min width that the content can fit in
@@ -2557,49 +2491,6 @@ namespace Motvin.LayoutGrid
 #endif
 				return finalSize;
 			}
-
-			//??? I'm not sure these DistributeStarColWidth/DistributeStarRowHeight calls would ever get called in this function
-			// they do get called if star mins take the grid past the avail length in MeasureOverride
-			// but I don't think they need to be called because the min will get used anyway in MeasureOverride
-			//if (starColCount > 0)
-			//{
-			//	double starColWidth = finalSize.Width - (totalPixelColWidth + totalAutoColWidth);
-
-			//	if (starColWidth != totalStarColWidth)
-			//	{
-			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-			//		for (int i = 0; i < starColMaxArrayCount; i++)
-			//		{
-			//			ref StarMinMax t = ref starColMaxArray[i];
-
-			//			ref GridColRowInfo cr = ref colInfoArray[t.index];
-
-			//			cr.constrainedPixelLength = 0;
-			//		}
-
-			//		DistributeStarColWidth(starColWidth);
-			//	}
-			//}
-
-			//if (starRowCount > 0)
-			//{
-			//	double starRowHeight = finalSize.Height - (totalPixelRowHeight + totalAutoRowHeight);
-
-			//	if (starRowHeight != totalStarRowHeight)
-			//	{
-			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-			//		for (int i = 0; i < starRowMaxArrayCount; i++)
-			//		{
-			//			ref StarMinMax t = ref starRowMaxArray[i];
-
-			//			ref GridColRowInfo cr = ref rowInfoArray[t.index];
-
-			//			cr.constrainedPixelLength = 0;
-			//		}
-
-			//		DistributeStarRowHeight(starRowHeight);
-			//	}
-			//}
 
 			double position;
 			position = 0;
