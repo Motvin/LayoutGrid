@@ -32,11 +32,14 @@
 		<Button Grid.Row="0" Grid.Column="4" Content="Rand 2" Margin="5" Padding="4" Name="btnRand2" MinWidth="70" Click="btnRand2_Click"/>
 		<Button Grid.Row="0" Grid.Column="5" Content="S_tars" Margin="5" Padding="4" Name="btnRandStars" MinWidth="70" Click="btnRandStars_Click"/>
 		<Button Grid.Row="0" Grid.Column="6" Content="S_tars 2" Margin="5" Padding="4" Name="btnRandStars2" MinWidth="70" Click="btnRandStars2_Click"/>
+		<Button Grid.Row="0" Grid.Column="7" Content="Different Controls" Margin="5" Padding="4" Name="btnDifferentControls" MinWidth="70" Click="btnDifferentControls_Click"/>
 		<Label Grid.Row="1" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
 		<Button Grid.Row="1" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn2" MinWidth="70"/>
 		<Button Grid.Row="1" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn3" MinWidth="70"/>
 		<Button Grid.Row="1" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn4" MinWidth="70"/>
+		<CheckBox Grid.Row="1" Grid.Column="6" Content="Infinite" Margin="5" Name="chkInfinite" MinWidth="70" IsChecked="False"/>
+		<CheckBox Grid.Row="1" Grid.Column="7" Content="Infinite Mix" Margin="5" Name="chkInfiniteMix" MinWidth="70" IsChecked="True"/>
 		<Label Grid.Row="2" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid 2:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>
@@ -47,5 +50,7 @@
 		<Button Grid.Row="3" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn32" MinWidth="70"/>
 		<Button Grid.Row="3" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn33" MinWidth="70"/>
 		<Button Grid.Row="3" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn34" MinWidth="70"/>
+		<Label Grid.Row="4" Grid.Column="0" Content="Status:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="6" Name="lblStatus" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 	</Grid>
 </Window>

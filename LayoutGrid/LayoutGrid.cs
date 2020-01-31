@@ -258,6 +258,7 @@ namespace Motvin.LayoutGrid
 		private const ushort ChildFlag_IsLastOfSameSpan = 1 << 4;
 
 		private const ushort ChildFlag_SpanHasAutoNoStar_Reset = (ushort)0xffff ^ ChildFlag_SpanHasAutoNoStar;
+		private const ushort ChildFlag_SpanHasAutoOrStar = ChildFlag_SpanHasAuto | ChildFlag_SpanHasStar;
 
 		[Flags]
 		public enum LayoutGridUnitType : ushort
@@ -274,9 +275,6 @@ namespace Motvin.LayoutGrid
 
 			public double minPixelLength;
 			public double maxPixelLength;
-
-			//??? remove this, or if more efficient keep it and remove stars
-			public double starLengthPercent; // this is the star length provided by the user and then later converted to total star length percent (i.e. if 1 originally and total stars = 4, then this becomes 1/4 = .25)
 
 			public double stars;
 
@@ -355,7 +353,7 @@ namespace Motvin.LayoutGrid
 			}
 		}
 
-		//??? add a few more groups - do we actually need the WithSpan groups if s
+		//??? add a few more groups
 		private const int CellGroup_PixelOrAutoColRow = 0;
 		private const int CellGroup_PixelOrAutoColRowWithSpan = 1; // maybe make 2 one with a col span and the ones with just rowspan and no colspan aren't in it???
 		private const int CellGroup_AutoColStarRow = 2;
@@ -391,7 +389,7 @@ namespace Motvin.LayoutGrid
 		private bool haveRowsChanged;
 		private bool haveChildrenChanged;
 
-		private bool haveStarColAndAutoRowChildren; // this doesn't need to change if infinite width forces star
+		private bool haveStarColAndAutoRowChildren; // this doesn't change if infinite width forces star
 
 		private bool wasInfiniteWidth;
 		private bool wasInfiniteHeight;
@@ -497,7 +495,6 @@ namespace Motvin.LayoutGrid
 				}
 
 				cr.stars = 1.0;
-				cr.starLengthPercent = 1.0;
 				cr.maxPixelLength = double.PositiveInfinity;
 
 				totalStarsInCols = 1.0;
@@ -581,14 +578,13 @@ namespace Motvin.LayoutGrid
 
 								starColCount++;
 								cr.stars = c.Width.Value;
-								cr.starLengthPercent = c.Width.Value;
 								if (cr.minPixelLength != 0)
 								{
 									starColCountMinNotZero++;
 									totalMinStarColWidth += cr.minPixelLength;
 								}
 								totalMaxStarColWidth += cr.maxPixelLength;
-								totalStarsInCols += cr.starLengthPercent;
+								totalStarsInCols += cr.stars;
 							}
 							break;
 					}
@@ -618,8 +614,6 @@ namespace Motvin.LayoutGrid
 
 					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
 					{
-						cr.starLengthPercent /= totalStarsInCols; // convert from star length to star length percent
-
 						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
 						{
@@ -655,6 +649,7 @@ namespace Motvin.LayoutGrid
 			haveColsChanged = false; // set this to false because we got all of the col info in this function
 		}
 
+		// this is the exact duplicate of CreateColInfo except that is renames all Col to Row and Width to Height
 		private void CreateRowInfo(bool isInfinite)
 		{
 			rowInfoArrayCount = RowDefinitions.Count;
@@ -695,7 +690,6 @@ namespace Motvin.LayoutGrid
 				}
 
 				cr.stars = 1.0;
-				cr.starLengthPercent = 1.0;
 				cr.maxPixelLength = double.PositiveInfinity;
 
 				totalStarsInRows = 1.0;
@@ -779,14 +773,13 @@ namespace Motvin.LayoutGrid
 
 								starRowCount++;
 								cr.stars = c.Height.Value;
-								cr.starLengthPercent = c.Height.Value;
 								if (cr.minPixelLength != 0)
 								{
 									starRowCountMinNotZero++;
 									totalMinStarRowHeight += cr.minPixelLength;
 								}
 								totalMaxStarRowHeight += cr.maxPixelLength;
-								totalStarsInRows += cr.starLengthPercent;
+								totalStarsInRows += cr.stars;
 							}
 							break;
 					}
@@ -816,8 +809,6 @@ namespace Motvin.LayoutGrid
 
 					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
 					{
-						cr.starLengthPercent /= totalStarsInRows; // convert from star length to star length percent
-
 						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
 						{
@@ -942,10 +933,13 @@ namespace Motvin.LayoutGrid
 					rowSpan = rowInfoArrayCount - row;
 				}
 
-				LayoutGridUnitType colType = colInfoArray[col].unitType;
-				LayoutGridUnitType rowType = rowInfoArray[row].unitType;
-
 				// cellGroup must be set based on the unitTypes, not effectiveUnitTypes
+				//LayoutGridUnitType colType = colInfoArray[col].unitType;
+				//LayoutGridUnitType rowType = rowInfoArray[row].unitType;
+
+				LayoutGridUnitType colType = colInfoArray[col].effectiveUnitType;
+				LayoutGridUnitType rowType = rowInfoArray[row].effectiveUnitType;
+
 				if (colSpan <= 1 && rowSpan <= 1)
 				{
 					// some of these if statements could be replaced by setting bit switches from the colType/rowType to determine the cellGroup??? - don't think it's worth it though
@@ -958,6 +952,8 @@ namespace Motvin.LayoutGrid
 						n.colSpan = colSpan;
 						n.rowSpan = rowSpan;
 						n.cellGroup = CellGroup_AutoColStarRow;
+						n.colFlags |= (ushort)colInfoArray[col].unitType;
+						n.rowFlags |= (ushort)rowInfoArray[row].unitType;
 					}
 					else if (rowType == LayoutGridUnitType.Star)
 					{
@@ -968,6 +964,8 @@ namespace Motvin.LayoutGrid
 						n.colSpan = colSpan;
 						n.rowSpan = rowSpan;
 						n.cellGroup = CellGroup_PixelOrStarColStarRow;
+						n.colFlags |= (ushort)colInfoArray[col].unitType;
+						n.rowFlags |= (ushort)rowInfoArray[row].unitType;
 					}
 					else if (colType == LayoutGridUnitType.Star)
 					{
@@ -978,6 +976,8 @@ namespace Motvin.LayoutGrid
 						n.colSpan = colSpan;
 						n.rowSpan = rowSpan;
 						n.cellGroup = CellGroup_StarColPixelOrAutoRow;
+						n.colFlags |= (ushort)colInfoArray[col].unitType;
+						n.rowFlags |= (ushort)rowInfoArray[row].unitType;
 
 						haveStarColAndAutoRowChildren |= (rowType == LayoutGridUnitType.Auto);
 					}
@@ -990,13 +990,13 @@ namespace Motvin.LayoutGrid
 						n.colSpan = colSpan;
 						n.rowSpan = rowSpan;
 						n.cellGroup = CellGroup_PixelOrAutoColRow;
+						n.colFlags |= (ushort)colInfoArray[col].unitType;
+						n.rowFlags |= (ushort)rowInfoArray[row].unitType;
 					}
 				}
 				else
 				{
 					//??? probably have to reset/get this stuff and re-sort if infinite width/height and star is treated as auto
-					//ushort colFlags = 0;
-					//ushort rowFlags;
 
 					ushort colFlags = 0;
 					if (colSpan > 1)
@@ -1013,10 +1013,24 @@ namespace Motvin.LayoutGrid
 							j++;
 						} while (j < maxColOrRowInSpanPlus1);
 
-						if ((colFlags & ChildFlag_SpanHasAuto) != 0 && ((colFlags & ChildFlag_SpanHasStar) == 0 || isInfiniteWidth))
+						if (isInfiniteWidth)
 						{
-							colFlags |= ChildFlag_SpanHasAutoNoStar;
+							if ((colFlags & ChildFlag_SpanHasAutoOrStar) != 0)
+							{
+								colFlags |= ChildFlag_SpanHasAutoNoStar;
+							}
 						}
+						else
+						{
+							if ((colFlags & ChildFlag_SpanHasAuto) != 0 && ((colFlags & ChildFlag_SpanHasStar) == 0))
+							{
+								colFlags |= ChildFlag_SpanHasAutoNoStar;
+							}
+						}
+					}
+					else
+					{
+						colFlags |= (ushort)colInfoArray[col].unitType;
 					}
 
 					ushort rowFlags = 0;
@@ -1034,17 +1048,37 @@ namespace Motvin.LayoutGrid
 							j++;
 						} while (j < maxColOrRowInSpanPlus1);
 
-						if ((rowFlags & ChildFlag_SpanHasAuto) != 0 && ((rowFlags & ChildFlag_SpanHasStar) == 0 || isInfiniteHeight))
+						if (isInfiniteHeight)
 						{
-							rowFlags |= ChildFlag_SpanHasAutoNoStar;
+							if ((rowFlags & ChildFlag_SpanHasAutoOrStar) != 0)
+							{
+								rowFlags |= ChildFlag_SpanHasAutoNoStar;
+							}
+						}
+						else
+						{
+							if ((rowFlags & ChildFlag_SpanHasAuto) != 0 && ((rowFlags & ChildFlag_SpanHasStar) == 0))
+							{
+								rowFlags |= ChildFlag_SpanHasAutoNoStar;
+							}
 						}
 					}
+					else
+					{
+						rowFlags |= (ushort)rowInfoArray[row].unitType;
+					}
 
-					// cellGroup must be set based on the unitTypes, not effectiveUnitTypes
-					bool colOrSpanHasStars = (colFlags & ChildFlag_SpanHasStar) != 0 || (colType == LayoutGridUnitType.Star);
-					bool rowOrSpanHasStars = (rowFlags & ChildFlag_SpanHasStar) != 0 || (rowType == LayoutGridUnitType.Star);
+					//bool colOrSpanHasStars = ((colFlags & ChildFlag_SpanHasStar) != 0 || (colType == LayoutGridUnitType.Star)) && !isInfiniteWidth;
+					//bool rowOrSpanHasStars = ((rowFlags & ChildFlag_SpanHasStar) != 0 || (rowType == LayoutGridUnitType.Star)) && !isInfiniteHeight;
 
-					haveStarColAndAutoRowChildren |= colOrSpanHasStars && ((rowFlags & ChildFlag_SpanHasAuto) != 0 || (rowType == LayoutGridUnitType.Auto));
+					bool colOrSpanHasStars = (colFlags & ChildFlag_SpanHasStar) != 0 && !isInfiniteWidth;
+					bool rowOrSpanHasStars = (rowFlags & ChildFlag_SpanHasStar) != 0 && !isInfiniteHeight;
+					bool colOrSpanHasAuto = (colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (colFlags & ChildFlag_SpanHasStar) != 0);
+					bool rowOrSpanHasAuto = (rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (rowFlags & ChildFlag_SpanHasStar) != 0);
+
+					haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
+					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowFlags & ChildFlag_SpanHasAuto) != 0;
+					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && ((rowFlags & ChildFlag_SpanHasAuto) != 0 || (rowType == LayoutGridUnitType.Auto));
 
 					ref ChildInfo n = ref childInfoArray[firstIndexForOtherCellGroups--];
 					n.child = child;
@@ -1059,7 +1093,9 @@ namespace Motvin.LayoutGrid
 					{
 						n.cellGroup = CellGroup_PixelOrAutoColRowWithSpan;
 					}
-					else if (!colOrSpanHasStars && ((n.colFlags & ChildFlag_SpanHasAuto) != 0 || (colType == LayoutGridUnitType.Auto)) && rowOrSpanHasStars)
+					else if (!colOrSpanHasStars && colOrSpanHasAuto && rowOrSpanHasStars)
+					//else if (!colOrSpanHasStars && (n.colFlags & ChildFlag_SpanHasAuto) != 0 && rowOrSpanHasStars)
+					//else if (!colOrSpanHasStars && ((n.colFlags & ChildFlag_SpanHasAuto) != 0 || (colType == LayoutGridUnitType.Auto)) && rowOrSpanHasStars)
 					{
 						n.cellGroup = CellGroup_AutoColStarRowWithSpan;
 					}
@@ -1242,6 +1278,7 @@ namespace Motvin.LayoutGrid
 			}
 		}
 
+		// this is the exact same code as DistributeStarColWidth except it uses Row instead of Col and Height instead of Width - maybe make this a single function???
 		private void DistributeStarRowHeight(double starLength)
 		{
 			int idx;
@@ -1393,21 +1430,21 @@ namespace Motvin.LayoutGrid
 
 					if (cr.effectiveUnitType == LayoutGridUnitType.Auto && !cr.isResolved)
 					{
-						if (cr.constrainedPixelLength + extraLengthPerAuto > cr.maxPixelLength)
+						double length;
+						if (cr.constrainedPixelLength >= cr.minPixelLength)
+						{
+							length = cr.constrainedPixelLength;
+						}
+						else
+						{
+							length = cr.minPixelLength;
+						}
+
+						if (length + extraLengthPerAuto > cr.maxPixelLength)
 						{
 							noMaxConstrainedInThisLoop = false;
 
 							spanUnresolvedAutoCount--;
-
-							double length;
-							if (cr.constrainedPixelLength >= cr.minPixelLength)
-							{
-								length = cr.constrainedPixelLength;
-							}
-							else
-							{
-								length = cr.minPixelLength;
-							}
 
 							used = cr.maxPixelLength - length;
 							remainingSpanExtraLength -= used;
@@ -1488,6 +1525,8 @@ namespace Motvin.LayoutGrid
 			double availableChildWidth;
 			double availableChildHeight;
 			int i;
+			int colSpan;
+			int rowSpan;
 
 #if CollectPerformanceStats
 			preMeasureTicks = 0;
@@ -1762,56 +1801,124 @@ namespace Motvin.LayoutGrid
 				if (isWidthDiff || isHeightDiff)
 				{
 					// if something changed in the infinite width / height values, then need to change things about the children array
-					//??? do we need to change the cell group and resort?
-					for (i = 0; i < childInfoArrayCount; i++)
+					//??? do we need to change the cell group and resort? yes
+
+					for (i = 0; i < childInfoArrayCount - 1; i++)
 					{
 						ref ChildInfo n = ref childInfoArray[i];
 
-						if (isWidthDiff)
-						{
-							if (isInfiniteWidth)
-							{
-								if ((n.colFlags & ChildFlag_SpanHasAuto) != 0 && (n.colFlags & ChildFlag_SpanHasStar) == 0)
-								{
-									n.colFlags |= ChildFlag_SpanHasAutoNoStar;
-								}
-								else
-								{
-									n.colFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
-								}
-							}
-							else if ((n.colFlags & ChildFlag_SpanHasAuto) != 0 && (n.colFlags & ChildFlag_SpanHasStar) == 0)
-							{
-								n.colFlags |= ChildFlag_SpanHasAutoNoStar;
-							}
-							else
-							{
-								n.colFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
-							}
-						}
+						LayoutGridUnitType colType = colInfoArray[n.col].effectiveUnitType;
+						LayoutGridUnitType rowType = rowInfoArray[n.row].effectiveUnitType;
 
-						if (isHeightDiff)
+						colSpan = n.colSpan;
+						rowSpan = n.rowSpan;
+
+						if (colSpan <= 1 && rowSpan <= 1)
 						{
-							if (isInfiniteHeight)
+							// some of these if statements could be replaced by setting bit switches from the colType/rowType to determine the cellGroup??? - don't think it's worth it though
+							if (colType == LayoutGridUnitType.Auto && rowType == LayoutGridUnitType.Star)
 							{
-								if ((n.rowFlags & ChildFlag_SpanHasAuto) != 0 && (n.rowFlags & ChildFlag_SpanHasStar) == 0)
-								{
-									n.rowFlags |= ChildFlag_SpanHasAutoNoStar;
-								}
-								else
-								{
-									n.rowFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
-								}
+								n.cellGroup = CellGroup_AutoColStarRow;
 							}
-							else if ((n.rowFlags & ChildFlag_SpanHasAuto) != 0 && (n.rowFlags & ChildFlag_SpanHasStar) == 0)
+							else if (rowType == LayoutGridUnitType.Star)
 							{
-								n.rowFlags |= ChildFlag_SpanHasAutoNoStar;
+								n.cellGroup = CellGroup_PixelOrStarColStarRow;
+							}
+							else if (colType == LayoutGridUnitType.Star)
+							{
+								n.cellGroup = CellGroup_StarColPixelOrAutoRow;
+
+								haveStarColAndAutoRowChildren |= (rowType == LayoutGridUnitType.Auto);
 							}
 							else
 							{
-								n.rowFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
+								n.cellGroup = CellGroup_PixelOrAutoColRow;
 							}
 						}
+						else
+						{
+							if (isWidthDiff)
+							{
+								if (n.colSpan > 1)
+								{
+									if (isInfiniteWidth)
+									{
+										if ((n.colFlags & ChildFlag_SpanHasAuto) != 0 && (n.colFlags & ChildFlag_SpanHasStar) == 0)
+										{
+											n.colFlags |= ChildFlag_SpanHasAutoNoStar;
+										}
+										else
+										{
+											n.colFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
+										}
+									}
+									else if ((n.colFlags & ChildFlag_SpanHasAuto) != 0 && (n.colFlags & ChildFlag_SpanHasStar) == 0)
+									{
+										n.colFlags |= ChildFlag_SpanHasAutoNoStar;
+									}
+									else
+									{
+										n.colFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
+									}
+								}
+							}
+
+							if (isHeightDiff)
+							{
+								if (n.rowSpan > 1)
+								{
+									if (isInfiniteHeight)
+									{
+										if ((n.rowFlags & ChildFlag_SpanHasAuto) != 0 && (n.rowFlags & ChildFlag_SpanHasStar) == 0)
+										{
+											n.rowFlags |= ChildFlag_SpanHasAutoNoStar;
+										}
+										else
+										{
+											n.rowFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
+										}
+									}
+									else if ((n.rowFlags & ChildFlag_SpanHasAuto) != 0 && (n.rowFlags & ChildFlag_SpanHasStar) == 0)
+									{
+										n.rowFlags |= ChildFlag_SpanHasAutoNoStar;
+									}
+									else
+									{
+										n.rowFlags &= ChildFlag_SpanHasAutoNoStar_Reset;
+									}
+								}
+							}
+
+							bool colOrSpanHasStars = (n.colFlags & ChildFlag_SpanHasStar) != 0 && !isInfiniteWidth;
+							bool rowOrSpanHasStars = (n.rowFlags & ChildFlag_SpanHasStar) != 0 && !isInfiniteHeight;
+							bool colOrSpanHasAuto = (n.colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (n.colFlags & ChildFlag_SpanHasStar) != 0);
+							bool rowOrSpanHasAuto = (n.rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (n.rowFlags & ChildFlag_SpanHasStar) != 0);
+
+							haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
+
+							if (!colOrSpanHasStars && !rowOrSpanHasStars)
+							{
+								n.cellGroup = CellGroup_PixelOrAutoColRowWithSpan;
+							}
+							else if (!colOrSpanHasStars && colOrSpanHasAuto && rowOrSpanHasStars)
+							{
+								n.cellGroup = CellGroup_AutoColStarRowWithSpan;
+							}
+							else if (colOrSpanHasStars && !rowOrSpanHasStars)
+							{
+								n.cellGroup = CellGroup_StarColPixelOrAutoRowWithSpan;
+							}
+							else
+							{
+								n.cellGroup = CellGroup_PixelOrStarColStarRowWithSpan;
+							}
+						}
+					}
+
+					int len = childInfoArrayCount - firstIndexForOtherCellGroups;
+					if (len > 1)
+					{
+						Array.Sort(childInfoArray, firstIndexForOtherCellGroups, len, compareChildInfoByCellGroup);
 					}
 				}
 			}
@@ -1866,8 +1973,6 @@ namespace Motvin.LayoutGrid
 			int cellGroup;
 			int col;
 			int row;
-			int colSpan;
-			int rowSpan;
 
 			for (i = 0; ; i++) 
 			{
@@ -2141,14 +2246,6 @@ namespace Motvin.LayoutGrid
 
 				colSpan = n.colSpan;
 				rowSpan = n.rowSpan;
-
-#if DEBUG //???
-				string name = (string)n.child.GetValue(FrameworkElement.NameProperty);
-				if (name == "btn7")
-				{
-					int asdf = 1;
-				}
-#endif
 
 				if (colSpan > 1)
 				{

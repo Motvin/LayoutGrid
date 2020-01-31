@@ -415,6 +415,165 @@ namespace LayoutGridTest
 			}
 		}
 
+		public static void SetupRandomGridDifferentControls(Grid g, int seed, bool allowZeroMax = true)
+		{
+			Random rand = new Random(seed);
+
+			int colCnt = rand.NextInc(1, 7);
+			int rowCnt = rand.NextInc(1, 10);
+
+			g.ColumnDefinitions.Clear();
+			for (int i = 0; i < colCnt; i++)
+			{
+				ColumnDefinition c = new ColumnDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 20);
+
+				if (unitTypeInt <= 3)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Width = len;
+				}
+				else if (unitTypeInt >= 10)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 50), GridUnitType.Star);
+					c.Width = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Width = len;
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MinWidth = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					if (allowZeroMax)
+					{
+						c.MaxWidth = rand.NextInc(0, 300);
+					}
+					else
+					{
+						c.MaxWidth = rand.NextInc(1, 300);
+					}
+				}
+
+				g.ColumnDefinitions.Add(c);
+			}
+
+			g.RowDefinitions.Clear();
+			for (int i = 0; i < rowCnt; i++)
+			{
+				RowDefinition c = new RowDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt <= 3)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Height = len;
+				}
+				else if (unitTypeInt >= 10)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 50), GridUnitType.Star);
+					c.Height = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Height = len;
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MinHeight = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) >= 3)
+				{
+					c.MaxHeight = rand.NextInc(0, 300);
+				}
+
+				g.RowDefinitions.Add(c);
+			}
+
+			HashSet<long> colAndRowSet = new HashSet<long>();
+			int childTryCnt = rand.NextInc(1, ((colCnt + 4) * rowCnt));
+			int childCnt = 0;
+			for (int i = 0; i < childTryCnt; i++)
+			{
+				int col = rand.NextInc(0, colCnt - 1);
+				int row = rand.NextInc(0, rowCnt - 1);
+
+				if (colAndRowSet.Add(CombineIntsIntoLong(col, row)) || rand.NextInc(1, 20) == 1)
+				{
+					int colSpan = 1;
+
+					if (rand.NextInc(0, 20) == 0)
+					{
+						colSpan = rand.NextInc(2, 10);
+						colSpan = Math.Min(colSpan, colCnt - col);
+					}
+
+					int rowSpan = 1;
+
+					if (rand.NextInc(0, 20) == 0)
+					{
+						rowSpan = rand.NextInc(2, 10);
+						rowSpan = Math.Min(rowSpan, rowCnt - row);
+					}
+
+					int controlTypeRand = rand.NextInc(0, 20);
+					UIElement n;
+					if (controlTypeRand <= 4)
+					{
+						Button b = new Button();
+						n = b;
+						b.Name = "btn" + childCnt.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 20));
+					}
+					else if (controlTypeRand <= 9)
+					{
+						Label b = new Label();
+						n = b;
+						b.Name = "lbl" + childCnt.ToString("0");
+						b.Content = "Label " + b.Name + new string('X', rand.NextInc(0, 20));
+					}
+					else if (controlTypeRand <= 14)
+					{
+						TextBox b = new TextBox();
+						n = b;
+						b.Name = "txt" + childCnt.ToString("0");
+						b.Text = "Text " + b.Name + new string('X', rand.NextInc(0, 20));
+					}
+					else
+					{
+						ComboBox b = new ComboBox();
+						n = b;
+						b.Name = "cbo" + childCnt.ToString("0");
+						b.Text = "Combo " + b.Name + new string('X', rand.NextInc(0, 20));
+					}
+
+					Grid.SetColumn(n, col);
+					Grid.SetRow(n, row);
+
+					Grid.SetColumnSpan(n, colSpan);
+					Grid.SetRowSpan(n, rowSpan);
+					g.Children.Add(n);
+					childCnt++;
+					//if (rand.NextInc(0, 200) == 0)
+					//{
+					//	g.Children.Add(null); //??? can't be null, so why do we even check for null - maybe can be null for databound children
+					//	childCnt++;
+					//}
+				}
+			}
+		}
+
 		public static void SetupRandomGridSpans(Grid g, int seed, bool putChildrenOnSeparateRows, out bool hasZeroStars)
 		{
 			hasZeroStars = false;
@@ -629,19 +788,68 @@ namespace LayoutGridTest
 
 			foreach (UIElement child in grd.Children)
 			{
-				Button b2 = child as Button;
-				if (b2 != null)
+				if (child == null)
 				{
-					Button b = new Button();
-					b.Name = b2.Name;
-					b.Content = b2.Content;
+					g.Children.Add(null);
+				}
+				else
+				{
+					if (child is Button)
+					{
+						Button b2 = child as Button;
+						Button b = new Button();
+						b.Name = b2.Name;
+						b.Content = b2.Content;
 
-					Grid.SetColumn(b, Grid.GetColumn(b2));
-					Grid.SetRow(b, Grid.GetRow(b2));
+						Grid.SetColumn(b, Grid.GetColumn(b2));
+						Grid.SetRow(b, Grid.GetRow(b2));
 
-					Grid.SetColumnSpan(b, Grid.GetColumnSpan(b2));
-					Grid.SetRowSpan(b, Grid.GetRowSpan(b2));
-					g.Children.Add(b);
+						Grid.SetColumnSpan(b, Grid.GetColumnSpan(b2));
+						Grid.SetRowSpan(b, Grid.GetRowSpan(b2));
+						g.Children.Add(b);
+					}
+					else if (child is Label)
+					{
+						Label l2 = child as Label;
+						Label l = new Label();
+						l.Name = l2.Name;
+						l.Content = l2.Content;
+
+						Grid.SetColumn(l, Grid.GetColumn(l2));
+						Grid.SetRow(l, Grid.GetRow(l2));
+
+						Grid.SetColumnSpan(l, Grid.GetColumnSpan(l2));
+						Grid.SetRowSpan(l, Grid.GetRowSpan(l2));
+						g.Children.Add(l);
+					}
+					else if (child is TextBox)
+					{
+						TextBox t2 = child as TextBox;
+						TextBox t = new TextBox();
+						t.Name = t2.Name;
+						t.Text = t2.Text;
+
+						Grid.SetColumn(t, Grid.GetColumn(t2));
+						Grid.SetRow(t, Grid.GetRow(t2));
+
+						Grid.SetColumnSpan(t, Grid.GetColumnSpan(t2));
+						Grid.SetRowSpan(t, Grid.GetRowSpan(t2));
+						g.Children.Add(t);
+					}
+					else if (child is ComboBox)
+					{
+						ComboBox c2 = child as ComboBox;
+						ComboBox c = new ComboBox();
+						c.Name = c2.Name;
+						c.Text = c2.Text;
+
+						Grid.SetColumn(c, Grid.GetColumn(c2));
+						Grid.SetRow(c, Grid.GetRow(c2));
+
+						Grid.SetColumnSpan(c, Grid.GetColumnSpan(c2));
+						Grid.SetRowSpan(c, Grid.GetRowSpan(c2));
+						g.Children.Add(c);
+					}
 				}
 			}
 		}
