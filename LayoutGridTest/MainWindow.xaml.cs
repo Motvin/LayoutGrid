@@ -121,6 +121,11 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
+
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -189,6 +194,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Many Children";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
 				StringBuilder sb2 = GridLog.CreateGridString(g2, seed);
@@ -268,6 +290,11 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
+
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -340,7 +367,7 @@ namespace LayoutGridTest
 					break;
 				}
 
-				if (seed == 159 && useInfinite)
+				if (seed > 159 && useInfinite)
 				{
 					break;
 				}
@@ -371,6 +398,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Spans";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
 				StringBuilder sb2 = GridLog.CreateGridString(g2, seed);
@@ -456,6 +500,10 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -509,6 +557,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 Rand 2";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				StringBuilder sb1 = GridLog.CreateGridString(g1, seed);
 				StringBuilder sb2 = GridLog.CreateGridString(g2, seed);
@@ -604,6 +669,10 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -662,6 +731,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false;
 				win2.Title = "Test Grid 2 Stars";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				sb1 = GridLog.CreateGridString(g1, seed);
 				sb2 = GridLog.CreateGridString(g2, seed);
@@ -748,6 +834,10 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -807,6 +897,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false;
 				win2.Title = "Test Grid 2 Stars";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				sb1 = GridLog.CreateGridString(g1, seed);
 				sb2 = GridLog.CreateGridString(g2, seed);
@@ -900,6 +1007,10 @@ namespace LayoutGridTest
 		{
 			int testCount = 0;
 			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
 			while (true)
 			{
 				if ((testCount % 500) == 0)
@@ -911,15 +1022,15 @@ namespace LayoutGridTest
 				}
 
 				if (
-					(seed == 235 && useInfinite) || // ??? check
-					(seed == 604 && useInfinite) || // ??? check
-					(seed == 1171 && useInfinite) || // ??? check
-					(seed == 1603 && useInfinite) || // ??? check
-					(seed == 2306 && useInfinite) || // ??? check
-					(seed == 2830 && useInfinite) || // ??? check
-					(seed == 3483 && useInfinite) || // ??? check
-					(seed == 3542 && useInfinite) || // ??? check
-					(seed == 3655 && useInfinite) || // ??? check
+					(seed == 235 && useInfinite) || // Grid expands spans beyond max col widths
+					(seed == 604 && useInfinite) || // different span distributions
+					(seed == 1171 && useInfinite) || // different span distributions
+					(seed == 1603 && useInfinite) || // different span distributions
+					(seed == 2306 && useInfinite) || // Grid expands pixel col
+					(seed == 2830 && useInfinite) || // we respect max, Grid goes over max
+					(seed == 3483 && useInfinite) || // we respect max, Grid goes over max
+					(seed == 3542 && useInfinite) || // different span distributions
+					(seed == 3655 && useInfinite) || // Grid expands pixel
 					seed == 760 || // Grid is very wrong.  For some reason there is a min col and a col with no min/max and one col with a max and yet it can't figure out the correct ratios
 					seed == 794 || // Grid is wrong.  Some Auto cols have controls that have desired width and rendered width > max???
 					seed == 901 || // Grid is wrong.  Some Auto cols have controls that have desired width and rendered width > max???
@@ -967,6 +1078,23 @@ namespace LayoutGridTest
 				//win2.ShowInTaskbar = false;
 				win2.Title = "Test Grid 2 Diff";
 				win2.Show();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
 
 				sb1 = GridLog.CreateGridString(g1, seed);
 				sb2 = GridLog.CreateGridString(g2, seed);
@@ -1358,11 +1486,28 @@ namespace LayoutGridTest
 
 		private void btnTestComplex_Click(object sender, RoutedEventArgs e)
 		{
-			TestComplexLayout_LayoutGrid swin = new TestComplexLayout_LayoutGrid();
-			swin.Show();
+			int testCount = 1;
+			TestComplexLayout_LayoutGrid lgWin = new TestComplexLayout_LayoutGrid();
+			lgWin.Width = 800;
+			lgWin.Height = 500;
+			lgWin.Show();
 
 			TestComplexLayout_Grid win = new TestComplexLayout_Grid();
+			win.Width = 800;
+			win.Height = 500;
 			win.Show();
+
+			StringBuilder sb1 = GridLog.CreateGridString(win.gridx, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(lgWin.gridx, 1);
+
+			string s1 = sb1.ToString();
+			string s2 = sb2.ToString();
+
+			if (!string.Equals(s1, s2, StringComparison.Ordinal)
+				)
+			{
+				testCount++;
+			}
 		}
 
 		private void btnGCCollect_Click(object sender, RoutedEventArgs e)

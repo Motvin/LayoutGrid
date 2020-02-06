@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
-        Title="TestComplexLayout_Grid" Height="500" Width="800">
+        Title="TestComplexLayout_Grid" Height="654" Width="1424">
 	<Grid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />

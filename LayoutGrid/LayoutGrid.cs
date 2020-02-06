@@ -17,22 +17,63 @@ namespace Motvin.LayoutGrid
 {
 	public class LayoutGrid : Panel//, IAddChild // Panel implements IAddChild, so I'm not sure why it is implemented here??? - maybe it uses explicit interface ...?
 	{
-		//public static readonly DependencyProperty ShowGridLinesProperty;
-
 		//??? i'm not sure that these properties affect both arrange and measure
 		//[CommonDependencyPropertyAttribute]
-		public static readonly DependencyProperty ColumnProperty = DependencyProperty.RegisterAttached("Column", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+		public static readonly DependencyProperty ColumnProperty = 
+			DependencyProperty.RegisterAttached("Column", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
 		//[CommonDependencyPropertyAttribute]
-		public static readonly DependencyProperty RowProperty = DependencyProperty.RegisterAttached("Row", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+		public static readonly DependencyProperty RowProperty = 
+			DependencyProperty.RegisterAttached("Row", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
 		//[CommonDependencyPropertyAttribute]
-		public static readonly DependencyProperty ColumnSpanProperty = DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+		public static readonly DependencyProperty ColumnSpanProperty = 
+			DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
 		//[CommonDependencyPropertyAttribute]
-		public static readonly DependencyProperty RowSpanProperty = DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+		public static readonly DependencyProperty RowSpanProperty = 
+			DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(LayoutGrid), new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-		public static readonly DependencyProperty IsSharedSizeScopeProperty = DependencyProperty.RegisterAttached("IsSharedSizeScope", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+		public static readonly DependencyProperty IsSharedSizeScopeProperty = 
+			DependencyProperty.RegisterAttached("IsSharedSizeScope", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+		public static readonly DependencyProperty ShowGridLinesProperty = 
+			DependencyProperty.RegisterAttached("ShowGridLines", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnShowGridLinesPropertyChanged)));
+
+		private static void OnShowGridLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			LayoutGrid g = d as LayoutGrid;
+
+			if (g != null)
+			{
+				bool val = false;
+				if (e.NewValue is bool)
+				{
+					val = (bool)e.NewValue;
+				}
+
+				if (val)
+				{
+					g.gridLinesVisual = new LayoutGridLinesVisual();
+				}
+				g.InvalidateVisual();
+			}
+			//???
+		}
+
+		//private bool showGridLines;//??? is it ok to use this instead of GetValue(ShowGridLinesProperty, ...)
+		public bool ShowGridLines
+		{
+			get
+			{
+				return (bool)GetValue(ShowGridLinesProperty);
+			}
+
+			set
+			{
+				SetValue(ShowGridLinesProperty, value);
+			}
+		}
 
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public ColumnDefCollection ColumnDefinitions { get; } = new ColumnDefCollection();
@@ -41,12 +82,156 @@ namespace Motvin.LayoutGrid
 		public double ColumnSpacing { get; set; }
 		public double RowSpacing { get; set; }
 
-		public bool ShowGridLines { get; set; } //??? is this needed?
-
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public RowDefCollection RowDefinitions { get; } = new RowDefCollection();
 
-		protected override int VisualChildrenCount { get { return base.VisualChildrenCount; } } //??? maybe need to add in grid lines renderer if this is used, otherwise we don't have to override this at all
+		protected override int VisualChildrenCount { get { return base.VisualChildrenCount + (ShowGridLines ? 1 : 0); } } //??? maybe need to add in grid lines renderer if this is used, otherwise we don't have to override this at all
+
+		// allow user to pass in the pen for grid lines drawing and to specify if outside border should be shown???
+		private class LayoutGridLinesVisual : DrawingVisual
+		{
+			Brush gridLinesBrush;
+			Pen gridLinesPen;
+
+			public LayoutGridLinesVisual()
+			{
+				//??? create and freeze drawing objects needed to draw grid lines
+				//mainCanvas.SnapsToDevicePixels = true;
+
+				//gridLines = new Image();
+				//gridLines.SetValue(Canvas.ZIndexProperty, 100);
+				//gridLines.SnapsToDevicePixels = true;
+
+				////Draw the grid        
+				//DrawingVisual gridLinesVisual = new DrawingVisual();
+				//DrawingContext dct = gridLinesVisual.RenderOpen();
+				//Pen blackPen = new Pen(Brushes.Black, 1.0);
+				//blackPen.Freeze();
+
+				////Draw the horizontal lines        
+				//Point x = new Point(0, 0.5);
+				//Point y = new Point(_width, 0.5);
+				//for (int i = 0; i <= _rows; i++)
+				//{
+				//	dct.DrawLine(blackPen, x, y);
+				//	x.Offset(0, _yOffset);
+				//	y.Offset(0, _yOffset);
+				//}
+				////Draw the vertical lines        
+				//x = new Point(0.5, 0);
+				//y = new Point(0.5, _height);
+				//for (int i = 0; i <= _columns; i++)
+				//{
+				//	dct.DrawLine(blackPen, x, y);
+				//	x.Offset(_xOffset, 0);
+				//	y.Offset(_xOffset, 0);
+				//}
+
+				//dct.Close();
+
+				//RenderTargetBitmap bmp = new RenderTargetBitmap((int)mainCanvas.ActualWidth, (int)mainCanvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+				//bmp.Render(gridLinesVisual);
+				//bmp.Freeze();
+				//gridLines.Source = bmp;
+
+				//mainCanvas.Children.Add(gridLines);
+			}
+
+			//??? why is this called at the end of ArrangeOverride
+			public void DrawGridLines(LayoutGrid g)
+			{
+				// this doesn't draw the outside grid border - maybe have an option to draw this???
+				if (g.ColumnDefinitions.Count > 1 || g.RowDefinitions.Count > 1)
+				{
+					if (gridLinesPen == null)
+					{
+						gridLinesBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
+						gridLinesBrush.Freeze();
+						gridLinesPen = new Pen(gridLinesBrush, 1.0);
+						gridLinesPen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
+						gridLinesPen.StartLineCap = PenLineCap.Flat;
+						gridLinesPen.EndLineCap = PenLineCap.Flat;
+						gridLinesPen.Freeze();
+					}
+
+					g.SnapsToDevicePixels = true; //??? if not true originally, then set this back?
+					//RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
+					//SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
+					using (DrawingContext dc = RenderOpen())
+					{
+						double lastColPos = 0;
+						double lastRowPos = 0;
+
+						if (g.rowInfoArrayCount > 0)
+						{
+							lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLengthOrPosition + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedPixelLength - 1.0) + 0.5;
+						}
+
+						for (int i = 1; ; i++)
+						{
+							ref GridColRowInfo cr = ref g.colInfoArray[i];
+
+							//Brush brush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
+							//Pen pen = new Pen(brush, 1.0);
+							//pen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
+							//pen.StartLineCap = PenLineCap.Flat;
+							//pen.EndLineCap = PenLineCap.Flat;
+							double x = Math.Round(cr.spanExtraLengthOrPosition) + 0.5;
+							dc.DrawLine(gridLinesPen, new Point(x, 0.5), new Point(x, lastRowPos));
+
+							if (i == g.colInfoArrayCount - 1)
+							{
+								lastColPos = Math.Round(cr.spanExtraLengthOrPosition + cr.constrainedPixelLength - 1.0) + 0.5;
+								break;
+							}
+						}
+
+						for (int i = 1; i < g.rowInfoArrayCount; i++)
+						{
+							ref GridColRowInfo cr = ref g.rowInfoArray[i];
+
+							//Brush brush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
+							//Pen pen = new Pen(brush, 1.0);
+							//pen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
+							//pen.StartLineCap = PenLineCap.Flat;
+							//pen.EndLineCap = PenLineCap.Flat;
+							double y = Math.Round(cr.spanExtraLengthOrPosition) + 0.5;
+							dc.DrawLine(gridLinesPen, new Point(0.5, y), new Point(lastColPos, y));
+						}
+					}
+				}
+			}
+		}
+		LayoutGridLinesVisual gridLinesVisual;
+
+		//??? maybe grid needs to implement these
+		// the base version supports zindex, but maybe need to override this to display the gridlines
+		protected override Visual GetVisualChild(int index)
+		{
+			if (ShowGridLines)
+			{
+				if (index == VisualChildrenCount - 1)
+				{
+					return gridLinesVisual; //??? return the Visual
+				}
+				else
+				{
+					return base.GetVisualChild(index);
+				}
+			}
+			else
+			{
+				return base.GetVisualChild(index);
+			}
+			//return Children[index];
+			//???return Children[(Children.Count - 1) - index];
+		}
+
+		//??? maybe grid needs to implement these
+		protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+		{
+
+		}
 
 		//???protected override IEnumerator LogicalChildren { get; } // not sure why this is needed?
 
@@ -235,21 +420,6 @@ namespace Motvin.LayoutGrid
 		{
 			return RowDefinitions.Count != 0;
 		}
-
-		//??? maybe grid needs to implement these
-		// the base version supports zindex, but maybe need to override this to display the gridlines
-		//protected override Visual GetVisualChild(int index)
-		//{
-		//	return base.GetVisualChild(index);
-		//	//return Children[index];
-		//	//???return Children[(Children.Count - 1) - index];
-		//}
-
-		//??? maybe grid needs to implement these
-		//protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-		//{
-
-		//}
 
 		private const ushort ChildFlag_SpanHasAuto = 1; // this flag must reflect the unitTypes (not effectiveUnitTypes)
 		private const ushort ChildFlag_SpanHasStar = 1 << 1; // this flag must reflect the unitTypes (not effectiveUnitTypes)
@@ -2532,6 +2702,11 @@ namespace Motvin.LayoutGrid
 #if CollectPerformanceStats
 			arrangeTicks = Stopwatch.GetTimestamp() - startTicks;
 #endif
+
+			if (gridLinesVisual != null)
+			{
+				gridLinesVisual.DrawGridLines(this);
+			}
 
 			return finalSize;
 		}

@@ -1,0 +1,30 @@
+﻿<Window x:Class="LayoutGridTest.TestInner_LayoutGrid"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayoutGridTest"
+ 		xmlns:p="clr-namespace:Motvin.LayoutGrid;assembly=LayoutGrid"
+		mc:Ignorable="d"
+        Title="TestInner_LayoutGrid" Height="450" Width="800">
+	<p:LayoutGrid>
+		<p:LayoutGrid>
+			<p:LayoutGrid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+			</p:LayoutGrid.ColumnDefinitions>
+			<p:LayoutGrid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</p:LayoutGrid.RowDefinitions>
+			<p:LayoutGrid x:Name="gridx" Grid.Row="0" Grid.Column="0">
+				<p:LayoutGrid.ColumnDefinitions>
+					<ColumnDefinition Width="1*" MinWidth="50" MaxWidth="200" />
+					<ColumnDefinition Width=".001*"/>
+				</p:LayoutGrid.ColumnDefinitions>
+				<p:LayoutGrid.RowDefinitions>
+					<RowDefinition Height="1*" />
+				</p:LayoutGrid.RowDefinitions>
+				<TextBox Grid.Row="0" Grid.Column="0" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Stretch" MinWidth="40" MaxWidth="200"/>
+			</p:LayoutGrid>
+		</p:LayoutGrid>
+	</p:LayoutGrid>
+</Window>
