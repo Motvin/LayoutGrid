@@ -54,7 +54,7 @@ namespace LayoutGridTest
 			public int childIndex;
 		}
 
-		public static void SetupRandomGrid(Grid g, int seed)
+		public static void SetupRandomGrid(Grid g, int seed, bool useInnerGrids)
 		{
 			Random rand = new Random(seed);
 
@@ -139,11 +139,32 @@ namespace LayoutGridTest
 				int col = rand.Next(0, colCnt - 1);
 				int row = rand.Next(0, rowCnt - 1);
 
-				Button b = new Button();
-				b.Name = "btn" + i.ToString("0");
-				b.Content = "Button " + b.Name + new string('X', rand.Next(0, 10));
+				UIElement t;
+				if (useInnerGrids)
+				{
+					if (rand.Next(0, 10) == 0)
+					{
+						Grid g2 = new Grid();
+						SetupRandomGrid(g2, seed + 1, false);
+						t = g2;
+					}
+					else
+					{
+						Button b = new Button();
+						b.Name = "btn" + i.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.Next(0, 10));
 
-				//??? also randomly insert other controls and grids set with this function
+						t = b;
+					}
+				}
+				else
+				{
+					Button b = new Button();
+					b.Name = "btn" + i.ToString("0");
+					b.Content = "Button " + b.Name + new string('X', rand.Next(0, 10));
+
+					t = b;
+				}
 
 				int colSpan = 1;
 
@@ -159,12 +180,12 @@ namespace LayoutGridTest
 					rowSpan = rand.Next(2, 10);
 				}
 
-				Grid.SetColumn(b, col);
-				Grid.SetRow(b, row);
+				Grid.SetColumn(t, col);
+				Grid.SetRow(t, row);
 
-				Grid.SetColumnSpan(b, colSpan);
-				Grid.SetRowSpan(b, rowSpan);
-				g.Children.Add(b);
+				Grid.SetColumnSpan(t, colSpan);
+				Grid.SetRowSpan(t, rowSpan);
+				g.Children.Add(t);
 			}
 		}
 
@@ -1085,14 +1106,17 @@ namespace LayoutGridTest
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), g, null);
 			List<Grid> childGridList = AddChildrenToString<Grid>(sb, g.Children);
 
-			sb.AppendLine("Child Grids:");
-
-			foreach (Grid grd in childGridList)
+			if (childGridList.Count > 0)
 			{
-				StringBuilder sbChild = CreateGridString(grd, seed);
+				sb.AppendLine("Child Grids:");
 
-				sb.Append(sbChild);
-				sb.AppendLine();
+				foreach (Grid grd in childGridList)
+				{
+					StringBuilder sbChild = CreateGridString(grd, seed);
+
+					sb.Append(sbChild);
+					sb.AppendLine();
+				}
 			}
 
 			return sb;
@@ -1108,14 +1132,17 @@ namespace LayoutGridTest
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), null, g);
 			List<LayoutGrid> childGridList = AddChildrenToString<LayoutGrid>(sb, g.Children);
 
-			sb.AppendLine("Child Grids:");
-
-			foreach (LayoutGrid grd in childGridList)
+			if (childGridList.Count > 0)
 			{
-				StringBuilder sbChild = CreateGridString(grd, seed);
+				sb.AppendLine("Child Grids:");
 
-				sb.Append(sbChild);
-				sb.AppendLine();
+				foreach (LayoutGrid grd in childGridList)
+				{
+					StringBuilder sbChild = CreateGridString(grd, seed);
+
+					sb.Append(sbChild);
+					sb.AppendLine();
+				}
 			}
 
 			return sb;

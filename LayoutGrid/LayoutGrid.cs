@@ -17,6 +17,22 @@ namespace Motvin.LayoutGrid
 {
 	public class LayoutGrid : Panel//, IAddChild // Panel implements IAddChild, so I'm not sure why it is implemented here??? - maybe it uses explicit interface ...?
 	{
+		static System.Drawing.Color redColor = System.Drawing.Color.FromArgb(255, 230, 25, 75);
+		static System.Drawing.Color greenColor = System.Drawing.Color.FromArgb(255, 60, 180, 75);
+		static System.Drawing.Color blueColor = System.Drawing.Color.FromArgb(255, 0, 130, 200);
+		static System.Drawing.Color orangeColor = System.Drawing.Color.FromArgb(255, 245, 130, 48);
+		static System.Drawing.Color cyanColor = System.Drawing.Color.FromArgb(255, 70, 240, 240);
+		static System.Drawing.Color magentaColor = System.Drawing.Color.FromArgb(255, 240, 50, 230);
+		static System.Drawing.Color yellowColor = System.Drawing.Color.FromArgb(255, 255, 255, 25);
+		static System.Drawing.Color maroonColor = System.Drawing.Color.FromArgb(255, 128, 0, 0);
+		static System.Drawing.Color tealColor = System.Drawing.Color.FromArgb(255, 0, 128, 128);
+		static System.Drawing.Color navyColor = System.Drawing.Color.FromArgb(255, 0, 0, 128);
+		static System.Drawing.Color brownColor = System.Drawing.Color.FromArgb(255, 170, 110, 40);
+		static System.Drawing.Color pinkColor = System.Drawing.Color.FromArgb(255, 250, 190, 190);
+		static System.Drawing.Color beigeColor = System.Drawing.Color.FromArgb(255, 255, 250, 200);
+		static System.Drawing.Color mintColor = System.Drawing.Color.FromArgb(255, 170, 255, 195);
+		static System.Drawing.Color lavendarColor = System.Drawing.Color.FromArgb(255, 230, 190, 255);
+
 		//??? i'm not sure that these properties affect both arrange and measure
 		//[CommonDependencyPropertyAttribute]
 		public static readonly DependencyProperty ColumnProperty = 
@@ -570,6 +586,9 @@ namespace Motvin.LayoutGrid
 		private double totalStarsInCols;
 		private double totalStarsInRows;
 
+		private double totalStarColWidth;
+		private double totalStarRowHeight;
+
 		private double totalPixelColWidth; // this is the total width (constrained) for all Pixel (absolute) sized cols
 		private double totalPixelRowHeight; // this is the total height (constrained) for all Pixel (absolute) sized rows
 
@@ -782,7 +801,7 @@ namespace Motvin.LayoutGrid
 				{
 					ref GridColRowInfo cr = ref colInfoArray[i];
 
-					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
+					if (cr.unitType == LayoutGridUnitType.Star) // use unitType here instead of effectiveUnitType because this initializes values of the star arrays
 					{
 						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
@@ -977,7 +996,7 @@ namespace Motvin.LayoutGrid
 				{
 					ref GridColRowInfo cr = ref rowInfoArray[i];
 
-					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
+					if (cr.unitType == LayoutGridUnitType.Star) // use unitType here instead of effectiveUnitType because this initializes values of the star arrays
 					{
 						s.index = i;
 						if (double.IsPositiveInfinity(cr.maxPixelLength))
@@ -1729,6 +1748,8 @@ namespace Motvin.LayoutGrid
 				// there is only a single cell in the grid (single column and single row), so we don't need to do the expensive processing, just do the easy/inexpensive processing below and return
 				double minWidth;
 				double maxWidth;
+				bool colIsAuto = false;
+				bool rowIsAuto = false;
 				if (ColumnDefinitions.Count == 1)
 				{
 					ColumnDefinition c = ColumnDefinitions[0];
@@ -1743,6 +1764,7 @@ namespace Motvin.LayoutGrid
 
 					if (colUnitType == LayoutGridUnitType.Auto)
 					{
+						colIsAuto = true;
 						availableChildWidth = double.PositiveInfinity;//??? I think this should be Max
 					}
 					else if (colUnitType == LayoutGridUnitType.Star)
@@ -1805,6 +1827,7 @@ namespace Motvin.LayoutGrid
 
 					if (rowUnitType == LayoutGridUnitType.Auto)
 					{
+						rowIsAuto = true;
 						availableChildHeight = double.PositiveInfinity;//??? I think this should be Max
 					}
 					else if (rowUnitType == LayoutGridUnitType.Star)
@@ -1888,7 +1911,10 @@ namespace Motvin.LayoutGrid
 							if (width > desiredWidth)
 							{
 								desiredWidth = width;
-								totalAutoColWidth = width;
+								if (colIsAuto)
+								{
+									totalAutoColWidth = width;
+								}
 							}
 						}
 
@@ -1899,7 +1925,10 @@ namespace Motvin.LayoutGrid
 							if (height > desiredHeight)
 							{
 								desiredHeight = height;
-								totalAutoRowHeight = height;
+								if (rowIsAuto)
+								{
+									totalAutoRowHeight = height;
+								}
 							}
 						}
 					}
@@ -2303,14 +2332,23 @@ namespace Motvin.LayoutGrid
 								{
 									cr.constrainedPixelLength += cr.spanExtraLengthOrPosition;
 								}
-								totalAutoColWidth += cr.constrainedPixelLength;
+
+								if (cr.unitType == LayoutGridUnitType.Auto)
+								{
+									totalAutoColWidth += cr.constrainedPixelLength; // don't add to this if it is a star treated as auto
+								}
+								else
+								{
+									totalStarColWidth += cr.constrainedPixelLength;
+								}
 							}
 						}
 					}
 
 					if (!isStarColLengthResolved && cellGroup >= CellGroup_StarColPixelOrAutoRow)
 					{
-						DistributeStarColWidth(availableSize.Width - (totalPixelColWidth + totalAutoColWidth));
+						totalStarColWidth = availableSize.Width - (totalPixelColWidth + totalAutoColWidth);
+						DistributeStarColWidth(totalStarColWidth);
 						isStarColLengthResolved = true;
 					}
 
@@ -2333,14 +2371,23 @@ namespace Motvin.LayoutGrid
 								{
 									cr.constrainedPixelLength += cr.spanExtraLengthOrPosition;
 								}
-								totalAutoRowHeight += cr.constrainedPixelLength;
+
+								if (cr.unitType == LayoutGridUnitType.Auto)
+								{
+									totalAutoRowHeight += cr.constrainedPixelLength; // don't add to this if it is a star treated as auto
+								}
+								else
+								{
+									totalStarRowHeight += cr.constrainedPixelLength;
+								}
 							}
 						}
 					}
 
 					if (!isStarRowLengthResolved && cellGroup >= distributeStarRowHeightBeforeCellGroup)
 					{
-						DistributeStarRowHeight(availableSize.Height - (totalPixelRowHeight + totalAutoRowHeight));
+						totalStarRowHeight = availableSize.Height - (totalPixelRowHeight + totalAutoRowHeight);
+						DistributeStarRowHeight(totalStarRowHeight);
 						isStarRowLengthResolved = true;
 					}
 
@@ -2550,7 +2597,7 @@ namespace Motvin.LayoutGrid
 			if (isInfiniteWidth)
 			{
 				// infinite width means return the min width that the content can fit in
-				desiredWidth = totalPixelColWidth + totalAutoColWidth;
+				desiredWidth = totalPixelColWidth + totalAutoColWidth + totalStarColWidth;
 			}
 			else
 			{
@@ -2562,7 +2609,7 @@ namespace Motvin.LayoutGrid
 			if (isInfiniteHeight)
 			{
 				// infinite height means return the min height that the content can fit in
-				desiredHeight = totalPixelRowHeight + totalAutoRowHeight;
+				desiredHeight = totalPixelRowHeight + totalAutoRowHeight + totalStarRowHeight;
 			}
 			else
 			{
@@ -2621,6 +2668,50 @@ namespace Motvin.LayoutGrid
 #endif
 				return finalSize;
 			}
+
+
+			//??? I'm not sure these DistributeStarColWidth/DistributeStarRowHeight calls would ever get called in this function
+			// they do get called if star mins take the grid past the avail length in MeasureOverride
+			// but I don't think they need to be called because the min will get used anyway in MeasureOverride
+			//if (starColCount > 0)
+			//{
+			//	double starColWidth = finalSize.Width - (totalPixelColWidth + totalAutoColWidth);
+
+			//	if (starColWidth != totalStarColWidth)
+			//	{
+			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
+			//		for (int i = 0; i < starColCount; i++)
+			//		{
+			//			ref StarMinMax t = ref starColMaxArray[i];
+
+			//			ref GridColRowInfo cr = ref colInfoArray[t.index];
+
+			//			cr.constrainedPixelLength = 0;
+			//		}
+
+			//		DistributeStarColWidth(starColWidth);
+			//	}
+			//}
+
+			//if (starRowCount > 0)
+			//{
+			//	double starRowHeight = finalSize.Height - (totalPixelRowHeight + totalAutoRowHeight);
+
+			//	if (starRowHeight != totalStarRowHeight)
+			//	{
+			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
+			//		for (int i = 0; i < starRowCount; i++)
+			//		{
+			//			ref StarMinMax t = ref starRowMaxArray[i];
+
+			//			ref GridColRowInfo cr = ref rowInfoArray[t.index];
+
+			//			cr.constrainedPixelLength = 0;
+			//		}
+
+			//		DistributeStarRowHeight(starRowHeight);
+			//	}
+			//}
 
 			double position;
 			position = 0;

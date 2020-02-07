@@ -26,11 +26,13 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked??true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix);
-			RunRandSpans(lblStatus, useInfinite, useInfiniteMix);
-			RunRand2(lblStatus, useInfinite, useInfiniteMix);
-			RunRandStars(lblStatus, useInfinite, useInfiniteMix);
-			//RunRandStarsNoZeroMax(lblStatus);
+			bool useInnerGrids = chkInnerGrids.IsChecked.Value;
+			RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
+			RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
+			RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
+			RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
+			RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
+			RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -39,7 +41,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -48,7 +51,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandSpans(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -57,7 +61,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRand2(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -66,7 +71,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandStars(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -75,7 +81,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -84,7 +91,8 @@ namespace LayoutGridTest
 		{
 			bool useInfinite = chkInfinite.IsChecked ?? true;
 			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
-			RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix);
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids);
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -117,7 +125,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static int RunRandManyChildren(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRandManyChildren(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -176,7 +184,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGrid(g1, seed);
+				GridLog.SetupRandomGrid(g1, seed, useInnerGrids);
 
 				LayoutGrid g2 = new LayoutGrid();
 
@@ -286,7 +294,7 @@ namespace LayoutGridTest
 			return testCount;
 		}
 
-		public static int RunRandSpans(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRandSpans(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -496,7 +504,7 @@ namespace LayoutGridTest
 			return testCount;
 		}
 
-		public static int RunRand2(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRand2(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -518,7 +526,6 @@ namespace LayoutGridTest
 					seed == 49 || // span expands pixel sized col/row for Grid, it should not
 					seed == 268 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					seed == 358 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
-					//seed == 425 || // Grid is correct and we are wrong.  We use the Min size as the constrained and this causes an uneven extra for span cols???
 					seed == 674 || // this is strange in that Grid somehow increases a column from a spanned col (but there is a star col in the span) and also the increase is completely unnecessary
 					seed == 668 || // we distribute to the auto and star row (which is effectively auto) evenly, where Grid does not
 					(seed == 859 && useInfinite) || // different ways of distributing span
@@ -665,7 +672,7 @@ namespace LayoutGridTest
 			return null;
 		}
 
-		public static int RunRandStars(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRandStars(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -830,7 +837,7 @@ namespace LayoutGridTest
 			return testCount;
 		}
 
-		public static int RunRandStarsNoZeroMax(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRandStarsNoZeroMax(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -1003,7 +1010,7 @@ namespace LayoutGridTest
 			return testCount;
 		}
 
-		public static int RunRandDifferentControls(Label lblStatus, bool useInfinite = false, bool useInfiniteMix = false)
+		public static int RunRandDifferentControls(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
 			int seed = 1;
@@ -1309,7 +1316,7 @@ namespace LayoutGridTest
 				layoutGridConstructorNanoSecsTotal += nanoSecs;
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGrid(g1, seed);
+				GridLog.SetupRandomGrid(g1, seed, false);
 
 				GridLog.CopyGridSetup(g1, g2);
 				g2.Name = "grd";
@@ -1513,6 +1520,32 @@ namespace LayoutGridTest
 		private void btnGCCollect_Click(object sender, RoutedEventArgs e)
 		{
 			PerfStatic.DoGCCollect();
+		}
+
+		private void btnInner_Click(object sender, RoutedEventArgs e)
+		{
+			int testCount = 1;
+			TestInner_LayoutGrid lgWin = new TestInner_LayoutGrid();
+			lgWin.Width = 800;
+			lgWin.Height = 500;
+			lgWin.Show();
+
+			TestInner_Grid win = new TestInner_Grid();
+			win.Width = 800;
+			win.Height = 500;
+			win.Show();
+
+			StringBuilder sb1 = GridLog.CreateGridString(win.gridx, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(lgWin.gridx, 1);
+
+			string s1 = sb1.ToString();
+			string s2 = sb2.ToString();
+
+			if (!string.Equals(s1, s2, StringComparison.Ordinal)
+				)
+			{
+				testCount++;
+			}
 		}
 	}
 }
