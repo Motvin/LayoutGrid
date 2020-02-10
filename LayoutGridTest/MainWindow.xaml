@@ -36,11 +36,11 @@
 		<Label Grid.Row="1" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
 		<Button Grid.Row="1" Grid.Column="2" Content="Inner" Margin="5" Padding="4,0,4,0" Name="btnInner" MinWidth="70" Click="btnInner_Click"/>
-		<Button Grid.Row="1" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn3" MinWidth="70"/>
+		<Button Grid.Row="1" Grid.Column="3" Content="Inner Check" Margin="5" Padding="4" Name="btnInnerCheck" MinWidth="70" Click="btnInnerCheck_Click"/>
 		<Button Grid.Row="1" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn4" MinWidth="70"/>
-		<CheckBox Grid.Row="1" Grid.Column="5" Content="Inner Grids" Margin="5" Name="chkInnerGrids" MinWidth="70" IsChecked="False"/>
+		<CheckBox Grid.Row="1" Grid.Column="5" Content="Inner Grids" Margin="5" Name="chkInnerGrids" MinWidth="70" IsChecked="True"/>
 		<CheckBox Grid.Row="1" Grid.Column="6" Content="Infinite" Margin="5" Name="chkInfinite" MinWidth="70" IsChecked="False"/>
-		<CheckBox Grid.Row="1" Grid.Column="7" Content="Infinite Mix" Margin="5" Name="chkInfiniteMix" MinWidth="70" IsChecked="True"/>
+		<CheckBox Grid.Row="1" Grid.Column="7" Content="Infinite Mix" Margin="5" Name="chkInfiniteMix" MinWidth="70" IsChecked="False"/>
 		<Label Grid.Row="2" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid 2:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>

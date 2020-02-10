@@ -7,8 +7,7 @@
  		xmlns:p="clr-namespace:Motvin.LayoutGrid;assembly=LayoutGrid"
 		mc:Ignorable="d"
         Title="TestInner_LayoutGrid" Height="450" Width="800">
-	<p:LayoutGrid>
-		<p:LayoutGrid>
+	<p:LayoutGrid Name="outerGrid">
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -29,6 +28,5 @@
 				</p:LayoutGrid.RowDefinitions>
 				<TextBox Grid.Row="0" Grid.Column="0" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Stretch" MinWidth="40" MaxWidth="200"/>
 			</p:LayoutGrid>
-		</p:LayoutGrid>
 	</p:LayoutGrid>
 </Window>

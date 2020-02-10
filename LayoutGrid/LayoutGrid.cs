@@ -17,6 +17,8 @@ namespace Motvin.LayoutGrid
 {
 	public class LayoutGrid : Panel//, IAddChild // Panel implements IAddChild, so I'm not sure why it is implemented here??? - maybe it uses explicit interface ...?
 	{
+		//??? these are distinct colors that can be used for different grid lines - could also look at visual studio colors
+		// vis. studio dash pattern is 3/3, a selection box (int Paint) dash pattern is 4 blue, 4 white
 		static System.Drawing.Color redColor = System.Drawing.Color.FromArgb(255, 230, 25, 75);
 		static System.Drawing.Color greenColor = System.Drawing.Color.FromArgb(255, 60, 180, 75);
 		static System.Drawing.Color blueColor = System.Drawing.Color.FromArgb(255, 0, 130, 200);
@@ -164,7 +166,7 @@ namespace Motvin.LayoutGrid
 						gridLinesBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
 						gridLinesBrush.Freeze();
 						gridLinesPen = new Pen(gridLinesBrush, 1.0);
-						gridLinesPen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
+						gridLinesPen.DashStyle = new DashStyle(new double[] { 2.0, 3.0 }, 0);
 						gridLinesPen.StartLineCap = PenLineCap.Flat;
 						gridLinesPen.EndLineCap = PenLineCap.Flat;
 						gridLinesPen.Freeze();
@@ -1739,6 +1741,8 @@ namespace Motvin.LayoutGrid
 
 			totalAutoColWidth = 0;
 			totalAutoRowHeight = 0;
+			totalStarColWidth = 0;
+			totalStarRowHeight = 0;
 
 			bool isInfiniteWidth = double.IsPositiveInfinity(availableSize.Width);
 			bool isInfiniteHeight = double.IsPositiveInfinity(availableSize.Height);
@@ -2594,6 +2598,10 @@ namespace Motvin.LayoutGrid
 			startTicks = Stopwatch.GetTimestamp();
 #endif
 
+			if (this.Name == "G1")
+			{
+				int asdf = 1;//???
+			}
 			if (isInfiniteWidth)
 			{
 				// infinite width means return the min width that the content can fit in
@@ -2669,49 +2677,48 @@ namespace Motvin.LayoutGrid
 				return finalSize;
 			}
 
-
 			//??? I'm not sure these DistributeStarColWidth/DistributeStarRowHeight calls would ever get called in this function
 			// they do get called if star mins take the grid past the avail length in MeasureOverride
 			// but I don't think they need to be called because the min will get used anyway in MeasureOverride
-			//if (starColCount > 0)
-			//{
-			//	double starColWidth = finalSize.Width - (totalPixelColWidth + totalAutoColWidth);
+			if (starColCount > 0 && finalSize.Width != DesiredSize.Width)
+			{
+				double starColWidth = finalSize.Width - (totalPixelColWidth + totalAutoColWidth);
 
-			//	if (starColWidth != totalStarColWidth)
-			//	{
-			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-			//		for (int i = 0; i < starColCount; i++)
-			//		{
-			//			ref StarMinMax t = ref starColMaxArray[i];
+				//if (starColWidth != totalStarColWidth) //??? I don't think this is the correct test because they could be equal, but not distributed correctly
+				{
+					// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
+					for (int i = 0; i < starColCount; i++)
+					{
+						ref StarMinMax t = ref starColMaxArray[i];
 
-			//			ref GridColRowInfo cr = ref colInfoArray[t.index];
+						ref GridColRowInfo cr = ref colInfoArray[t.index];
 
-			//			cr.constrainedPixelLength = 0;
-			//		}
+						cr.constrainedPixelLength = 0;
+					}
 
-			//		DistributeStarColWidth(starColWidth);
-			//	}
-			//}
+					DistributeStarColWidth(starColWidth);
+				}
+			}
 
-			//if (starRowCount > 0)
-			//{
-			//	double starRowHeight = finalSize.Height - (totalPixelRowHeight + totalAutoRowHeight);
+			if (starRowCount > 0 && finalSize.Height != DesiredSize.Height)
+			{
+				double starRowHeight = finalSize.Height - (totalPixelRowHeight + totalAutoRowHeight);
 
-			//	if (starRowHeight != totalStarRowHeight)
-			//	{
-			//		// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
-			//		for (int i = 0; i < starRowCount; i++)
-			//		{
-			//			ref StarMinMax t = ref starRowMaxArray[i];
+				//if (starRowHeight != totalStarRowHeight)
+				{
+					// for star, set all constrainedPixelLength to 0 because setting to > 0 means it is constrained by min
+					for (int i = 0; i < starRowCount; i++)
+					{
+						ref StarMinMax t = ref starRowMaxArray[i];
 
-			//			ref GridColRowInfo cr = ref rowInfoArray[t.index];
+						ref GridColRowInfo cr = ref rowInfoArray[t.index];
 
-			//			cr.constrainedPixelLength = 0;
-			//		}
+						cr.constrainedPixelLength = 0;
+					}
 
-			//		DistributeStarRowHeight(starRowHeight);
-			//	}
-			//}
+					DistributeStarRowHeight(starRowHeight);
+				}
+			}
 
 			double position;
 			position = 0;

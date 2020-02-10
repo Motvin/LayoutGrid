@@ -134,6 +134,7 @@ namespace LayoutGridTest
 			}
 
 			int childCnt = rand.Next(0, 100);
+			int gridCnt = 0;
 			for (int i = 0; i < childCnt; i++)
 			{
 				int col = rand.Next(0, colCnt - 1);
@@ -142,10 +143,12 @@ namespace LayoutGridTest
 				UIElement t;
 				if (useInnerGrids)
 				{
-					if (rand.Next(0, 10) == 0)
+					if (rand.Next(0, 30) == 0)
 					{
 						Grid g2 = new Grid();
-						SetupRandomGrid(g2, seed + 1, false);
+						g2.Name = "G" + (gridCnt + 1).ToString("0");
+						gridCnt++;
+						SetupRandomGrid(g2, seed + i + 1, false);
 						t = g2;
 					}
 					else
@@ -189,7 +192,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void SetupRandomGrid2(Grid g, int seed)
+		public static void SetupRandomGrid2(Grid g, int seed, bool useInnerGrids)
 		{
 			Random rand = new Random(seed);
 
@@ -271,6 +274,7 @@ namespace LayoutGridTest
 			HashSet<long> colAndRowSet = new HashSet<long>();
 			int childTryCnt = rand.NextInc(1, ((colCnt + 1) * rowCnt));
 			int childCnt = 0;
+			int gridCnt = 0;
 			for (int i = 0; i < childTryCnt; i++)
 			{
 				int col = rand.NextInc(0, colCnt - 1);
@@ -294,22 +298,47 @@ namespace LayoutGridTest
 						rowSpan = Math.Min(rowSpan, rowCnt - row);
 					}
 
-					Button b = new Button();
-					b.Name = "btn" + childCnt.ToString("0");
-					b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+					UIElement t;
+					if (useInnerGrids)
+					{
+						if (rand.Next(0, 30) == 0)
+						{
+							Grid g2 = new Grid();
+							g2.Name = "G" + (gridCnt + 1).ToString("0");
+							gridCnt++;
+							SetupRandomGrid(g2, seed + i + 1, false);
+							t = g2;
+						}
+						else
+						{
+							Button b = new Button();
+							b.Name = "btn" + i.ToString("0");
+							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
-					Grid.SetColumn(b, col);
-					Grid.SetRow(b, row);
+							t = b;
+						}
+					}
+					else
+					{
+						Button b = new Button();
+						b.Name = "btn" + childCnt.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
-					Grid.SetColumnSpan(b, colSpan);
-					Grid.SetRowSpan(b, rowSpan);
-					g.Children.Add(b);
+						t = b;
+					}
+
+					Grid.SetColumn(t, col);
+					Grid.SetRow(t, row);
+
+					Grid.SetColumnSpan(t, colSpan);
+					Grid.SetRowSpan(t, rowSpan);
+					g.Children.Add(t);
 					childCnt++;
 				}
 			}
 		}
 
-		public static void SetupRandomGridStars(Grid g, int seed, bool allowZeroMax = true)
+		public static void SetupRandomGridStars(Grid g, int seed, bool useInnerGrids, bool allowZeroMax = true)
 		{
 			Random rand = new Random(seed);
 
@@ -398,6 +427,7 @@ namespace LayoutGridTest
 			HashSet<long> colAndRowSet = new HashSet<long>();
 			int childTryCnt = rand.NextInc(1, ((colCnt + 1) * rowCnt));
 			int childCnt = 0;
+			int gridCnt = 0;
 			for (int i = 0; i < childTryCnt; i++)
 			{
 				int col = rand.NextInc(0, colCnt - 1);
@@ -421,22 +451,47 @@ namespace LayoutGridTest
 					//	rowSpan = Math.Min(rowSpan, rowCnt - row);
 					//}
 
-					Button b = new Button();
-					b.Name = "btn" + childCnt.ToString("0");
-					b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+					UIElement t;
+					if (useInnerGrids)
+					{
+						if (rand.Next(0, 30) == 0)
+						{
+							Grid g2 = new Grid();
+							g2.Name = "G" + (gridCnt + 1).ToString("0");
+							gridCnt++;
+							SetupRandomGrid(g2, seed + i + 1, false);
+							t = g2;
+						}
+						else
+						{
+							Button b = new Button();
+							b.Name = "btn" + childCnt.ToString("0");
+							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
-					Grid.SetColumn(b, col);
-					Grid.SetRow(b, row);
+							t = b;
+						}
+					}
+					else
+					{
+						Button b = new Button();
+						b.Name = "btn" + childCnt.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
-					Grid.SetColumnSpan(b, colSpan);
-					Grid.SetRowSpan(b, rowSpan);
-					g.Children.Add(b);
+						t = b;
+					}
+
+					Grid.SetColumn(t, col);
+					Grid.SetRow(t, row);
+
+					Grid.SetColumnSpan(t, colSpan);
+					Grid.SetRowSpan(t, rowSpan);
+					g.Children.Add(t);
 					childCnt++;
 				}
 			}
 		}
 
-		public static void SetupRandomGridDifferentControls(Grid g, int seed, bool allowZeroMax = true)
+		public static void SetupRandomGridDifferentControls(Grid g, int seed, bool useInnerGrids, bool allowZeroMax = true)
 		{
 			Random rand = new Random(seed);
 
@@ -525,6 +580,7 @@ namespace LayoutGridTest
 			HashSet<long> colAndRowSet = new HashSet<long>();
 			int childTryCnt = rand.NextInc(1, ((colCnt + 4) * rowCnt));
 			int childCnt = 0;
+			int gridCnt = 0;
 			for (int i = 0; i < childTryCnt; i++)
 			{
 				int col = rand.NextInc(0, colCnt - 1);
@@ -549,42 +605,57 @@ namespace LayoutGridTest
 					}
 
 					int controlTypeRand = rand.NextInc(0, 20);
-					UIElement n;
-					if (controlTypeRand <= 4)
+					UIElement t = null;
+					if (useInnerGrids)
 					{
-						Button b = new Button();
-						n = b;
-						b.Name = "btn" + childCnt.ToString("0");
-						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 20));
-					}
-					else if (controlTypeRand <= 9)
-					{
-						Label b = new Label();
-						n = b;
-						b.Name = "lbl" + childCnt.ToString("0");
-						b.Content = "Label " + b.Name + new string('X', rand.NextInc(0, 20));
-					}
-					else if (controlTypeRand <= 14)
-					{
-						TextBox b = new TextBox();
-						n = b;
-						b.Name = "txt" + childCnt.ToString("0");
-						b.Text = "Text " + b.Name + new string('X', rand.NextInc(0, 20));
-					}
-					else
-					{
-						ComboBox b = new ComboBox();
-						n = b;
-						b.Name = "cbo" + childCnt.ToString("0");
-						b.Text = "Combo " + b.Name + new string('X', rand.NextInc(0, 20));
+						if (rand.Next(0, 30) == 0)
+						{
+							Grid g2 = new Grid();
+							g2.Name = "G" + (gridCnt + 1).ToString("0");
+							gridCnt++;
+							SetupRandomGrid(g2, seed + i + 1, false);
+							t = g2;
+						}
 					}
 
-					Grid.SetColumn(n, col);
-					Grid.SetRow(n, row);
+					if (t == null)
+					{
+						if (controlTypeRand <= 4)
+						{
+							Button b = new Button();
+							t = b;
+							b.Name = "btn" + childCnt.ToString("0");
+							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 20));
+						}
+						else if (controlTypeRand <= 9)
+						{
+							Label b = new Label();
+							t = b;
+							b.Name = "lbl" + childCnt.ToString("0");
+							b.Content = "Label " + b.Name + new string('X', rand.NextInc(0, 20));
+						}
+						else if (controlTypeRand <= 14)
+						{
+							TextBox b = new TextBox();
+							t = b;
+							b.Name = "txt" + childCnt.ToString("0");
+							b.Text = "Text " + b.Name + new string('X', rand.NextInc(0, 20));
+						}
+						else
+						{
+							ComboBox b = new ComboBox();
+							t = b;
+							b.Name = "cbo" + childCnt.ToString("0");
+							b.Text = "Combo " + b.Name + new string('X', rand.NextInc(0, 20));
+						}
+					}
 
-					Grid.SetColumnSpan(n, colSpan);
-					Grid.SetRowSpan(n, rowSpan);
-					g.Children.Add(n);
+					Grid.SetColumn(t, col);
+					Grid.SetRow(t, row);
+
+					Grid.SetColumnSpan(t, colSpan);
+					Grid.SetRowSpan(t, rowSpan);
+					g.Children.Add(t);
 					childCnt++;
 					//if (rand.NextInc(0, 200) == 0)
 					//{
@@ -595,7 +666,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void SetupRandomGridSpans(Grid g, int seed, bool putChildrenOnSeparateRows, out bool hasZeroStars)
+		public static void SetupRandomGridSpans(Grid g, int seed, bool putChildrenOnSeparateRows, bool useInnerGrids, out bool hasZeroStars)
 		{
 			hasZeroStars = false;
 
@@ -703,6 +774,7 @@ namespace LayoutGridTest
 				childCnt = rand.NextInc(0, 10);
 			}
 
+			int gridCnt = 0;
 			for (int i = 0; i < childCnt;)
 			{
 				int col = 0;
@@ -738,9 +810,34 @@ namespace LayoutGridTest
 					}
 				}
 
-				Button b = new Button();
-				b.Name = "btn" + i.ToString("0");
-				b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+				UIElement t;
+				if (useInnerGrids)
+				{
+					if (rand.Next(0, 30) == 0)
+					{
+						Grid g2 = new Grid();
+						g2.Name = "G" + (gridCnt + 1).ToString("0");
+						gridCnt++;
+						SetupRandomGrid(g2, seed + i + 1, false);
+						t = g2;
+					}
+					else
+					{
+						Button b = new Button();
+						b.Name = "btn" + i.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+
+						t = b;
+					}
+				}
+				else
+				{
+					Button b = new Button();
+					b.Name = "btn" + i.ToString("0");
+					b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+
+					t = b;
+				}
 
 				//??? also randomly insert other controls and grids set with this function
 
@@ -770,12 +867,12 @@ namespace LayoutGridTest
 
 				i += rowSpan;
 
-				Grid.SetColumn(b, col);
-				Grid.SetRow(b, row);
+				Grid.SetColumn(t, col);
+				Grid.SetRow(t, row);
 
-				Grid.SetColumnSpan(b, colSpan);
-				Grid.SetRowSpan(b, rowSpan);
-				g.Children.Add(b);
+				Grid.SetColumnSpan(t, colSpan);
+				Grid.SetRowSpan(t, rowSpan);
+				g.Children.Add(t);
 			}
 		}
 
@@ -787,6 +884,7 @@ namespace LayoutGridTest
 
 		public static void CopyGridSetup(Grid grd, LayoutGrid g)
 		{
+			g.Name = grd.Name;
 			g.ColumnDefinitions.Clear();
 			foreach (ColumnDefinition c2 in grd.ColumnDefinitions)
 			{
@@ -870,6 +968,21 @@ namespace LayoutGridTest
 						Grid.SetColumnSpan(c, Grid.GetColumnSpan(c2));
 						Grid.SetRowSpan(c, Grid.GetRowSpan(c2));
 						g.Children.Add(c);
+					}
+					else if (child is Grid)
+					{
+						Grid g2 = child as Grid;
+						LayoutGrid lg2 = new LayoutGrid();
+						lg2.Name = lg2.Name;
+
+						Grid.SetColumn(lg2, Grid.GetColumn(g2));
+						Grid.SetRow(lg2, Grid.GetRow(g2));
+
+						Grid.SetColumnSpan(lg2, Grid.GetColumnSpan(g2));
+						Grid.SetRowSpan(lg2, Grid.GetRowSpan(g2));
+						g.Children.Add(lg2);
+
+						CopyGridSetup(g2, lg2);
 					}
 				}
 			}
@@ -1065,6 +1178,13 @@ namespace LayoutGridTest
 					if (conCtrl != null)
 					{
 						c.content = conCtrl.Content.ToString();
+					}
+					else
+					{
+						if (child is Grid || child is LayoutGrid)
+						{
+							c.content = "Grid";
+						}
 					}
 					c.type = child.GetType().Name;
 					c.child = child;

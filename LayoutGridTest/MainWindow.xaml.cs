@@ -128,7 +128,7 @@ namespace LayoutGridTest
 		public static int RunRandManyChildren(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids)
 		{
 			int testCount = 0;
-			int seed = 1;
+			int seed = 11;
 			if (useInfiniteMix)
 			{
 				useInfinite = true;
@@ -144,7 +144,10 @@ namespace LayoutGridTest
 					PerfStatic.DoGCCollect();
 				}
 
-				if (seed == 15 || // span expands pixel sized col/row for Grid, it should not
+				if (
+					(seed == 11 && useInnerGrids) || // Grid is wrong, the desired size is double what it should be???
+					seed == 15 || // span expands pixel sized col/row for Grid, it should not
+					(seed == 19 && useInnerGrids) || // Grid is wrong, it expands a pixel col/row for span
 					seed == 45 || // span expands pixel sized col/row for Grid, it should not
 					(seed == 60 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
 					seed == 87 || // span expands pixel sized col/row for Grid, it should not
@@ -383,7 +386,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGridSpans(g1, seed, true, out bool hasZeroStar);
+				GridLog.SetupRandomGridSpans(g1, seed, true, useInnerGrids, out bool hasZeroStar);
 				if (hasZeroStar)
 				{
 					seed++;
@@ -546,7 +549,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGrid2(g1, seed);
+				GridLog.SetupRandomGrid2(g1, seed, useInnerGrids);
 
 				LayoutGrid g2 = new LayoutGrid();
 
@@ -720,7 +723,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGridStars(g1, seed);
+				GridLog.SetupRandomGridStars(g1, seed, useInnerGrids);
 
 				LayoutGrid g2 = new LayoutGrid();
 
@@ -886,7 +889,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGridStars(g1, seed, false);
+				GridLog.SetupRandomGridStars(g1, seed, useInnerGrids, false);
 
 				LayoutGrid g2 = new LayoutGrid();
 
@@ -1067,7 +1070,7 @@ namespace LayoutGridTest
 				Grid g1 = new Grid();
 
 				g1.Name = "grd";
-				GridLog.SetupRandomGridDifferentControls(g1, seed, false);
+				GridLog.SetupRandomGridDifferentControls(g1, seed, useInnerGrids, false);
 
 				LayoutGrid g2 = new LayoutGrid();
 
@@ -1522,21 +1525,23 @@ namespace LayoutGridTest
 			PerfStatic.DoGCCollect();
 		}
 
+		TestInner_Grid innerGridWin;
+		TestInner_LayoutGrid innerLayoutGridWin;
 		private void btnInner_Click(object sender, RoutedEventArgs e)
 		{
 			int testCount = 1;
-			TestInner_LayoutGrid lgWin = new TestInner_LayoutGrid();
-			lgWin.Width = 800;
-			lgWin.Height = 500;
-			lgWin.Show();
+			innerLayoutGridWin = new TestInner_LayoutGrid();
+			innerLayoutGridWin.Width = 500;
+			innerLayoutGridWin.Height = 500;
+			innerLayoutGridWin.Show();
 
-			TestInner_Grid win = new TestInner_Grid();
-			win.Width = 800;
-			win.Height = 500;
-			win.Show();
+			innerGridWin = new TestInner_Grid();
+			innerGridWin.Width = 500;
+			innerGridWin.Height = 500;
+			innerGridWin.Show();
 
-			StringBuilder sb1 = GridLog.CreateGridString(win.gridx, 1);
-			StringBuilder sb2 = GridLog.CreateGridString(lgWin.gridx, 1);
+			StringBuilder sb1 = GridLog.CreateGridString(innerGridWin.outerGrid, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(innerLayoutGridWin.outerGrid, 1);
 
 			string s1 = sb1.ToString();
 			string s2 = sb2.ToString();
@@ -1545,6 +1550,21 @@ namespace LayoutGridTest
 				)
 			{
 				testCount++;
+			}
+		}
+
+		private void btnInnerCheck_Click(object sender, RoutedEventArgs e)
+		{
+			StringBuilder sb1 = GridLog.CreateGridString(innerGridWin.outerGrid, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(innerLayoutGridWin.outerGrid, 1);
+
+			string s1 = sb1.ToString();
+			string s2 = sb2.ToString();
+
+			if (!string.Equals(s1, s2, StringComparison.Ordinal)
+				)
+			{
+				MessageBox.Show("Grids Are Different");
 			}
 		}
 	}
