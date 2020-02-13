@@ -988,7 +988,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size renderSize, int intID)
+		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size desiredSize, Size renderSize, int intID)
 		{
 			string gridName;
 			if (string.IsNullOrEmpty(name))
@@ -999,7 +999,7 @@ namespace LayoutGridTest
 			{
 				gridName = name;
 			}
-			string gridNamePlusSize = gridName + ' ' + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0");
+			string gridNamePlusSize = gridName + " DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + " RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0");
 			sb.AppendLine(gridNamePlusSize);
 		}
 
@@ -1220,7 +1220,7 @@ namespace LayoutGridTest
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.RenderSize, seed);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), g, null);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), g, null);
@@ -1246,7 +1246,7 @@ namespace LayoutGridTest
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.RenderSize, seed);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), null, g);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), null, g);
