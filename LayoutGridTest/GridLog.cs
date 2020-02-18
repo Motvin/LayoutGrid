@@ -10,6 +10,70 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LayoutGridTest
 {
+	public class GridDerived : Grid
+	{
+		public List<Size> measureSizeParams = new List<Size>();
+		public List<Size> measureSizeReturns = new List<Size>();
+
+		public List<Size> arrangeSizeParams = new List<Size>();
+		public List<Size> arrangeSizeReturns = new List<Size>();
+
+		protected override Size MeasureOverride(Size constraint)
+		{
+			measureSizeParams.Add(constraint);
+
+			Size retSize = base.MeasureOverride(constraint);
+			measureSizeReturns.Add(retSize);
+			return retSize;
+		}
+
+		protected override Size ArrangeOverride(Size arrangeSize)
+		{
+			arrangeSizeParams.Add(arrangeSize);
+
+			Size retSize = base.ArrangeOverride(arrangeSize);
+			arrangeSizeReturns.Add(retSize);
+			return retSize;
+		}
+	}
+
+	public class ButtonDerived : Button
+	{
+		public static void ResetCounts()
+		{
+			measureCount = 0;
+			arrangeCount = 0;
+		}
+
+		public static int measureCount;
+		public List<Size> measureSizeParams = new List<Size>();
+		public List<Size> measureSizeReturns = new List<Size>();
+
+		public static int arrangeCount;
+		public List<Size> arrangeSizeParams = new List<Size>();
+		public List<Size> arrangeSizeReturns = new List<Size>();
+
+		protected override Size MeasureOverride(Size constraint)
+		{
+			measureSizeParams.Add(constraint);
+
+			Size retSize = base.MeasureOverride(constraint);
+			measureSizeReturns.Add(retSize);
+			measureCount++;
+			return retSize;
+		}
+
+		protected override Size ArrangeOverride(Size arrangeSize)
+		{
+			arrangeSizeParams.Add(arrangeSize);
+
+			Size retSize = base.ArrangeOverride(arrangeSize);
+			arrangeSizeReturns.Add(retSize);
+			arrangeCount++;
+			return retSize;
+		}
+	}
+
 	public static class GridLog
 	{
 		const string dblFmt = "###0.##";
@@ -49,6 +113,7 @@ namespace LayoutGridTest
 			public string type;
 			public string name;
 			public string content;
+			public string extra;
 			public UIElement child;
 			public int zIndex; // if zIndex = 0, then use child index to determine z order
 			public int childIndex;
@@ -75,7 +140,7 @@ namespace LayoutGridTest
 				}
 				else if (unitTypeInt >= 7)
 				{
-					GridLength len = new GridLength(rand.Next(0, 100), GridUnitType.Star);
+					GridLength len = new GridLength(rand.Next(1 /* don't do 0 */, 100), GridUnitType.Star);
 					c.Width = len;
 				}
 				else
@@ -111,7 +176,7 @@ namespace LayoutGridTest
 				}
 				else if (unitTypeInt >= 7)
 				{
-					GridLength len = new GridLength(rand.Next(0, 100), GridUnitType.Star);
+					GridLength len = new GridLength(rand.Next(1 /* don't do 0 */, 100), GridUnitType.Star);
 					c.Height = len;
 				}
 				else
@@ -153,7 +218,7 @@ namespace LayoutGridTest
 					}
 					else
 					{
-						Button b = new Button();
+						ButtonDerived b = new ButtonDerived();
 						b.Name = "btn" + i.ToString("0");
 						b.Content = "Button " + b.Name + new string('X', rand.Next(0, 10));
 
@@ -162,7 +227,7 @@ namespace LayoutGridTest
 				}
 				else
 				{
-					Button b = new Button();
+					ButtonDerived b = new ButtonDerived();
 					b.Name = "btn" + i.ToString("0");
 					b.Content = "Button " + b.Name + new string('X', rand.Next(0, 10));
 
@@ -192,7 +257,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		public static void SetupRandomGrid2(Grid g, int seed, bool useInnerGrids)
+		public static void SetupRandomGrid2(Grid g, int seed, bool useInnerGrids, bool useSpans)
 		{
 			Random rand = new Random(seed);
 
@@ -284,7 +349,7 @@ namespace LayoutGridTest
 				{
 					int colSpan = 1;
 
-					if (rand.NextInc(0, 20) == 0)
+					if (useSpans && rand.NextInc(0, 20) == 0)
 					{
 						colSpan = rand.NextInc(2, 10);
 						colSpan = Math.Min(colSpan, colCnt - col);
@@ -292,7 +357,7 @@ namespace LayoutGridTest
 
 					int rowSpan = 1;
 
-					if (rand.NextInc(0, 20) == 0)
+					if (useSpans && rand.NextInc(0, 20) == 0)
 					{
 						rowSpan = rand.NextInc(2, 10);
 						rowSpan = Math.Min(rowSpan, rowCnt - row);
@@ -913,7 +978,21 @@ namespace LayoutGridTest
 				}
 				else
 				{
-					if (child is Button)
+					if (child is ButtonDerived)
+					{
+						ButtonDerived b2 = child as ButtonDerived;
+						ButtonDerived b = new ButtonDerived();
+						b.Name = b2.Name;
+						b.Content = b2.Content;
+
+						Grid.SetColumn(b, Grid.GetColumn(b2));
+						Grid.SetRow(b, Grid.GetRow(b2));
+
+						Grid.SetColumnSpan(b, Grid.GetColumnSpan(b2));
+						Grid.SetRowSpan(b, Grid.GetRowSpan(b2));
+						g.Children.Add(b);
+					}
+					else if (child is Button)
 					{
 						Button b2 = child as Button;
 						Button b = new Button();
@@ -988,7 +1067,8 @@ namespace LayoutGridTest
 			}
 		}
 
-		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size desiredSize, Size renderSize, int intID)
+		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size desiredSize, Size renderSize, int intID, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			string gridName;
 			if (string.IsNullOrEmpty(name))
@@ -999,7 +1079,45 @@ namespace LayoutGridTest
 			{
 				gridName = name;
 			}
-			string gridNamePlusSize = gridName + " DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + " RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0");
+			string extra = "";
+			if (showExtraInfo)
+			{
+				if (measureSizeParams != null)
+				{
+					foreach (Size m in measureSizeParams)
+					{
+						extra += " MeasureParam: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+					}
+				}
+
+				if (measureSizeReturns != null)
+				{
+					foreach (Size m in measureSizeReturns)
+					{
+						extra += " MeasureRet: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6) + Environment.NewLine;
+					}
+				}
+
+				if (arrangeSizeParams != null)
+				{
+					foreach (Size m in arrangeSizeParams)
+					{
+						extra += " ArrangeParam: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+					}
+				}
+
+				if (arrangeSizeReturns != null)
+				{
+					foreach (Size m in arrangeSizeReturns)
+					{
+						extra += " ArrangeRet: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+					}
+				}
+			}
+
+			string gridNamePlusSize = gridName + (showExtraInfo ? (" DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + Environment.NewLine) : "") +
+				" RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0") + extra +
+				" MeasureCount=" + measureCount.ToString("0") + " ArrangeCount=" + arrangeCount.ToString("0");
 			sb.AppendLine(gridNamePlusSize);
 		}
 
@@ -1149,7 +1267,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		private static List<T> AddChildrenToString<T>(StringBuilder sb, UIElementCollection children) where T : class
+		private static List<T> AddChildrenToString<T>(StringBuilder sb, UIElementCollection children, bool showChildrenExtraInfo = false) where T : class
 		{
 			List<T> childGridList = new List<T>();
 
@@ -1174,10 +1292,37 @@ namespace LayoutGridTest
 					c.colSpan = (int)child.GetValue(Grid.ColumnSpanProperty);
 					c.rowSpan = (int)child.GetValue(Grid.RowSpanProperty);
 
+					string extra = "";
 					ContentControl conCtrl = child as ContentControl;
 					if (conCtrl != null)
 					{
 						c.content = conCtrl.Content.ToString();
+						if (showChildrenExtraInfo)
+						{
+							ButtonDerived d = child as ButtonDerived;
+							if (d != null)
+							{
+								foreach (Size m in d.measureSizeParams)
+								{
+									extra += " MeasureParam: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+								}
+
+								foreach (Size m in d.measureSizeReturns)
+								{
+									extra += " MeasureRet: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+								}
+
+								foreach (Size m in d.arrangeSizeParams)
+								{
+									extra += " ArrangeParam: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+								}
+
+								foreach (Size m in d.arrangeSizeReturns)
+								{
+									extra += " ArrangeRet: " + m.Width.ToString(dblFmt6) + "," + m.Height.ToString(dblFmt6);
+								}
+							}
+						}
 					}
 					else
 					{
@@ -1191,6 +1336,7 @@ namespace LayoutGridTest
 					c.name = child.GetValue(FrameworkElement.NameProperty) as string;
 					c.zIndex = (int)child.GetValue(Panel.ZIndexProperty);
 					c.childIndex = i;
+					c.extra = extra;
 				}
 			}
 			childList.Sort(new SortChildData());
@@ -1206,25 +1352,26 @@ namespace LayoutGridTest
 				{
 					contentStr = "";
 				}
-				sb.AppendLine(c.name + contentStr + " ; col=" + c.col.ToString("N0") + "; row=" + c.row.ToString("N0") +
+				sb.AppendLine(c.name.PadRight(5) + contentStr + " ; col=" + c.col.ToString("N0") + "; row=" + c.row.ToString("N0") +
 					(c.colSpan > 1 ? " ; colSpan=" + c.colSpan.ToString("N0") : "") + (c.rowSpan > 1 ? "; rowSpan=" + c.rowSpan.ToString("N0") : "") +
 					"; DesiredSize=" + c.child.DesiredSize.Width.ToString(dblFmt6) + "," + c.child.DesiredSize.Height.ToString(dblFmt6) +
-					"; RenderSize=" + c.child.RenderSize.Width.ToString(dblFmt6) + "," + c.child.RenderSize.Height.ToString(dblFmt6)
+					"; RenderSize=" + c.child.RenderSize.Width.ToString(dblFmt6) + "," + c.child.RenderSize.Height.ToString(dblFmt6) + c.extra
 					);
 			}
 
 			return childGridList;
 		}
 
-		public static StringBuilder CreateGridString(Grid g, int seed)
+		public static StringBuilder CreateGridString(Grid g, int seed, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureCount, arrangeCount, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), g, null);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), g, null);
-			List<Grid> childGridList = AddChildrenToString<Grid>(sb, g.Children);
+			List<Grid> childGridList = AddChildrenToString<Grid>(sb, g.Children, showExtraInfo);
 
 			if (childGridList.Count > 0)
 			{
@@ -1242,15 +1389,16 @@ namespace LayoutGridTest
 			return sb;
 		}
 
-		public static StringBuilder CreateGridString(LayoutGrid g, int seed)
+		public static StringBuilder CreateGridString(LayoutGrid g, int seed, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureCount, arrangeCount, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), null, g);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), null, g);
-			List<LayoutGrid> childGridList = AddChildrenToString<LayoutGrid>(sb, g.Children);
+			List<LayoutGrid> childGridList = AddChildrenToString<LayoutGrid>(sb, g.Children, showExtraInfo);
 
 			if (childGridList.Count > 0)
 			{

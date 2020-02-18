@@ -604,6 +604,14 @@ namespace Motvin.LayoutGrid
 		public int shortArrangeCount;
 #endif
 
+#if DEBUG
+		public List<Size> measureSizeParams = new List<Size>();
+		public List<Size> measureSizeReturns = new List<Size>();
+
+		public List<Size> arrangeSizeParams = new List<Size>();
+		public List<Size> arrangeSizeReturns = new List<Size>();
+#endif
+
 		private CompareStarMinMaxByPerStar compareStarMinMaxByPerStar = new CompareStarMinMaxByPerStar(); //??? maybe create only if needed
 		private CompareStarMinMaxByPerStarDesc compareStarMinMaxByPerStarDesc = new CompareStarMinMaxByPerStarDesc(); //??? maybe create only if needed
 		private CompareChildInfoByCellGroup compareChildInfoByCellGroup;
@@ -1313,7 +1321,8 @@ namespace Motvin.LayoutGrid
 					bool colOrSpanHasAuto = (colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (colFlags & ChildFlag_SpanHasStar) != 0);
 					bool rowOrSpanHasAuto = (rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (rowFlags & ChildFlag_SpanHasStar) != 0);
 
-					haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
+					haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
 					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowFlags & ChildFlag_SpanHasAuto) != 0;
 					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && ((rowFlags & ChildFlag_SpanHasAuto) != 0 || (rowType == LayoutGridUnitType.Auto));
 
@@ -1771,8 +1780,16 @@ namespace Motvin.LayoutGrid
 			return length;
 		}
 
+		//??? remove these
+		public double actualColWidth;
+		public double actualRowHeight;
+
 		protected override Size MeasureOverride(Size availableSize)
 		{
+#if DEBUG
+			measureSizeParams.Add(availableSize);
+#endif
+
 			Size availableChildSize;
 			double availableChildWidth;
 			double availableChildHeight;
@@ -1813,8 +1830,10 @@ namespace Motvin.LayoutGrid
 				// there is only a single cell in the grid (single column and single row), so we don't need to do the expensive processing, just do the easy/inexpensive processing below and return
 				double minWidth;
 				double maxWidth;
-				bool colIsAuto = false;
-				bool rowIsAuto = false;
+				//bool colIsAuto = false;
+				//bool rowIsAuto = false;
+				bool isColPixel = false;
+				bool isRowPixel = false;
 				if (ColumnDefinitions.Count == 1)
 				{
 					ColumnDefinition c = ColumnDefinitions[0];
@@ -1829,7 +1848,7 @@ namespace Motvin.LayoutGrid
 
 					if (colUnitType == LayoutGridUnitType.Auto)
 					{
-						colIsAuto = true;
+						//colIsAuto = true;
 						availableChildWidth = double.PositiveInfinity;//??? I think this should be Max
 					}
 					else if (colUnitType == LayoutGridUnitType.Star)
@@ -1854,6 +1873,7 @@ namespace Motvin.LayoutGrid
 					}
 					else // must be pixel/absolute
 					{
+						isColPixel = true;
 						availableChildWidth = c.Width.Value;
 
 						if (availableChildWidth > maxWidth)
@@ -1892,7 +1912,7 @@ namespace Motvin.LayoutGrid
 
 					if (rowUnitType == LayoutGridUnitType.Auto)
 					{
-						rowIsAuto = true;
+						//rowIsAuto = true;
 						availableChildHeight = double.PositiveInfinity;//??? I think this should be Max
 					}
 					else if (rowUnitType == LayoutGridUnitType.Star)
@@ -1917,6 +1937,7 @@ namespace Motvin.LayoutGrid
 					}
 					else // must be pixel/absolute
 					{
+						isRowPixel = true;
 						availableChildHeight = r.Height.Value;
 
 						if (availableChildHeight > maxHeight)
@@ -1939,12 +1960,14 @@ namespace Motvin.LayoutGrid
 					maxHeight = double.PositiveInfinity;
 				}
 
-				if (!double.IsPositiveInfinity(availableChildWidth))
+				//if (!double.IsPositiveInfinity(availableChildWidth)) // this is auto or star that is effectively auto
+				if (isColPixel)
 				{
 					desiredWidth = availableChildWidth;
 				}
 
-				if (!double.IsPositiveInfinity(availableChildHeight))
+				//if (!double.IsPositiveInfinity(availableChildHeight)) // this is auto or star that is effectively auto
+				if (isRowPixel) // this is auto or star that is effectively auto
 				{
 					desiredHeight = availableChildHeight;
 				}
@@ -1969,31 +1992,33 @@ namespace Motvin.LayoutGrid
 						childMeasureTicks += Stopwatch.GetTimestamp() - startTicksChildMeasure;
 #endif
 
-						if (double.IsPositiveInfinity(availableChildWidth))
+						//if (double.IsPositiveInfinity(availableChildWidth))
+						if (!isColPixel)
 						{
 							double width = child.DesiredSize.Width;
 
 							if (width > desiredWidth)
 							{
 								desiredWidth = width;
-								if (colIsAuto)
-								{
-									totalAutoColWidth = width;
-								}
+								//if (colIsAuto)
+								//{
+								//	totalAutoColWidth = width;
+								//}
 							}
 						}
 
-						if (double.IsPositiveInfinity(availableChildHeight))
+						//if (double.IsPositiveInfinity(availableChildHeight))
+						if (!isRowPixel)
 						{
 							double height = child.DesiredSize.Height;
 
 							if (height > desiredHeight)
 							{
 								desiredHeight = height;
-								if (rowIsAuto)
-								{
-									totalAutoRowHeight = height;
-								}
+								//if (rowIsAuto)
+								//{
+								//	totalAutoRowHeight = height;
+								//}
 							}
 						}
 					}
@@ -2017,10 +2042,34 @@ namespace Motvin.LayoutGrid
 					desiredHeight = maxHeight;
 				}
 
+				// the code below just sets actualColWidth/actualRowHeight, but we really only need this for testing for now, so remove when we set this in the ColumnDefition, RowDefition??? - probably can just used desired instead of actual anyway? No, sometimes they are different (like for star)
+				if (double.IsPositiveInfinity(availableChildWidth)) // this is auto or star that is effectively auto
+				{
+					actualColWidth = desiredWidth;
+				}
+				else
+				{
+					actualColWidth = availableChildWidth;
+				}
+
+				if (double.IsPositiveInfinity(availableChildHeight)) // this is auto or star that is effectively auto
+				{
+					actualRowHeight = desiredHeight;
+				}
+				else
+				{
+					actualRowHeight = availableChildHeight;
+				}
+
 #if CollectPerformanceStats
 				shortMeasureTicks = Stopwatch.GetTimestamp() - startTicks;
 				shortMeasureCount++;
 #endif
+
+#if DEBUG
+				measureSizeReturns.Add(new Size(desiredWidth, desiredHeight));
+#endif
+
 				return new Size(desiredWidth, desiredHeight);
 			}
 
@@ -2158,7 +2207,8 @@ namespace Motvin.LayoutGrid
 							bool colOrSpanHasAuto = (n.colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (n.colFlags & ChildFlag_SpanHasStar) != 0);
 							bool rowOrSpanHasAuto = (n.rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (n.rowFlags & ChildFlag_SpanHasStar) != 0);
 
-							haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
+							haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+							//haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
 
 							if (!colOrSpanHasStars && !rowOrSpanHasStars)
 							{
@@ -2179,10 +2229,17 @@ namespace Motvin.LayoutGrid
 						}
 					}
 
-					int len = childInfoArrayCount - firstIndexForOtherCellGroups;
-					if (len > 1)
+					if (firstIndexForOtherCellGroups >= 0)
 					{
-						Array.Sort(childInfoArray, firstIndexForOtherCellGroups, len, compareChildInfoByCellGroup);
+						int len = childInfoArrayCount - firstIndexForOtherCellGroups;
+						if (len > 1)
+						{
+							if (compareChildInfoByCellGroup == null)
+							{
+								compareChildInfoByCellGroup = new CompareChildInfoByCellGroup();
+							}
+							Array.Sort(childInfoArray, firstIndexForOtherCellGroups, len, compareChildInfoByCellGroup);
+						}
 					}
 				}
 			}
@@ -2397,6 +2454,7 @@ namespace Motvin.LayoutGrid
 								{
 									cr.constrainedLength += cr.spanExtraLengthOrPosition; //??? for some reason I thought we were constrained by max even if auto span, but this doesn't constrain by max here
 								}
+								cr.spanExtraLengthOrPosition = 0;
 
 								if (cr.unitType == LayoutGridUnitType.Auto)
 								{
@@ -2436,6 +2494,7 @@ namespace Motvin.LayoutGrid
 								{
 									cr.constrainedLength += cr.spanExtraLengthOrPosition;
 								}
+								cr.spanExtraLengthOrPosition = 0;
 
 								if (cr.unitType == LayoutGridUnitType.Auto)
 								{
@@ -2466,7 +2525,7 @@ namespace Motvin.LayoutGrid
 
 					if (cellGroup > CellGroup_StarColPixelOrAutoRowWithSpan && firstChildIndexOfAutoColStarRowCellGroup != -1)
 					{
-						for (int j = firstChildIndexOfAutoColStarRowCellGroup; j < childInfoArrayCount; j++) // loop one past so that the cell group change logic can be in one place
+						for (int j = firstChildIndexOfAutoColStarRowCellGroup; ; j++)
 						{
 							ref ChildInfo n2 = ref childInfoArray[j];
 
@@ -2481,10 +2540,7 @@ namespace Motvin.LayoutGrid
 							ref GridColRowInfo c2 = ref colInfoArray[col];
 							ref GridColRowInfo r2 = ref rowInfoArray[row];
 
-							colSpan = n2.colSpan;
 							rowSpan = n2.rowSpan;
-
-							availableChildWidth = double.PositiveInfinity;
 
 							if (rowSpan > 1)
 							{
@@ -2492,21 +2548,40 @@ namespace Motvin.LayoutGrid
 							}
 							else
 							{
-								availableChildHeight = r2.constrainedLength + r2.spanExtraLengthOrPosition;
+								availableChildHeight = r2.constrainedLength;
+								//availableChildHeight = r2.constrainedLength + r2.spanExtraLengthOrPosition;
 							}
 
-							availableChildSize.Width = availableChildWidth;
+							availableChildSize.Width = double.PositiveInfinity;
 							availableChildSize.Height = availableChildHeight;
 
 #if CollectPerformanceStats
 							startTicksChildMeasure = Stopwatch.GetTimestamp();
 #endif
 
-							n2.child.Measure(availableChildSize); // call Measure for every child with the correct width and height that the child gets, even if we don't need the size - like with pixel or star sizing - here is is called a 2nd time with the correct width and height
+							n2.child.Measure(availableChildSize); // call Measure for every child with the correct width and height that the child gets, even if we don't need the size - here Measure is called a 2nd time with the correct width and height
 
 #if CollectPerformanceStats
 							childMeasureTicks += Stopwatch.GetTimestamp() - startTicksChildMeasure;
 #endif
+
+							if (rowSpan == 1 && r2.effectiveUnitType == LayoutGridUnitType.Star)
+							{
+								length = n2.child.DesiredSize.Height;
+
+								// for effective star, use spanExtraLengthOrPosition to store the desired size value - should this start out as the min value???
+								if (length > r2.spanExtraLengthOrPosition)
+								{
+									if (length <= r2.maxLength)
+									{
+										r2.spanExtraLengthOrPosition = length;
+									}
+									else
+									{
+										r2.spanExtraLengthOrPosition = r2.maxLength;
+									}
+								}
+							}
 						}
 
 						firstChildIndexOfAutoColStarRowCellGroup = -1;
@@ -2528,6 +2603,12 @@ namespace Motvin.LayoutGrid
 
 				colSpan = n.colSpan;
 				rowSpan = n.rowSpan;
+
+				Button btn = n.child as Button;
+				if (btn != null && btn.Name == "btn79")
+				{
+					int afs = 1;//???
+				}
 
 				if (colSpan > 1)
 				{
@@ -2561,7 +2642,7 @@ namespace Motvin.LayoutGrid
 
 				if (rowSpan > 1)
 				{
-					if ((n.rowFlags & ChildFlag_SpanHasAutoNoStar) != 0)
+					if ((n.rowFlags & ChildFlag_SpanHasAutoNoStar) != 0 || (remeasureAutoColStarRowGroup && (cellGroup == CellGroup_AutoColStarRow || cellGroup == CellGroup_AutoColStarRowWithSpan)))
 					{
 						availableChildHeight = double.PositiveInfinity;//??? I think this should be max?
 					}
@@ -2572,7 +2653,7 @@ namespace Motvin.LayoutGrid
 				}
 				else
 				{
-					if (r.effectiveUnitType == LayoutGridUnitType.Auto)
+					if (r.effectiveUnitType == LayoutGridUnitType.Auto || (remeasureAutoColStarRowGroup && (cellGroup == CellGroup_AutoColStarRow || cellGroup == CellGroup_AutoColStarRowWithSpan)))
 					{
 						availableChildHeight = double.PositiveInfinity;//??? I think this should be max?
 					}
@@ -2596,7 +2677,6 @@ namespace Motvin.LayoutGrid
 				startTicksChildMeasure = Stopwatch.GetTimestamp();
 #endif
 
-
 				n.child.Measure(availableChildSize); // call Measure for every child, even if we don't need the size - like with pixel or star sizing
 
 #if CollectPerformanceStats
@@ -2619,20 +2699,23 @@ namespace Motvin.LayoutGrid
 						}
 					}
 				}
-				else if (colSpan == 1 && c.effectiveUnitType == LayoutGridUnitType.Star)
+				else if (c.effectiveUnitType == LayoutGridUnitType.Star)
 				{
 					length = n.child.DesiredSize.Width;
 
-					// for effective star, use spanExtraLengthOrPosition to store the desired size value - should this start out as the min value???
-					if (length > c.spanExtraLengthOrPosition) 
+					//if (colSpan == 1)
 					{
-						if (length <= c.maxLength)
+						// for effective star, use spanExtraLengthOrPosition to store the desired size value - should this start out as the min value???
+						if (length > c.spanExtraLengthOrPosition)
 						{
-							c.spanExtraLengthOrPosition = length;
-						}
-						else
-						{
-							c.spanExtraLengthOrPosition = c.maxLength;
+							if (length <= c.maxLength)
+							{
+								c.spanExtraLengthOrPosition = length;
+							}
+							else
+							{
+								c.spanExtraLengthOrPosition = c.maxLength;
+							}
 						}
 					}
 				}
@@ -2661,20 +2744,24 @@ namespace Motvin.LayoutGrid
 						}
 					}
 				}
-				else if (rowSpan == 1 && r.effectiveUnitType == LayoutGridUnitType.Star)
+				//else if (rowSpan == 1 && r.effectiveUnitType == LayoutGridUnitType.Star)
+				else if (r.effectiveUnitType == LayoutGridUnitType.Star)
 				{
-					length = n.child.DesiredSize.Width;
-
-					// for effective star, use spanExtraLengthOrPosition to store the desired size value - should this start out as the min value???
-					if (length > r.spanExtraLengthOrPosition)
+					length = n.child.DesiredSize.Height;
+					//if (rowSpan == 1)
 					{
-						if (length <= r.maxLength)
+
+						// for effective star, use spanExtraLengthOrPosition to store the desired size value - should this start out as the min value???
+						if (length > r.spanExtraLengthOrPosition)
 						{
-							c.spanExtraLengthOrPosition = length;
-						}
-						else
-						{
-							c.spanExtraLengthOrPosition = r.maxLength;
+							if (length <= r.maxLength)
+							{
+								r.spanExtraLengthOrPosition = length;
+							}
+							else
+							{
+								r.spanExtraLengthOrPosition = r.maxLength;
+							}
 						}
 					}
 				}
@@ -2692,29 +2779,6 @@ namespace Motvin.LayoutGrid
 			measureTicks = Stopwatch.GetTimestamp() - startTicks;
 			startTicks = Stopwatch.GetTimestamp();
 #endif
-			for (int j = 0; j < starColCount; j++)
-			{
-				ref StarMinMax t = ref starColMaxArray[j];
-
-				ref GridColRowInfo cr = ref colInfoArray[t.index];
-
-				if (cr.effectiveUnitType == LayoutGridUnitType.Star)
-				{
-					totalStarColWidthDesired += cr.spanExtraLengthOrPosition;
-				}
-			}
-
-			for (int j = 0; j < starRowCount; j++)
-			{
-				ref StarMinMax t = ref starRowMaxArray[j];
-
-				ref GridColRowInfo cr = ref rowInfoArray[t.index];
-
-				if (cr.effectiveUnitType == LayoutGridUnitType.Star)
-				{
-					totalStarRowHeightDesired += cr.spanExtraLengthOrPosition;
-				}
-			}
 
 			if (this.Name == "G1")
 			{
@@ -2732,7 +2796,85 @@ namespace Motvin.LayoutGrid
 			//	desiredWidth = totalPixelColWidth + totalAutoColWidth + totalMinStarColWidth;//??? not sure this is correct
 			//	//desiredWidth = totalPixelColWidth + totalAutoColWidth + totalStarColWidth;//??? not sure this is correct
 			//}
-			desiredWidth = totalPixelColWidth + totalAutoColWidth + totalStarColWidthDesired;
+
+			//if (!isInfiniteWidth)
+			//{
+			//	desiredWidth = totalPixelColWidth + totalAutoColWidth;
+			//}
+			//else
+			{
+				for (int j = 0; j < starColCount; j++)
+				{
+					ref StarMinMax t = ref starColMaxArray[j];
+
+					ref GridColRowInfo cr = ref colInfoArray[t.index];
+
+					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
+					{
+						double starLength;
+						if (cr.spanExtraLengthOrPosition < cr.minLength)
+						{
+							starLength = cr.minLength;
+						}
+						else if (cr.spanExtraLengthOrPosition > cr.maxLength)
+						{
+							starLength = cr.maxLength;
+						}
+						else
+						{
+							starLength = cr.spanExtraLengthOrPosition;
+						}
+
+						if (starLength > cr.constrainedLength)
+						{
+							starLength = cr.constrainedLength;
+						}
+						totalStarColWidthDesired += starLength;
+					}
+				}
+
+				desiredWidth = totalPixelColWidth + totalAutoColWidth + totalStarColWidthDesired;
+			}
+
+			//if (!isInfiniteHeight)
+			//{
+			//	desiredHeight = totalPixelRowHeight + totalAutoRowHeight;
+			//}
+			//else
+			{
+				for (int j = 0; j < starRowCount; j++)
+				{
+					ref StarMinMax t = ref starRowMaxArray[j];
+
+					ref GridColRowInfo cr = ref rowInfoArray[t.index];
+
+					if (cr.effectiveUnitType == LayoutGridUnitType.Star)
+					{
+						double starLength;
+						if (cr.spanExtraLengthOrPosition < cr.minLength)
+						{
+							starLength = cr.minLength;
+						}
+						else if (cr.spanExtraLengthOrPosition > cr.maxLength)
+						{
+							starLength = cr.maxLength;
+						}
+						else
+						{
+							starLength = cr.spanExtraLengthOrPosition;
+						}
+
+						if (starLength > cr.constrainedLength)
+						{
+							starLength = cr.constrainedLength;
+						}
+						totalStarRowHeightDesired += starLength;
+					}
+				}
+
+				desiredHeight = totalPixelRowHeight + totalAutoRowHeight + totalStarRowHeightDesired;
+			}
+
 
 			//if (isInfiniteHeight)
 			//{
@@ -2744,7 +2886,6 @@ namespace Motvin.LayoutGrid
 			//	desiredHeight = totalPixelRowHeight + totalAutoRowHeight + totalMinStarRowHeight;//??? not sure this is correct
 			//	//desiredHeight = totalPixelRowHeight + totalAutoRowHeight + totalStarRowHeight;//??? not sure this is correct
 			//}
-			desiredHeight = totalPixelRowHeight + totalAutoRowHeight + totalStarRowHeightDesired;
 
 			//??? retSize should never be more (width or height than what gets passed in)?
 			Size retSize = new Size(desiredWidth, desiredHeight);
@@ -2753,11 +2894,18 @@ namespace Motvin.LayoutGrid
 			postMeasureTicks = Stopwatch.GetTimestamp() - startTicks;
 #endif
 
+#if DEBUG
+			measureSizeReturns.Add(retSize);
+#endif
 			return retSize;
 		}
 
 		protected override Size ArrangeOverride(Size finalSize)
 		{
+#if DEBUG
+			arrangeSizeParams.Add(finalSize);
+#endif
+
 #if CollectPerformanceStats
 			preArrangeTicks = 0;
 			arrangeTicks = 0;
@@ -2772,7 +2920,8 @@ namespace Motvin.LayoutGrid
 			if (ColumnDefinitions.Count <= 1 && RowDefinitions.Count <= 1)
 			{
 				int childrenCount = InternalChildren.Count;
-				Rect arrangeRect = new Rect(0, 0, desiredWidth, desiredHeight); //??? should be able to just use this.DesiredSize.Width, ...
+				Rect arrangeRect = new Rect(0, 0, actualColWidth, actualRowHeight); //??? should be able to just use this.DesiredSize.Width, ...
+				//Rect arrangeRect = new Rect(0, 0, finalSize.Width, finalSize.Height); //??? should be able to just use this.DesiredSize.Width, ...
 																				//Rect arrangeRect = new Rect(0, 0, finalSize.Width, finalSize.Height);
 				for (int i = 0; i < childrenCount; i++)
 				{
@@ -2784,7 +2933,7 @@ namespace Motvin.LayoutGrid
 						startTicksChildArrange = Stopwatch.GetTimestamp();
 #endif
 
-						child.Arrange(arrangeRect);//??? don't use finalSize, use desiredSize? - Grid uses finalSize, so why don't we?
+						child.Arrange(arrangeRect);//??? don't use finalSize, use desiredSize? - Grid uses finalSize (or does it?), so why don't we?
 
 #if CollectPerformanceStats
 						childArrangeTicks += Stopwatch.GetTimestamp() - startTicksChildArrange;
@@ -2796,6 +2945,11 @@ namespace Motvin.LayoutGrid
 				shortArrangeTicks = Stopwatch.GetTimestamp() - startTicks;
 				shortArrangeCount++;
 #endif
+
+#if DEBUG
+				arrangeSizeReturns.Add(finalSize);
+#endif
+				
 				return finalSize;
 			}
 
@@ -3044,6 +3198,10 @@ namespace Motvin.LayoutGrid
 				gridLinesVisual.DrawGridLines(this);
 			}
 
+#if DEBUG
+			arrangeSizeReturns.Add(finalSize);
+#endif
+
 			return finalSize;
 		}
 
@@ -3063,13 +3221,26 @@ namespace Motvin.LayoutGrid
 			}
 			else
 			{
-				length = desiredWidth;
+				//??? not sure this is correct, maybe for now need to set this in a member variable until it is set in the ColumnDefinitions itself
+				length = actualColWidth;
+				//length = ActualWidth;
+				//if (ColumnDefinitions.Count > 0)
+				//{
+				//	if (length < ColumnDefinitions[0].MinWidth)
+				//	{
+				//		length = ColumnDefinitions[0].MinWidth;
+				//	}
+				//	else if (length > ColumnDefinitions[0].MaxWidth)
+				//	{
+				//		length = ColumnDefinitions[0].MaxWidth;
+				//	}
+				//}
 			}
 
 			return length;
 		}
 
-		//??? remove this function, get this from row def ActualWidth
+		//??? remove this function, get this from row def ActualHeight
 		public double GetRowHeight(int row)
 		{
 			double length = 0;
@@ -3085,7 +3256,20 @@ namespace Motvin.LayoutGrid
 			}
 			else
 			{
-				length = desiredHeight;
+				//??? not sure this is correct, maybe for now need to set this in a member variable until it is set in the RowDefinitions itself
+				length = actualRowHeight;
+				//length = ActualHeight;
+				//if (RowDefinitions.Count > 0)
+				//{
+				//	if (length < RowDefinitions[0].MinHeight)
+				//	{
+				//		length = RowDefinitions[0].MinHeight;
+				//	}
+				//	else if (length > RowDefinitions[0].MaxHeight)
+				//	{
+				//		length = RowDefinitions[0].MaxHeight;
+				//	}
+				//}
 			}
 
 			return length;
