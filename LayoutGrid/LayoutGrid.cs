@@ -1321,10 +1321,11 @@ namespace Motvin.LayoutGrid
 					bool colOrSpanHasAuto = (colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (colFlags & ChildFlag_SpanHasStar) != 0);
 					bool rowOrSpanHasAuto = (rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (rowFlags & ChildFlag_SpanHasStar) != 0);
 
-					haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+					haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto && !rowOrSpanHasStars; // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
 					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
 					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowFlags & ChildFlag_SpanHasAuto) != 0;
-					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && ((rowFlags & ChildFlag_SpanHasAuto) != 0 || (rowType == LayoutGridUnitType.Auto));
+					//haveStarColAndAutoRowChildren |= colOrSpanHasStars && ((rowFlags & ChildFlag_SpanHasAutoNoStar) != 0);
 
 					ref ChildInfo n = ref childInfoArray[firstIndexForOtherCellGroups--];
 					n.child = child;
@@ -2115,6 +2116,7 @@ namespace Motvin.LayoutGrid
 				{
 					// if something changed in the infinite width / height values, then need to change things about the children array
 					//??? do we need to change the cell group and resort? yes
+					haveStarColAndAutoRowChildren = false;
 
 					for (i = 0; i < childInfoArrayCount - 1; i++)
 					{
@@ -2207,7 +2209,8 @@ namespace Motvin.LayoutGrid
 							bool colOrSpanHasAuto = (n.colFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteWidth && (n.colFlags & ChildFlag_SpanHasStar) != 0);
 							bool rowOrSpanHasAuto = (n.rowFlags & ChildFlag_SpanHasAuto) != 0 || (isInfiniteHeight && (n.rowFlags & ChildFlag_SpanHasStar) != 0);
 
-							haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+							haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto && !rowOrSpanHasStars; // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
+							//haveStarColAndAutoRowChildren |= colOrSpanHasStars && (rowType == LayoutGridUnitType.Auto); // if there is a row span from a star into an auto, this doesn't count because those spans aren't distributed
 							//haveStarColAndAutoRowChildren |= colOrSpanHasStars && rowOrSpanHasAuto;
 
 							if (!colOrSpanHasStars && !rowOrSpanHasStars)

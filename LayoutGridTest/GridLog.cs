@@ -376,7 +376,7 @@ namespace LayoutGridTest
 						}
 						else
 						{
-							Button b = new Button();
+							ButtonDerived b = new ButtonDerived();
 							b.Name = "btn" + i.ToString("0");
 							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -385,7 +385,7 @@ namespace LayoutGridTest
 					}
 					else
 					{
-						Button b = new Button();
+						ButtonDerived b = new ButtonDerived();
 						b.Name = "btn" + childCnt.ToString("0");
 						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -529,7 +529,7 @@ namespace LayoutGridTest
 						}
 						else
 						{
-							Button b = new Button();
+							ButtonDerived b = new ButtonDerived();
 							b.Name = "btn" + childCnt.ToString("0");
 							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -538,7 +538,7 @@ namespace LayoutGridTest
 					}
 					else
 					{
-						Button b = new Button();
+						ButtonDerived b = new ButtonDerived();
 						b.Name = "btn" + childCnt.ToString("0");
 						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -687,7 +687,7 @@ namespace LayoutGridTest
 					{
 						if (controlTypeRand <= 4)
 						{
-							Button b = new Button();
+							ButtonDerived b = new ButtonDerived();
 							t = b;
 							b.Name = "btn" + childCnt.ToString("0");
 							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 20));
@@ -888,7 +888,7 @@ namespace LayoutGridTest
 					}
 					else
 					{
-						Button b = new Button();
+						ButtonDerived b = new ButtonDerived();
 						b.Name = "btn" + i.ToString("0");
 						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -897,7 +897,7 @@ namespace LayoutGridTest
 				}
 				else
 				{
-					Button b = new Button();
+					ButtonDerived b = new ButtonDerived();
 					b.Name = "btn" + i.ToString("0");
 					b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
 
@@ -1067,7 +1067,7 @@ namespace LayoutGridTest
 			}
 		}
 
-		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size desiredSize, Size renderSize, int intID, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+		private static void AddNameAndSizeToString(StringBuilder sb, string name, Size desiredSize, Size renderSize, int intID, bool showExtraInfo = false, 
 			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			string gridName;
@@ -1116,8 +1116,7 @@ namespace LayoutGridTest
 			}
 
 			string gridNamePlusSize = gridName + (showExtraInfo ? (" DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + Environment.NewLine) : "") +
-				" RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0") + extra +
-				" MeasureCount=" + measureCount.ToString("0") + " ArrangeCount=" + arrangeCount.ToString("0");
+				" RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0") + extra;
 			sb.AppendLine(gridNamePlusSize);
 		}
 
@@ -1362,12 +1361,17 @@ namespace LayoutGridTest
 			return childGridList;
 		}
 
-		public static StringBuilder CreateGridString(Grid g, int seed, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+		public static void AddCountString(StringBuilder sb, int measureCount, int arrangeCount)
+		{
+			sb.Insert(0, "MeasureCount=" + measureCount.ToString("0") + ',' + "ArrangeCount=" + arrangeCount.ToString("0") + Environment.NewLine);
+		}
+
+		public static StringBuilder CreateGridString(Grid g, int seed, bool showExtraInfo = false, 
 			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureCount, arrangeCount, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), g, null);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), g, null);
@@ -1389,12 +1393,12 @@ namespace LayoutGridTest
 			return sb;
 		}
 
-		public static StringBuilder CreateGridString(LayoutGrid g, int seed, bool showExtraInfo = false, int measureCount = 0, int arrangeCount = 0,
+		public static StringBuilder CreateGridString(LayoutGrid g, int seed, bool showExtraInfo = false, 
 			List<Size> measureSizeParams = null, List<Size> measureSizeReturns = null, List<Size> arrangeSizeParams = null, List<Size> arrangeSizeReturns = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureCount, arrangeCount, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
+			AddNameAndSizeToString(sb, g.Name, g.DesiredSize, g.RenderSize, seed, showExtraInfo, measureSizeParams, measureSizeReturns, arrangeSizeParams, arrangeSizeReturns);
 
 			AddColsStoString(sb, new List<ColumnDefinition>(g.ColumnDefinitions), null, g);
 			AddRowsToString(sb, new List<RowDefinition>(g.RowDefinitions), null, g);
