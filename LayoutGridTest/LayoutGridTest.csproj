@@ -19,4 +19,22 @@
     <ProjectReference Include="..\LayoutGrid\LayoutGrid.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="TestOverlappingControls_LayoutGrid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="TestOverlappingControls_Grid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="TestOverlappingControls_LayoutGrid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="TestOverlappingControls_Grid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

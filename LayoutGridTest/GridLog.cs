@@ -403,6 +403,300 @@ namespace LayoutGridTest
 			}
 		}
 
+		public static void SetupRandomGridButtonHeight(Grid g, int seed, bool useInnerGrids, bool useSpans)
+		{
+			Random rand = new Random(seed);
+
+			int colCnt = rand.NextInc(1, 5);
+			int rowCnt = rand.NextInc(1, 5);
+
+			g.ColumnDefinitions.Clear();
+			for (int i = 0; i < colCnt; i++)
+			{
+				ColumnDefinition c = new ColumnDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt == 0)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Width = len;
+				}
+				else if (unitTypeInt >= 7)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 100), GridUnitType.Star);
+					c.Width = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Width = len;
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MinWidth = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MaxWidth = rand.NextInc(0, 300);
+				}
+
+				g.ColumnDefinitions.Add(c);
+			}
+
+			g.RowDefinitions.Clear();
+			for (int i = 0; i < rowCnt; i++)
+			{
+				RowDefinition c = new RowDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt == 0)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Height = len;
+				}
+				else if (unitTypeInt >= 7)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 100), GridUnitType.Star);
+					c.Height = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Height = len;
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MinHeight = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MaxHeight = rand.NextInc(0, 300);
+				}
+
+				g.RowDefinitions.Add(c);
+			}
+
+			HashSet<long> colAndRowSet = new HashSet<long>();
+			int childTryCnt = rand.NextInc(1, ((colCnt + 1) * rowCnt));
+			int childCnt = 0;
+			int gridCnt = 0;
+			for (int i = 0; i < childTryCnt; i++)
+			{
+				int col = rand.NextInc(0, colCnt - 1);
+				int row = rand.NextInc(0, rowCnt - 1);
+
+				if (colAndRowSet.Add(CombineIntsIntoLong(col, row)) || rand.NextInc(1, 20) == 1)
+				{
+					int colSpan = 1;
+
+					if (useSpans && rand.NextInc(0, 20) == 0)
+					{
+						colSpan = rand.NextInc(2, 10);
+						colSpan = Math.Min(colSpan, colCnt - col);
+					}
+
+					int rowSpan = 1;
+
+					if (useSpans && rand.NextInc(0, 20) == 0)
+					{
+						rowSpan = rand.NextInc(2, 10);
+						rowSpan = Math.Min(rowSpan, rowCnt - row);
+					}
+
+					UIElement t;
+					if (useInnerGrids)
+					{
+						if (rand.Next(0, 30) == 0)
+						{
+							Grid g2 = new Grid();
+							g2.Name = "G" + (gridCnt + 1).ToString("0");
+							gridCnt++;
+							SetupRandomGrid(g2, seed + i + 1, false);
+							t = g2;
+						}
+						else
+						{
+							ButtonDerived b = new ButtonDerived();
+							b.Name = "btn" + i.ToString("0");
+							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+							b.Height = rand.NextInc(10, 30);
+
+							t = b;
+						}
+					}
+					else
+					{
+						ButtonDerived b = new ButtonDerived();
+						b.Name = "btn" + childCnt.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+						b.Height = rand.NextInc(10, 30);
+
+						t = b;
+					}
+
+					Grid.SetColumn(t, col);
+					Grid.SetRow(t, row);
+
+					Grid.SetColumnSpan(t, colSpan);
+					Grid.SetRowSpan(t, rowSpan);
+					g.Children.Add(t);
+					childCnt++;
+				}
+			}
+		}
+
+		public static void SetupRandomGridSingleColRow(Grid g, int seed, bool useInnerGrids, bool useSpans)
+		{
+			Random rand = new Random(seed);
+
+			int colCnt = rand.NextInc(0, 1);
+			int rowCnt = rand.NextInc(0, 1);
+
+			g.ColumnDefinitions.Clear();
+			for (int i = 0; i < colCnt; i++)
+			{
+				ColumnDefinition c = new ColumnDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt == 0)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Width = len;
+				}
+				else if (unitTypeInt >= 7)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 100), GridUnitType.Star);
+					c.Width = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Width = len;
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MinWidth = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MaxWidth = rand.NextInc(0, 300);
+				}
+
+				g.ColumnDefinitions.Add(c);
+			}
+
+			g.RowDefinitions.Clear();
+			for (int i = 0; i < rowCnt; i++)
+			{
+				RowDefinition c = new RowDefinition();
+
+				int unitTypeInt = rand.NextInc(0, 8);
+
+				if (unitTypeInt == 0)
+				{
+					GridLength len = new GridLength((double)rand.NextInc(0, 500), GridUnitType.Pixel);
+					c.Height = len;
+				}
+				else if (unitTypeInt >= 7)
+				{
+					GridLength len = new GridLength(rand.NextInc(1, 100), GridUnitType.Star);
+					c.Height = len;
+				}
+				else
+				{
+					GridLength len = new GridLength(rand.NextInc(0, 100), GridUnitType.Auto);
+					c.Height = len;
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MinHeight = rand.NextInc(0, 100);
+				}
+
+				if (rand.NextInc(0, 4) == 4)
+				{
+					c.MaxHeight = rand.NextInc(0, 300);
+				}
+
+				g.RowDefinitions.Add(c);
+			}
+
+			HashSet<long> colAndRowSet = new HashSet<long>();
+			int childTryCnt = rand.NextInc(0, 8);
+			int childCnt = 0;
+			int gridCnt = 0;
+			for (int i = 0; i < childTryCnt; i++)
+			{
+				int col = rand.NextInc(0, colCnt - 1);
+				int row = rand.NextInc(0, rowCnt - 1);
+
+				if (colAndRowSet.Add(CombineIntsIntoLong(col, row)) || rand.NextInc(1, 2) == 1)
+				{
+					int colSpan = 1;
+
+					if (useSpans && rand.NextInc(0, 20) == 0)
+					{
+						colSpan = rand.NextInc(2, 10);
+						colSpan = Math.Min(colSpan, colCnt - col);
+					}
+
+					int rowSpan = 1;
+
+					if (useSpans && rand.NextInc(0, 20) == 0)
+					{
+						rowSpan = rand.NextInc(2, 10);
+						rowSpan = Math.Min(rowSpan, rowCnt - row);
+					}
+
+					UIElement t;
+					if (useInnerGrids)
+					{
+						if (rand.Next(0, 30) == 0)
+						{
+							Grid g2 = new Grid();
+							g2.Name = "G" + (gridCnt + 1).ToString("0");
+							gridCnt++;
+							SetupRandomGrid(g2, seed + i + 1, false);
+							t = g2;
+						}
+						else
+						{
+							ButtonDerived b = new ButtonDerived();
+							b.Name = "btn" + i.ToString("0");
+							b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+
+							t = b;
+						}
+					}
+					else
+					{
+						ButtonDerived b = new ButtonDerived();
+						b.Name = "btn" + childCnt.ToString("0");
+						b.Content = "Button " + b.Name + new string('X', rand.NextInc(0, 10));
+
+						t = b;
+					}
+
+					Grid.SetColumn(t, col);
+					Grid.SetRow(t, row);
+
+					Grid.SetColumnSpan(t, colSpan);
+					Grid.SetRowSpan(t, rowSpan);
+					g.Children.Add(t);
+					childCnt++;
+				}
+			}
+		}
+
 		public static void SetupRandomGridStars(Grid g, int seed, bool useInnerGrids, bool allowZeroMax = true)
 		{
 			Random rand = new Random(seed);
@@ -984,6 +1278,7 @@ namespace LayoutGridTest
 						ButtonDerived b = new ButtonDerived();
 						b.Name = b2.Name;
 						b.Content = b2.Content;
+						b.Height = b2.Height;
 
 						Grid.SetColumn(b, Grid.GetColumn(b2));
 						Grid.SetRow(b, Grid.GetRow(b2));
@@ -998,6 +1293,7 @@ namespace LayoutGridTest
 						Button b = new Button();
 						b.Name = b2.Name;
 						b.Content = b2.Content;
+						b.Height = b2.Height;
 
 						Grid.SetColumn(b, Grid.GetColumn(b2));
 						Grid.SetRow(b, Grid.GetRow(b2));
@@ -1115,8 +1411,8 @@ namespace LayoutGridTest
 				}
 			}
 
-			string gridNamePlusSize = gridName + (showExtraInfo ? (" DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + Environment.NewLine) : "") +
-				" RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + intID.ToString("0") + extra;
+			string gridNamePlusSize = gridName + ' ' + intID.ToString("0") + (showExtraInfo ? (" DesiredSize=" + desiredSize.Width.ToString(dblFmt) + ',' + desiredSize.Height.ToString(dblFmt) + Environment.NewLine) : "") +
+				" RenderSize=" + renderSize.Width.ToString(dblFmt) + ',' + renderSize.Height.ToString(dblFmt) + " ; " + extra;
 			sb.AppendLine(gridNamePlusSize);
 		}
 

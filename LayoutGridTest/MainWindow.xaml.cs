@@ -37,6 +37,156 @@ namespace LayoutGridTest
 			RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
 			RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
 			RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+			RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+			RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+
+			lblStatus.Content = "Done Running Tests";
+		}
+
+
+		private void btnTestEverything_Click(object sender, RoutedEventArgs e)
+		{
+			bool useInnerGrids = false;
+			bool useInfinite = false;
+			bool useInfiniteMix = false;
+			bool outputExtraInfo = false;
+
+			for (int i = 0; ; i++)
+			{
+				if (i == 0)
+				{
+					useInnerGrids = false;
+					useInfinite = false;
+					useInfiniteMix = false;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 1)
+				{
+					useInnerGrids = true;
+					useInfinite = false;
+					useInfiniteMix = false;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 2)
+				{
+					useInnerGrids = true;
+					useInfinite = true;
+					useInfiniteMix = false;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 3)
+				{
+					useInnerGrids = true;
+					useInfinite = false;
+					useInfiniteMix = true;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 4)
+				{
+					useInnerGrids = true;
+					useInfinite = false;
+					useInfiniteMix = false;
+					outputExtraInfo = true;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 5)
+				{
+					useInnerGrids = false;
+					useInfinite = true;
+					useInfiniteMix = false;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 6)
+				{
+					useInnerGrids = false;
+					useInfinite = false;
+					useInfiniteMix = true;
+					outputExtraInfo = false;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else if (i == 7)
+				{
+					useInnerGrids = false;
+					useInfinite = false;
+					useInfiniteMix = false;
+					outputExtraInfo = true;
+					RunRandManyChildren(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRand2(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStars(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandStarsNoZeroMax(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandDifferentControls(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandNoSpans(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+					RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
+				}
+				else
+				{
+					break;
+				}
+
+			}
 
 			lblStatus.Content = "Done Running Tests";
 		}
@@ -120,12 +270,24 @@ namespace LayoutGridTest
 
 		private void btnButtonHeight_Click(object sender, RoutedEventArgs e)
 		{
+			bool useInfinite = chkInfinite.IsChecked ?? true;
+			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			bool outputExtraInfo = chkOutputExtraInfo.IsChecked.Value;
+			RunRandButtonHeight(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
 
+			lblStatus.Content = "Done Running Tests";
 		}
 
 		private void btnSingleColRow_Click(object sender, RoutedEventArgs e)
 		{
+			bool useInfinite = chkInfinite.IsChecked ?? true;
+			bool useInfiniteMix = chkInfiniteMix.IsChecked ?? true;
+			bool useInnerGrids = chkInnerGrids.IsChecked ?? true;
+			bool outputExtraInfo = chkOutputExtraInfo.IsChecked.Value;
+			RunRandSingleColRow(lblStatus, useInfinite, useInfiniteMix, useInnerGrids, outputExtraInfo);
 
+			lblStatus.Content = "Done Running Tests";
 		}
 
 		private void btnPerf1_Click(object sender, RoutedEventArgs e)
@@ -184,6 +346,7 @@ namespace LayoutGridTest
 					}
 
 					if (
+						(seed == 11 && useInfinite) || //  Grid expands col spans differently
 						seed == 15 || //  Grid is wrong, it expands a pixel col/row for span
 						seed == 19 || //  Grid is wrong, it expands a pixel col/row for span
 						seed == 40 || //  many things are different
@@ -203,9 +366,7 @@ namespace LayoutGridTest
 						(seed == 47 && outputExtraInfo) || // not sure how Grid comes up with a desired size for the star with spans
 						(seed == 60 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
 						seed == 87 || // span expands pixel sized col/row for Grid, it should not
-						(seed == 138 && outputExtraInfo) || // not sure how Grid comes up with a desired size for the star with spans
 						seed == 181 || // span expands pixel sized col/row for Grid, it should not
-						(seed == 197 && outputExtraInfo) || // not sure how Grid comes up with a desired size for the star with spans
 						(seed == 288 && useInfinite) || // span expands pixel sized col/row for Grid, it should not
 						seed == 382 || // span expands pixel sized col/row for Grid, it should not
 						seed == 401 || // span expands pixel sized col/row for Grid, it should not
@@ -234,7 +395,11 @@ namespace LayoutGridTest
 					}
 				}
 
-				if (seed >= 1183)
+				if (outputExtraInfo && seed == 288)
+				{
+					break;
+				}
+				else if (seed >= 1183)
 				{
 					break;
 				}
@@ -386,11 +551,16 @@ namespace LayoutGridTest
 				}
 
 				if (
+					(seed == 3 && outputExtraInfo) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
 					(seed == 5 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
 					(seed == 12 && useInfinite) || // We expand a row after the min, not sure this is correct??? - could expand more evenly like Grid does
+					(seed == 19 && useInfinite && useInnerGrids) || // Grid is wrong, we expand the 3 rows evenly, but for some reason Grid does not
 					(seed == 25 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
+					(seed == 29 && useInfinite && useInnerGrids) || // Grid expands star row more than the auto rows for some reason
 					(seed == 31 && useInnerGrids) || // off by .01
+					(seed == 34 && useInfinite && useInnerGrids) || // distribute spans differently
 					(seed == 36 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
+					(seed == 46 && useInfinite && useInnerGrids) || // Grid expands star more than the auto for some reason??? maybe we should do the same?
 					(seed == 56 && useInnerGrids) || // 0*
 					(seed == 65 && useInnerGrids) || // distribute spans differently
 					(seed == 70 && useInfinite) || // Grid is wrong, we expand the last 2 rows evenly, but for some reason Grid does not
@@ -418,11 +588,9 @@ namespace LayoutGridTest
 					seed == 255 || // span order
 					(seed == 293 && useInnerGrids) || // distribute spans differently
 					(seed == 310 && useInnerGrids) || // distribute spans differently
-					//(seed == 316 && useInnerGrids) || // desired size is different, not sure why Grid does it that way
 					seed == 324 || // this is an auto width that goes beyond the max, we constrain the desired/rendered size to max, but Grid does not, which chops off the border???
 					(seed == 330 && useInnerGrids) || // desired size is different, not sure why Grid does it that way, it probably has something to do with different spans
 					seed == 348 || // this is 0* treated like pixel sizing
-					//(seed == 354 && useInnerGrids) || // desired size is different, not sure why Grid does it that way
 					seed == 367 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed
 					seed == 371 || // this is 0* treated like pixel sizing
 					seed == 381 || // span order
@@ -436,7 +604,6 @@ namespace LayoutGridTest
 					seed == 493 || // this is 0* treated like pixel sizing
 					seed == 498 || // this is 0* treated like pixel sizing
 					(seed == 507 && useInnerGrids) || // distribute spans differently - LayoutGrid goes past a max for an auto col with a span
-					//(seed == 520 && useInnerGrids) || // desired size is different, it seems like Grid adds in the totalStarColWidth to the desiredWidth in this case, but this messes up other cases??? - try to make this work the same as Grid
 					(seed == 534 && useInnerGrids) || // distribute spans differently
 					seed == 521 || // this is 0* treated like pixel sizing
 					seed == 525 || // this is 0* treated like pixel sizing
@@ -451,7 +618,6 @@ namespace LayoutGridTest
 					seed == 689 || // Grid is wrong, it distributes extra space to a col in a colspan when that extra space is not needed
 					(seed == 727 && useInnerGrids) || // distribute spans differently - spans don't increase past max (but sometimes they do???)
 					seed == 729 || // Grid is wrong.  We use the extra space to not distribute more extra if not needed when overlapping spans.
-					//(seed == 748 && useInnerGrids) || // desired size is different
 					seed == 808 || // There is a rowspan(no colspan) with a higher cellgroup than the colspan that overlaps this col, the colspan is done first, although you could do the rowspan (only the single col width part of it) first - but it's probably not a big deal and we don't want to be calling measure more times than 1 per child when we don't have to
 					(seed == 825 && useInnerGrids) || // distribute spans differently
 					seed == 835 || // span order
@@ -471,12 +637,22 @@ namespace LayoutGridTest
 					continue; // these are cases where we are correct and Grid is wrong
 				}
 
-				if (seed == 1030)
+				if (seed == 55 && useInfinite && useInnerGrids)
+				{
+					break;
+				}
+
+				if (seed == 6 && outputExtraInfo)
 				{
 					break;
 				}
 
 				if (seed > 159 && useInfinite)
+				{
+					break;
+				}
+
+				if (seed == 1030)
 				{
 					break;
 				}
@@ -645,6 +821,9 @@ namespace LayoutGridTest
 					}
 
 					if (
+						(seed == 49 && outputExtraInfo) || // desired size uses desired child width of pixel col
+						(seed == 49 && useInfinite) || // span expands pixel col
+						(seed == 268 && useInfinite) || // Grid expands star more than auto - maybe we should do the same?
 						seed == 330 || // colspan distributed differently
 						seed == 375 || // span expands pixel col
 						seed == 400 || // span expands pixel col
@@ -675,6 +854,11 @@ namespace LayoutGridTest
 						seed++;
 						continue; // these are cases where we are correct and Grid is wrong
 					}
+				}
+
+				if (seed == 87 && outputExtraInfo)
+				{
+					break;
 				}
 
 				if (seed == 1458)
@@ -851,7 +1035,7 @@ namespace LayoutGridTest
 					}
 
 					if (
-						seed == 606 || // different desired size with star
+						(seed == 323 && useInfinite) || // different span distributions
 						seed == 611 || // 0 max star messes up star distribution for Grid
 						seed == 1252 || // Grid doesn't do star distribution correctly
 						
@@ -1052,7 +1236,7 @@ namespace LayoutGridTest
 					}
 
 					if (
-						seed == 606 || // different desired size with star
+						(seed == 323 && useInfinite) || // different span distributions
 						seed == 1252 || // Grid doesn't do star distribution correctly
 
 						1 == 0
@@ -1259,6 +1443,7 @@ namespace LayoutGridTest
 
 					if (
 						seed == 7 || // different span distributions
+						(seed == 8 && outputExtraInfo) || // different desired for star cols
 						seed == 65 || // pixel treated differently
 
 						1 == 2
@@ -1295,6 +1480,11 @@ namespace LayoutGridTest
 						seed++;
 						continue; // these are cases where we are correct and Grid is wrong
 					}
+				}
+
+				if (seed == 90 && outputExtraInfo)
+				{
+					break;
 				}
 
 				if (seed > 4219)
@@ -1470,8 +1660,6 @@ namespace LayoutGridTest
 						seed == 525 || // Grid distributes span unevenly
 						seed == 609 || // Grid distributes span unevenly
 						seed == 769 || // off by .01
-						seed == 1057 || // Grid has strange desired size with star
-						seed == 1281 || // Grid has strange desired size with star
 						seed == 1343 || // Grid distributes span differently
 						seed == 1437 || // Grid expands pixel
 
@@ -1528,6 +1716,367 @@ namespace LayoutGridTest
 				WindowPlain win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
 				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
 				win2.Title = "Test Grid 2 No Spans";
+				win2.Show();
+				int measureCount2 = ButtonDerived.measureCount;
+				int arrangeCount2 = ButtonDerived.arrangeCount;
+				ButtonDerived.ResetCounts();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
+
+				StringBuilder sb1 = GridLog.CreateGridString(g1, seed, outputExtraInfo, g1.measureSizeParams, g1.measureSizeReturns, g1.arrangeSizeParams, g1.arrangeSizeReturns);
+				StringBuilder sb2 = GridLog.CreateGridString(g2, seed, outputExtraInfo, g2.measureSizeParams, g2.measureSizeReturns, g2.arrangeSizeParams, g2.arrangeSizeReturns);
+
+				if (addCounts)
+				{
+					GridLog.AddCountString(sb1, measureCount1, arrangeCount1);
+					GridLog.AddCountString(sb2, measureCount2, arrangeCount2);
+				}
+
+				string s1 = sb1.ToString();
+				string s2 = sb2.ToString();
+
+				if (string.Equals(s1, s2, StringComparison.Ordinal)
+					//&& measureCount1 == measureCount2 && arrangeCount1 == arrangeCount2
+					)
+				{
+					win1.Close();
+					win2.Close();
+					testCount++;
+				}
+				else
+				{
+					int index = s1.Zip(s2, (c1, c2) => c1 == c2).TakeWhile(b => b).Count();
+					int decPlaces = 2;
+					Workbook wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.Message, ex.ToString());
+					}
+					finally
+					{
+						wb.Close();
+					}
+
+					wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.Message, ex.ToString());
+					}
+					finally
+					{
+						wb.Close();
+					}
+
+					break;
+				}
+				seed++;
+			}
+			return testCount;
+		}
+
+		public static int RunRandButtonHeight(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids, bool outputExtraInfo)
+		{
+			int testCount = 0;
+			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
+			while (true)
+			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					lblStatus.Content = "Button Height: test = " + testCount.ToString("N0");
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
+				if (useInnerGrids)
+				{
+					if (seed == 1287)
+					{
+						break;
+					}
+
+					if (
+						(seed == 78 && useInfinite) || // distribute spans differently
+						seed == 609 || // distribute spans differently
+						seed == 769 || // off by .01
+						seed == 1080 || // pixel is expanded by span
+
+						1 == 2
+					)
+					{
+						seed++;
+						continue; // these are cases where we are correct and Grid is wrong
+					}
+				}
+				else if (
+					//seed == 609 || // distribute spans differently
+
+					1 == 2
+				)
+				{
+					seed++;
+					continue; // these are cases where we are correct and Grid is wrong
+				}
+
+				if (seed == 5_000)
+				{
+					break;
+				}
+
+				GridDerived g1 = new GridDerived();
+
+				g1.Name = "grd";
+				GridLog.SetupRandomGridButtonHeight(g1, seed, useInnerGrids, false);
+
+				LayoutGrid g2 = new LayoutGrid();
+
+				GridLog.CopyGridSetup(g1, g2);
+				g2.Name = "grd";
+
+				GetRandInfinite(seed, useInfinite, out bool useInfiniteWidth, out bool useInfiniteHeight);
+
+				WindowPlain win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+				//win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
+				win1.Title = "Grid 1 Button Height";
+				win1.Show();
+				int measureCount1 = ButtonDerived.measureCount;
+				int arrangeCount1 = ButtonDerived.arrangeCount;
+				ButtonDerived.ResetCounts();
+
+				WindowPlain win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
+				win2.Title = "Test Grid 2 Button Height";
+				win2.Show();
+				int measureCount2 = ButtonDerived.measureCount;
+				int arrangeCount2 = ButtonDerived.arrangeCount;
+				ButtonDerived.ResetCounts();
+
+				if (useInfiniteMix)
+				{
+					GetRandInfinite(seed, useInfinite, out useInfiniteWidth, out useInfiniteHeight);
+
+					win1.Close();
+					win2.Close();
+
+					win1.outerGrid.Children.Remove(g1);
+					win2.outerGrid.Children.Remove(g2);
+
+					win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+					win1.Show();
+
+					win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+					win2.Show();
+				}
+
+				StringBuilder sb1 = GridLog.CreateGridString(g1, seed, outputExtraInfo, g1.measureSizeParams, g1.measureSizeReturns, g1.arrangeSizeParams, g1.arrangeSizeReturns);
+				StringBuilder sb2 = GridLog.CreateGridString(g2, seed, outputExtraInfo, g2.measureSizeParams, g2.measureSizeReturns, g2.arrangeSizeParams, g2.arrangeSizeReturns);
+
+				if (addCounts)
+				{
+					GridLog.AddCountString(sb1, measureCount1, arrangeCount1);
+					GridLog.AddCountString(sb2, measureCount2, arrangeCount2);
+				}
+
+				string s1 = sb1.ToString();
+				string s2 = sb2.ToString();
+
+				if (string.Equals(s1, s2, StringComparison.Ordinal)
+					//&& measureCount1 == measureCount2 && arrangeCount1 == arrangeCount2
+					)
+				{
+					win1.Close();
+					win2.Close();
+					testCount++;
+				}
+				else
+				{
+					int index = s1.Zip(s2, (c1, c2) => c1 == c2).TakeWhile(b => b).Count();
+					int decPlaces = 2;
+					Workbook wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g2, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\LayoutGridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.Message, ex.ToString());
+					}
+					finally
+					{
+						wb.Close();
+					}
+
+					wb = null;
+					try
+					{
+						wb = new Workbook(spWorkbookFileFormat.OfficeOpenXML);
+
+						GridLog.WriteGridToExcelCreateWorksheet(wb, g1, decPlaces);
+
+						string fileName = @"e:\proj\SpreadsheetOut\GridRand.xlsx";
+
+						wb.SaveAs(fileName);
+
+						ProcessStartInfo p = new ProcessStartInfo();
+						p.UseShellExecute = true;
+						p.FileName = fileName;
+						p.Verb = "Open";
+						Process.Start(p);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.Message, ex.ToString());
+					}
+					finally
+					{
+						wb.Close();
+					}
+
+					break;
+				}
+				seed++;
+			}
+			return testCount;
+		}
+
+		public static int RunRandSingleColRow(Label lblStatus, bool useInfinite, bool useInfiniteMix, bool useInnerGrids, bool outputExtraInfo)
+		{
+			int testCount = 0;
+			int seed = 1;
+			if (useInfiniteMix)
+			{
+				useInfinite = true;
+			}
+			while (true)
+			{
+				if ((testCount % 500) == 0)
+				{
+					// need to do this to free the memory held by Show and then Close windows
+					lblStatus.Content = "Single Col Row: test = " + testCount.ToString("N0");
+					DoEvents();
+					PerfStatic.DoGCCollect();
+				}
+
+				if (useInnerGrids)
+				{
+					if (seed == 2100)
+					{
+						break;
+					}
+
+					if (
+						seed == 395 || // Grid distributes span to pixel col
+						(seed == 759 && useInfinite) || // Grid distributes spans to star before auto
+						(seed == 1345 && useInfinite) || // Grid distributes spans to star before auto
+
+						1 == 2
+					)
+					{
+						seed++;
+						continue; // these are cases where we are correct and Grid is wrong
+					}
+				}
+				else if (
+					//seed == 3015 || // off by .01
+
+					1 == 2
+				)
+				{
+					seed++;
+					continue; // these are cases where we are correct and Grid is wrong
+				}
+
+				if (seed == 5_000)
+				{
+					break;
+				}
+
+				GridDerived g1 = new GridDerived();
+
+				g1.Name = "grd";
+				GridLog.SetupRandomGridSingleColRow(g1, seed, useInnerGrids, false);
+
+				LayoutGrid g2 = new LayoutGrid();
+
+				GridLog.CopyGridSetup(g1, g2);
+				g2.Name = "grd";
+
+				GetRandInfinite(seed, useInfinite, out bool useInfiniteWidth, out bool useInfiniteHeight);
+
+				WindowPlain win1 = new WindowPlain(g1, useInfiniteWidth, useInfiniteHeight);
+				//win1.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
+				win1.Title = "Grid 1 Single Col Row";
+				win1.Show();
+				int measureCount1 = ButtonDerived.measureCount;
+				int arrangeCount1 = ButtonDerived.arrangeCount;
+				ButtonDerived.ResetCounts();
+
+				WindowPlain win2 = new WindowPlain(g2, useInfiniteWidth, useInfiniteHeight);
+				//win2.ShowInTaskbar = false; // showing and closing windows seems to be faster with this set to false
+				win2.Title = "Test Grid 2 Single Col Row";
 				win2.Show();
 				int measureCount2 = ButtonDerived.measureCount;
 				int arrangeCount2 = ButtonDerived.arrangeCount;
@@ -1961,7 +2510,7 @@ namespace LayoutGridTest
 			if (!string.Equals(s1, s2, StringComparison.Ordinal)
 				)
 			{
-				testCount++;
+				MessageBox.Show("Grids Are Different");
 			}
 		}
 
@@ -1974,7 +2523,6 @@ namespace LayoutGridTest
 		TestInner_LayoutGrid innerLayoutGridWin;
 		private void btnInner_Click(object sender, RoutedEventArgs e)
 		{
-			int testCount = 1;
 			innerLayoutGridWin = new TestInner_LayoutGrid();
 			innerLayoutGridWin.Width = 500;
 			innerLayoutGridWin.Height = 500;
@@ -1994,14 +2542,24 @@ namespace LayoutGridTest
 			if (!string.Equals(s1, s2, StringComparison.Ordinal)
 				)
 			{
-				testCount++;
+				MessageBox.Show("Grids Are Different");
 			}
 		}
 
-		private void btnInnerCheck_Click(object sender, RoutedEventArgs e)
+		private void btnOverlappingControls_Click(object sender, RoutedEventArgs e)
 		{
-			StringBuilder sb1 = GridLog.CreateGridString(innerGridWin.outerGrid, 1);
-			StringBuilder sb2 = GridLog.CreateGridString(innerLayoutGridWin.outerGrid, 1);
+			TestOverlappingControls_LayoutGrid layoutGridWin = new TestOverlappingControls_LayoutGrid();
+			layoutGridWin.Width = 500;
+			layoutGridWin.Height = 500;
+			layoutGridWin.Show();
+
+			TestOverlappingControls_Grid gridWin = new TestOverlappingControls_Grid();
+			gridWin.Width = 500;
+			gridWin.Height = 500;
+			gridWin.Show();
+
+			StringBuilder sb1 = GridLog.CreateGridString(gridWin.gridMain, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(layoutGridWin.gridMain, 1);
 
 			string s1 = sb1.ToString();
 			string s2 = sb2.ToString();

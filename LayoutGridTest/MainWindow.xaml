@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
-        Title="Test LayoutGrid" Height="450" Width="1214">
+        Title="Test LayoutGrid" Height="450" Width="1289">
     <Grid>
 		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
@@ -39,25 +40,25 @@
 		<Button Grid.Row="0" Grid.Column="8" Content="No Spans" Margin="5" Padding="4" Name="btnNoSpans" MinWidth="70" Click="btnNoSpans_Click"/>
 		<Button Grid.Row="0" Grid.Column="9" Content="Button Height" Margin="5" Padding="4" Name="btnButtonHeight" MinWidth="70" Click="btnButtonHeight_Click"/>
 		<Button Grid.Row="0" Grid.Column="10" Content="Single Col/Row" Margin="5" Padding="4" Name="btnSingleColRow" MinWidth="70" Click="btnSingleColRow_Click"/>
+		<Button Grid.Row="0" Grid.Column="11" Content="Test Everything" Margin="5" Padding="4" Name="btnTestEverything" MinWidth="70" Click="btnTestEverything_Click"/>
 		<Label Grid.Row="1" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
 		<Button Grid.Row="1" Grid.Column="2" Content="Inner" Margin="5" Padding="4,0,4,0" Name="btnInner" MinWidth="70" Click="btnInner_Click"/>
-		<Button Grid.Row="1" Grid.Column="3" Content="Inner Check" Margin="5" Padding="4" Name="btnInnerCheck" MinWidth="70" Click="btnInnerCheck_Click"/>
+		<Button Grid.Row="1" Grid.Column="3" Content="Overlapping Controls" Margin="5" Padding="4" Name="btnOverlappingControls" MinWidth="70" Click="btnOverlappingControls_Click"/>
 		<Button Grid.Row="1" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn4" MinWidth="70"/>
 		<CheckBox Grid.Row="1" Grid.Column="5" Content="Inner Grids" Margin="5" Name="chkInnerGrids" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="6" Content="Infinite" Margin="5" Name="chkInfinite" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="7" Content="Infinite Mix" Margin="5" Name="chkInfiniteMix" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="8" Content="Output Extra Info" Margin="5" Name="chkOutputExtraInfo" MinWidth="70" IsChecked="False"/>
+		<CheckBox Grid.Row="1" Grid.Column="9" Content="Change cols/rows" Margin="5" Name="chkChangeColRows" MinWidth="70" IsChecked="False"/>
+		<CheckBox Grid.Row="1" Grid.Column="10" Content="Change children" Margin="5" Name="chkChangeChildren" MinWidth="70" IsChecked="False"/>
 		<Label Grid.Row="2" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid 2:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn23" MinWidth="70"/>
 		<Button Grid.Row="2" Grid.Column="4" Content="GC Collect" Margin="5" Padding="4" Name="btnGCCollect" MinWidth="70" Click="btnGCCollect_Click"/>
 		<Label Grid.Row="3" Grid.Column="0" Content="Performance LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
-		<Button Grid.Row="3" Grid.Column="1" Content="Perf 1" Margin="5" Padding="4,0,4,0" Name="btnPerf1" MinWidth="70" Click="btnPerf1_Click"/>
-		<Button Grid.Row="3" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn32" MinWidth="70"/>
-		<Button Grid.Row="3" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn33" MinWidth="70"/>
-		<Button Grid.Row="3" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn34" MinWidth="70"/>
+		<Button Grid.Row="3" Grid.Column="1" Content="Perf 1"  Margin="5" Padding="4" Name="btnPerf1" MinWidth="70" Click="btnPerf1_Click"/>
 		<Label Grid.Row="4" Grid.Column="0" Content="Status:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="6" Name="lblStatus" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 	</Grid>

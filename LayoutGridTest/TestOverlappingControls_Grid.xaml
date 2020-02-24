@@ -1,0 +1,33 @@
+﻿<Window x:Class="LayoutGridTest.TestOverlappingControls_Grid"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayoutGridTest"
+        mc:Ignorable="d"
+        Title="Overlapping Controls" Height="474" Width="800">
+	<Grid Name="gridMain">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Label Grid.Row="0" Grid.Column="0" Content="Sele_ct:"/>
+		<ComboBox Grid.Row="0" Grid.Column="1" Name="cboSelect" />
+		<Button Grid.Row="0" Grid.Column="2" Content="Z Index" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<Button Grid.Row="0" Grid.Column="2" Content="AAA" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<Button Grid.Row="0" Grid.Column="2" Content="BB" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<Button Grid.Row="0" Grid.Column="2" Content="C" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<Button Grid.Row="0" Grid.Column="3" Content="Cancel" Margin="10,0,0,0" Name="btnCancel" Width="70"/>
+		<Button Grid.Row="0" Grid.Column="4" Content="_New" Margin="10,0,0,0" Name="btnNew" Width="70"/>
+		<Button Grid.Row="0" Grid.Column="5" Content="Delete" Margin="10,0,0,0" Width="70"/>
+	</Grid>
+</Window>
+
