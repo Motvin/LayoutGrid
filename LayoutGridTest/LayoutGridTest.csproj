@@ -20,6 +20,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="DiffSpanPixel_Grid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="DiffSpanPixel_LayoutGrid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="DiffSpanExpands_Grid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="DiffSpanExpands_LayoutGrid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="TestOverlappingControls_LayoutGrid.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -29,6 +41,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="DiffSpanPixel_Grid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="DiffSpanPixel_LayoutGrid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="DiffSpanExpands_Grid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="DiffSpanExpands_LayoutGrid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="TestOverlappingControls_LayoutGrid.xaml">
       <SubType>Designer</SubType>
     </Page>

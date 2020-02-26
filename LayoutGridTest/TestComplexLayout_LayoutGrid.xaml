@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
         Title="TestComplexLayout_LayoutGrid" Height="524" Width="1519">
-	<p:LayoutGrid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True">
+	<p:LayoutGrid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True" GridLinesColorMix="Distinct">
 		<p:LayoutGrid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="1*" />

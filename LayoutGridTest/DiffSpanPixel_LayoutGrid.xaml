@@ -1,0 +1,24 @@
+﻿<Window x:Class="LayoutGridTest.DiffSpanPixel_LayoutGrid"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayoutGridTest"
+ 		xmlns:p="clr-namespace:Motvin.LayoutGrid;assembly=LayoutGrid"
+		mc:Ignorable="d"
+        Title="DiffSpan_LayoutGrid Pixel Col Not Expanded" Height="450" Width="800">
+	<p:LayoutGrid Name="gridMain" ShowGridLines="True">
+		<p:LayoutGrid.ColumnDefinitions>
+			<ColumnDefinition Width="40"/>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</p:LayoutGrid.ColumnDefinitions>
+		<p:LayoutGrid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto"/>
+		</p:LayoutGrid.RowDefinitions>
+		<Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Btn Span" />
+		<Button Grid.Row="1" Grid.Column="0" Content="Pix" />
+		<Button Grid.Row="1" Grid.Column="2" Content="Button 2" />
+	</p:LayoutGrid>
+</Window>

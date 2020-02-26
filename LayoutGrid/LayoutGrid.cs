@@ -17,58 +17,89 @@ namespace Motvin.LayoutGrid
 {
 	public class LayoutGrid : Panel//, IAddChild // Panel implements IAddChild, so I'm not sure why it is implemented here??? - maybe it uses explicit interface ...?
 	{
+		private int FindGridParentSiblingIndex()
+		{
+			int idx = 0;
+			LayoutGrid gp = this;
+			FrameworkElement parent = gp.Parent as FrameworkElement;
+			do
+			{
+				if (parent == null)
+				{
+					break;
+				}
+
+				gp = parent as LayoutGrid;
+				if (gp != null)
+				{
+					if (gp.gridLinesParentSiblingIndex >= 0)
+					{
+						idx = gp.gridLinesParentSiblingIndex + 1;
+
+						// look for any existing sibling LayoutGrids (these are the parent's children) - go backwards because we want the last LayoutGrid sibling
+
+						int childrenCount = gp.InternalChildren.Count;
+						for (int i = childrenCount - 1; i >= 0; i--)
+						{
+							UIElement child = gp.InternalChildren[i];
+							LayoutGrid g = child as LayoutGrid;
+							if (g != null)
+							{
+								if (g.gridLinesParentSiblingIndex >= 0)
+								{
+									idx = g.gridLinesParentSiblingIndex + 1;
+									break;
+								}
+							}
+						}
+					}
+				}
+				parent = parent.Parent as FrameworkElement;
+
+			} while (true);
+
+			return idx;
+		}
 
 		private static bool IsDebugMode()
 		{
 			return System.Diagnostics.Debugger.IsAttached;
 		}
 
-		private enum GridLinesColorType //??? private or public?
+		public enum GridLinesColorMixType
 		{
+			None,
+			Single,
 			Distinct,
 			HeatMap // blue outer, teal inner, then light green, green, yellow, orange, red
 		}
 
-		private System.Drawing.Color[] distinctColorArray = new System.Drawing.Color[] 
-		{
-			redColor,
-			greenColor,
-			blueColor,
-
-			orangeColor,
-			cyanColor,
-			magentaColor,
-
-			yellowColor,
-			maroonColor,
-			tealColor,
-
-			navyColor,
-			brownColor,
-			pinkColor,
-
-			beigeColor,
-			mintColor,
-			lavendarColor,
-		};
+		private int gridLinesParentSiblingIndex = -1; // -1 means this isn't determined yet  - don't determine until necessary (before drawing the grid lines) ??? move this to other member vars. declarations - 
 
 		//??? these are distinct colors that can be used for different grid lines - could also look at visual studio colors
 		// vis. studio dash pattern is 3/3, a selection box (int Paint) dash pattern is 4 blue, 4 white
-		static System.Drawing.Color redColor = System.Drawing.Color.FromArgb(255, 230, 25, 75);
-		static System.Drawing.Color greenColor = System.Drawing.Color.FromArgb(255, 60, 180, 75);
-		static System.Drawing.Color blueColor = System.Drawing.Color.FromArgb(255, 0, 130, 200);
-		static System.Drawing.Color orangeColor = System.Drawing.Color.FromArgb(255, 245, 130, 48);
-		static System.Drawing.Color cyanColor = System.Drawing.Color.FromArgb(255, 70, 240, 240);
-		static System.Drawing.Color magentaColor = System.Drawing.Color.FromArgb(255, 240, 50, 230);
-		static System.Drawing.Color yellowColor = System.Drawing.Color.FromArgb(255, 255, 255, 25);
-		static System.Drawing.Color maroonColor = System.Drawing.Color.FromArgb(255, 128, 0, 0);
-		static System.Drawing.Color tealColor = System.Drawing.Color.FromArgb(255, 0, 128, 128);
-		static System.Drawing.Color navyColor = System.Drawing.Color.FromArgb(255, 0, 0, 128);
-		static System.Drawing.Color brownColor = System.Drawing.Color.FromArgb(255, 170, 110, 40);
-		static System.Drawing.Color pinkColor = System.Drawing.Color.FromArgb(255, 250, 190, 190);
-		static System.Drawing.Color beigeColor = System.Drawing.Color.FromArgb(255, 255, 250, 200);
-		static System.Drawing.Color mintColor = System.Drawing.Color.FromArgb(255, 170, 255, 195);
-		static System.Drawing.Color lavendarColor = System.Drawing.Color.FromArgb(255, 230, 190, 255);
+		private static Color[] distinctColorArray = new Color[]
+		{
+			Color.FromArgb(255, 230, 25, 75), // redColor
+			Color.FromArgb(255, 60, 180, 75), // greenColor
+			Color.FromArgb(255, 0, 130, 200), // blueColor
+
+			Color.FromArgb(255, 245, 130, 48), // orangeColor
+			Color.FromArgb(255, 70, 240, 240), //cyanColor
+			Color.FromArgb(255, 240, 50, 230), // magentaColor
+
+			Color.FromArgb(255, 255, 255, 25), // yellowColor
+			Color.FromArgb(255, 128, 0, 0), // maroonColor
+			Color.FromArgb(255, 0, 128, 128), // tealColor
+
+			Color.FromArgb(255, 0, 0, 128), // navyColor
+			Color.FromArgb(255, 170, 110, 40), // brownColor
+			Color.FromArgb(255, 250, 190, 190), // pinkColor
+
+			Color.FromArgb(255, 255, 250, 200), // beigeColor
+			Color.FromArgb(255, 170, 255, 195), // mintColor
+			Color.FromArgb(255, 230, 190, 255), // lavendarColor
+		};
 
 		//??? i'm not sure that these properties affect both arrange and measure
 		//[CommonDependencyPropertyAttribute]
@@ -90,8 +121,11 @@ namespace Motvin.LayoutGrid
 		public static readonly DependencyProperty IsSharedSizeScopeProperty = 
 			DependencyProperty.RegisterAttached("IsSharedSizeScope", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-		public static readonly DependencyProperty ShowGridLinesProperty = 
+		public static readonly DependencyProperty ShowGridLinesProperty =
 			DependencyProperty.RegisterAttached("ShowGridLines", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnShowGridLinesPropertyChanged)));
+
+		public static readonly DependencyProperty GridLinesColorMixProperty =
+			DependencyProperty.RegisterAttached("GridLinesColorMix", typeof(GridLinesColorMixType), typeof(LayoutGrid), new FrameworkPropertyMetadata(GridLinesColorMixType.None, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesColorMixPropertyChanged)));
 
 		private static void OnShowGridLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -114,6 +148,27 @@ namespace Motvin.LayoutGrid
 			//???
 		}
 
+		private static void OnGridLinesColorMixPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			LayoutGrid g = d as LayoutGrid;
+
+			if (g != null)
+			{
+				GridLinesColorMixType val = GridLinesColorMixType.None;
+				if (e.NewValue is GridLinesColorMixType)
+				{
+					val = (GridLinesColorMixType)e.NewValue;
+				}
+
+				if (val != GridLinesColorMixType.None)
+				{
+					g.gridLinesVisual = new LayoutGridLinesVisual();
+				}
+				g.InvalidateVisual();
+			}
+			//???
+		}
+
 		//private bool showGridLines;//??? is it ok to use this instead of GetValue(ShowGridLinesProperty, ...)
 		public bool ShowGridLines
 		{
@@ -125,6 +180,19 @@ namespace Motvin.LayoutGrid
 			set
 			{
 				SetValue(ShowGridLinesProperty, value);
+			}
+		}
+
+		public GridLinesColorMixType GridLinesColorMix
+		{
+			get
+			{
+				return (GridLinesColorMixType)GetValue(GridLinesColorMixProperty);
+			}
+
+			set
+			{
+				SetValue(GridLinesColorMixProperty, value);
 			}
 		}
 
@@ -198,7 +266,51 @@ namespace Motvin.LayoutGrid
 				{
 					if (gridLinesPen == null)
 					{
-						gridLinesBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
+						Color brushColor;
+
+						bool isBrushColorSet = false;
+						GridLinesColorMixType mix = g.GridLinesColorMix;
+						if (mix == GridLinesColorMixType.None) // try to get the mix from a parent if none because any other value is passed on to the children
+						{
+							// if a parent has a non-None mix value, then it is inherited from the parent to the child
+							LayoutGrid gp = g;
+							do
+							{
+								if (gp.Parent == null)
+								{
+									break;
+								}
+
+								gp = gp.Parent as LayoutGrid;
+								if (gp != null)
+								{
+									mix = gp.GridLinesColorMix;
+									if (mix != GridLinesColorMixType.None)
+									{
+										break;
+									}
+								}
+
+							} while (true);
+						}
+
+						if (mix == GridLinesColorMixType.Distinct)
+						{
+							if (g.gridLinesParentSiblingIndex < 0)
+							{
+								g.gridLinesParentSiblingIndex = g.FindGridParentSiblingIndex();
+							}
+
+							brushColor = distinctColorArray[g.gridLinesParentSiblingIndex % distinctColorArray.Length];
+							isBrushColorSet = true;
+						}
+
+						if (!isBrushColorSet)
+						{
+							brushColor = distinctColorArray[0];
+						}
+
+						gridLinesBrush = new SolidColorBrush(brushColor);
 						gridLinesBrush.Freeze();
 						gridLinesPen = new Pen(gridLinesBrush, 1.0);
 						gridLinesPen.DashStyle = new DashStyle(new double[] { 2.0, 3.0 }, 0);

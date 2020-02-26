@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
-        Title="Test LayoutGrid" Height="450" Width="1289">
+        Title="Test LayoutGrid" Height="450" Width="1559">
     <Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
@@ -45,18 +45,20 @@
 		<Button Grid.Row="1" Grid.Column="1" Content="Complex" Margin="5" Padding="4,0,4,0" Name="btnTestComplex" MinWidth="70" Click="btnTestComplex_Click"/>
 		<Button Grid.Row="1" Grid.Column="2" Content="Inner" Margin="5" Padding="4,0,4,0" Name="btnInner" MinWidth="70" Click="btnInner_Click"/>
 		<Button Grid.Row="1" Grid.Column="3" Content="Overlapping Controls" Margin="5" Padding="4" Name="btnOverlappingControls" MinWidth="70" Click="btnOverlappingControls_Click"/>
-		<Button Grid.Row="1" Grid.Column="4" Content="4" Margin="5" Padding="4" Name="btn4" MinWidth="70"/>
 		<CheckBox Grid.Row="1" Grid.Column="5" Content="Inner Grids" Margin="5" Name="chkInnerGrids" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="6" Content="Infinite" Margin="5" Name="chkInfinite" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="7" Content="Infinite Mix" Margin="5" Name="chkInfiniteMix" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="8" Content="Output Extra Info" Margin="5" Name="chkOutputExtraInfo" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="9" Content="Change cols/rows" Margin="5" Name="chkChangeColRows" MinWidth="70" IsChecked="False"/>
 		<CheckBox Grid.Row="1" Grid.Column="10" Content="Change children" Margin="5" Name="chkChangeChildren" MinWidth="70" IsChecked="False"/>
-		<Label Grid.Row="2" Grid.Column="0" Content="Test Specific LayoutGrid vs. Grid 2:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
-		<Button Grid.Row="2" Grid.Column="1" Content="1" Margin="5" Padding="4,0,4,0" Name="btn21" MinWidth="70"/>
-		<Button Grid.Row="2" Grid.Column="2" Content="2 Children" Margin="5" Padding="4,0,4,0" Name="btn22" MinWidth="70"/>
-		<Button Grid.Row="2" Grid.Column="3" Content="3" Margin="5" Padding="4" Name="btn23" MinWidth="70"/>
-		<Button Grid.Row="2" Grid.Column="4" Content="GC Collect" Margin="5" Padding="4" Name="btnGCCollect" MinWidth="70" Click="btnGCCollect_Click"/>
+		<Label Grid.Row="2" Grid.Column="0" Content="Differences LayoutGrid vs. Grid" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+		<Button Grid.Row="2" Grid.Column="1" Content="Pixel Col Span" Margin="5" Padding="4,0,4,0" Name="btnSpanDiffPixel" MinWidth="70" Click="btnSpanDiffPixel_Click"/>
+		<Button Grid.Row="2" Grid.Column="2" Content="Span Expands Differently" Margin="5" Padding="4,0,4,0" Name="btnSpanDiffExpand" MinWidth="70" Click="btnSpanDiffExpand_Click"/>
+		<Button Grid.Row="2" Grid.Column="3" Content="Grid Expands Past Max" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsPastMax" MinWidth="70" Click="btnGridExpandsPastMax_Click"/>
+		<Button Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2" Content="Grid Expands Star Differently than Auto" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsStarDifferentlyThanAuto" MinWidth="70" Click="btnGridExpandsStarDifferentlyThanAuto_Click"/>
+		<Button Grid.Row="2" Grid.Column="6" Content="0 Star Col/Row" Margin="5" Padding="4" Name="btnZeroStar" MinWidth="70" Click="btnZeroStar_Click"/>
+		<Button Grid.Row="2" Grid.Column="7" Content="Star Col/Row with Max" Margin="5" Padding="4" Name="btnMaxStar" MinWidth="70" Click="btnMaxStar_Click"/>
+		<Button Grid.Row="2" Grid.Column="8" Content="Grid Desired Size is Different" Margin="5" Padding="4" Name="btnGridDesiredSize" MinWidth="70" Click="btnGridDesiredSize_Click"/>
 		<Label Grid.Row="3" Grid.Column="0" Content="Performance LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="3" Grid.Column="1" Content="Perf 1"  Margin="5" Padding="4" Name="btnPerf1" MinWidth="70" Click="btnPerf1_Click"/>
 		<Label Grid.Row="4" Grid.Column="0" Content="Status:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>

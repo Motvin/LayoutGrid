@@ -2514,11 +2514,6 @@ namespace LayoutGridTest
 			}
 		}
 
-		private void btnGCCollect_Click(object sender, RoutedEventArgs e)
-		{
-			PerfStatic.DoGCCollect();
-		}
-
 		TestInner_Grid innerGridWin;
 		TestInner_LayoutGrid innerLayoutGridWin;
 		private void btnInner_Click(object sender, RoutedEventArgs e)
@@ -2569,6 +2564,88 @@ namespace LayoutGridTest
 			{
 				MessageBox.Show("Grids Are Different");
 			}
+		}
+
+		private void btnSpanDiffPixel_Click(object sender, RoutedEventArgs e)
+		{
+			DiffSpanPixel_LayoutGrid layoutGridWin = new DiffSpanPixel_LayoutGrid();
+			layoutGridWin.Width = 500;
+			layoutGridWin.Height = 500;
+			layoutGridWin.Show();
+
+			DiffSpanPixel_Grid gridWin = new DiffSpanPixel_Grid();
+			gridWin.Width = 500;
+			gridWin.Height = 500;
+			gridWin.Show();
+
+			StringBuilder sb1 = GridLog.CreateGridString(gridWin.gridMain, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(layoutGridWin.gridMain, 1);
+
+			string s1 = sb1.ToString();
+			string s2 = sb2.ToString();
+
+			if (!string.Equals(s1, s2, StringComparison.Ordinal)
+				)
+			{
+				int a = 1; // these are different, so we should come here
+			}
+			else
+			{
+				MessageBox.Show("Grids Are Same");
+			}
+		}
+
+		private void btnSpanDiffExpand_Click(object sender, RoutedEventArgs e)
+		{
+			DiffSpanExpands_LayoutGrid layoutGridWin = new DiffSpanExpands_LayoutGrid();
+			layoutGridWin.Width = 500;
+			layoutGridWin.Height = 500;
+			layoutGridWin.Show();
+
+			DiffSpanExpands_Grid gridWin = new DiffSpanExpands_Grid();
+			gridWin.Width = 500;
+			gridWin.Height = 500;
+			gridWin.Show();
+
+			StringBuilder sb1 = GridLog.CreateGridString(gridWin.gridMain, 1);
+			StringBuilder sb2 = GridLog.CreateGridString(layoutGridWin.gridMain, 1);
+
+			string s1 = sb1.ToString();
+			string s2 = sb2.ToString();
+
+			if (!string.Equals(s1, s2, StringComparison.Ordinal)
+				)
+			{
+				int a = 1; // these are different, so we should come here
+			}
+			else
+			{
+				MessageBox.Show("Grids Are Same");
+			}
+		}
+
+		private void btnGridExpandsPastMax_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnGridExpandsStarDifferentlyThanAuto_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnZeroStar_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnMaxStar_Click(object sender, RoutedEventArgs e)
+		{
+		}
+
+		private void btnGridDesiredSize_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }
