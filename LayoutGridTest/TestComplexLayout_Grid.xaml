@@ -17,7 +17,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Name="top">
+		<Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Name="top" ShowGridLines="True">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -37,7 +37,7 @@
 			<Button Grid.Row="0" Grid.Column="4" Content="_New" Margin="10,0,0,0" Name="btnNew" Width="70"/>
 			<Button Grid.Row="0" Grid.Column="5" Content="Delete" Margin="10,0,0,0" Width="70"/>
 		</Grid>
-		<Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff">
+		<Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff" ShowGridLines="True">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -75,7 +75,7 @@
 				<ContentPresenter x:Name="contentPresenter2" Focusable="False" HorizontalAlignment="Center" Margin="3,2,3,3" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" Content="contentjgpq"/>
 			</Border>
 		</Grid>
-		<Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3">
+		<Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3" ShowGridLines="True">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -96,7 +96,7 @@
 			<Label Grid.Row="1" Grid.Column="0" Content="A stuff 1:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
 			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"/>
 			<Label Grid.Row="2" Grid.Column="0" Content="A stuff 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
-			<Grid x:Name="gridx" Grid.Row="2" Grid.Column="1">
+			<Grid x:Name="gridx" Grid.Row="2" Grid.Column="1" ShowGridLines="True">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="1*" MinWidth="50" MaxWidth="200" />
 					<ColumnDefinition Width=".001*"/>
@@ -126,7 +126,7 @@
 			<Label Grid.Row="5" Grid.Column="3" Content="B stuff 5:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
 			<ComboBox Grid.Row="5" Grid.Column="4" Margin="0,8,0,0"/>
 		</Grid>
-		<Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Name="bottom">
+		<Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Name="bottom" ShowGridLines="True">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="70" MaxWidth="300"/>

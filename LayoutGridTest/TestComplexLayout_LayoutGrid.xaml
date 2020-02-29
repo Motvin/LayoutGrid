@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:LayoutGridTest"
         mc:Ignorable="d"
         Title="TestComplexLayout_LayoutGrid" Height="524" Width="1519">
-	<p:LayoutGrid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True" GridLinesColorMix="Distinct">
+	<p:LayoutGrid Margin="12,12,12,12" Name="gridMain" ShowGridLines="True">
 		<p:LayoutGrid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="1*" />
@@ -18,7 +18,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</p:LayoutGrid.RowDefinitions>
-		<p:LayoutGrid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Name="top">
+		<p:LayoutGrid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Name="top" ShowGridLines="True" GridLinesColor="Cyan">
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -38,7 +38,11 @@
 			<Button Grid.Row="0" Grid.Column="4" Content="_New" Margin="10,0,0,0" Name="btnNew" Width="70"/>
 			<Button Grid.Row="0" Grid.Column="5" Content="Delete" Margin="10,0,0,0" Width="70"/>
 		</p:LayoutGrid>
-		<p:LayoutGrid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff">
+		<p:LayoutGrid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff" ShowGridLines="True" GridLinesColor="LightGreen" GridLinesThickness="2">
+			<p:LayoutGrid.GridLinesDashStyle>
+				<DashStyle Dashes="0"/>
+			</p:LayoutGrid.GridLinesDashStyle>
+
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -76,7 +80,7 @@
 				<ContentPresenter x:Name="contentPresenter2" Focusable="False" HorizontalAlignment="Center" Margin="3,2,3,3" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" Content="contentjgpq"/>
 			</Border>
 		</p:LayoutGrid>
-		<p:LayoutGrid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3">
+		<p:LayoutGrid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3" ShowGridLines="True" GridLinesColor="#6010FF10" ShowGridLinesOuterEdge="True">
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -97,7 +101,7 @@
 			<Label Grid.Row="1" Grid.Column="0" Content="A stuff 1:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
 			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"/>
 			<Label Grid.Row="2" Grid.Column="0" Content="A stuff 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
-			<p:LayoutGrid x:Name="gridx" Grid.Row="2" Grid.Column="1">
+			<p:LayoutGrid x:Name="gridx" Grid.Row="2" Grid.Column="1" ShowGridLines="True" GridLinesColor="Blue">
 				<p:LayoutGrid.ColumnDefinitions>
 					<ColumnDefinition Width="1*" MinWidth="50" MaxWidth="200" />
 					<ColumnDefinition Width=".001*"/>
@@ -127,7 +131,7 @@
 			<Label Grid.Row="5" Grid.Column="3" Content="B stuff 5:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
 			<ComboBox Grid.Row="5" Grid.Column="4" Margin="0,8,0,0"/>
 		</p:LayoutGrid>
-		<p:LayoutGrid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Name="bottom">
+		<p:LayoutGrid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Name="bottom" ShowGridLines="True" GridLinesColor="Yellow">
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="70" MaxWidth="300"/>

@@ -53,10 +53,10 @@
 		<CheckBox Grid.Row="1" Grid.Column="10" Content="Change children" Margin="5" Name="chkChangeChildren" MinWidth="70" IsChecked="False"/>
 		<Label Grid.Row="2" Grid.Column="0" Content="Differences LayoutGrid vs. Grid" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 		<Button Grid.Row="2" Grid.Column="1" Content="Pixel Col Span" Margin="5" Padding="4,0,4,0" Name="btnSpanDiffPixel" MinWidth="70" Click="btnSpanDiffPixel_Click"/>
-		<Button Grid.Row="2" Grid.Column="2" Content="Span Expands Differently" Margin="5" Padding="4,0,4,0" Name="btnSpanDiffExpand" MinWidth="70" Click="btnSpanDiffExpand_Click"/>
-		<Button Grid.Row="2" Grid.Column="3" Content="Grid Expands Past Max" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsPastMax" MinWidth="70" Click="btnGridExpandsPastMax_Click"/>
-		<Button Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2" Content="Grid Expands Star Differently than Auto" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsStarDifferentlyThanAuto" MinWidth="70" Click="btnGridExpandsStarDifferentlyThanAuto_Click"/>
-		<Button Grid.Row="2" Grid.Column="6" Content="0 Star Col/Row" Margin="5" Padding="4" Name="btnZeroStar" MinWidth="70" Click="btnZeroStar_Click"/>
+		<Button Grid.Row="2" Grid.Column="2" Content="0 Star Col/Row" Margin="5" Padding="4" Name="btnZeroStar" MinWidth="70" Click="btnZeroStar_Click"/>
+		<Button Grid.Row="2" Grid.Column="3" Content="Span Expands Differently" Margin="5" Padding="4,0,4,0" Name="btnSpanDiffExpand" MinWidth="70" Click="btnSpanDiffExpand_Click"/>
+		<Button Grid.Row="2" Grid.Column="4" Content="Grid Expands Past Max" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsPastMax" MinWidth="70" Click="btnGridExpandsPastMax_Click"/>
+		<Button Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="2" Content="Grid Expands Star Differently than Auto" Margin="5" Padding="4,0,4,0" Name="btnGridExpandsStarDifferentlyThanAuto" MinWidth="70" Click="btnGridExpandsStarDifferentlyThanAuto_Click"/>
 		<Button Grid.Row="2" Grid.Column="7" Content="Star Col/Row with Max" Margin="5" Padding="4" Name="btnMaxStar" MinWidth="70" Click="btnMaxStar_Click"/>
 		<Button Grid.Row="2" Grid.Column="8" Content="Grid Desired Size is Different" Margin="5" Padding="4" Name="btnGridDesiredSize" MinWidth="70" Click="btnGridDesiredSize_Click"/>
 		<Label Grid.Row="3" Grid.Column="0" Content="Performance LayoutGrid vs. Grid:" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>

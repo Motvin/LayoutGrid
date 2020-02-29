@@ -17,89 +17,126 @@ namespace Motvin.LayoutGrid
 {
 	public class LayoutGrid : Panel//, IAddChild // Panel implements IAddChild, so I'm not sure why it is implemented here??? - maybe it uses explicit interface ...?
 	{
-		private int FindGridParentSiblingIndex()
-		{
-			int idx = 0;
-			LayoutGrid gp = this;
-			FrameworkElement parent = gp.Parent as FrameworkElement;
-			do
-			{
-				if (parent == null)
-				{
-					break;
-				}
+		//private int FindGridParentSiblingIndex()
+		//{
+		//	int idx = 0;
+		//	LayoutGrid gp = this;
+		//	FrameworkElement parent = gp.Parent as FrameworkElement;
+		//	do
+		//	{
+		//		if (parent == null)
+		//		{
+		//			break;
+		//		}
 
-				gp = parent as LayoutGrid;
-				if (gp != null)
-				{
-					if (gp.gridLinesParentSiblingIndex >= 0)
-					{
-						idx = gp.gridLinesParentSiblingIndex + 1;
+		//		gp = parent as LayoutGrid;
+		//		if (gp != null)
+		//		{
+		//			if (gp.gridLinesParentSiblingIndex >= 0)
+		//			{
+		//				idx = gp.gridLinesParentSiblingIndex + 1;
 
-						// look for any existing sibling LayoutGrids (these are the parent's children) - go backwards because we want the last LayoutGrid sibling
+		//				// look for any existing sibling LayoutGrids (these are the parent's children) - go backwards because we want the last LayoutGrid sibling
 
-						int childrenCount = gp.InternalChildren.Count;
-						for (int i = childrenCount - 1; i >= 0; i--)
-						{
-							UIElement child = gp.InternalChildren[i];
-							LayoutGrid g = child as LayoutGrid;
-							if (g != null)
-							{
-								if (g.gridLinesParentSiblingIndex >= 0)
-								{
-									idx = g.gridLinesParentSiblingIndex + 1;
-									break;
-								}
-							}
-						}
-					}
-				}
-				parent = parent.Parent as FrameworkElement;
+		//				int childrenCount = gp.InternalChildren.Count;
+		//				for (int i = childrenCount - 1; i >= 0; i--)
+		//				{
+		//					UIElement child = gp.InternalChildren[i];
+		//					LayoutGrid g = child as LayoutGrid;
+		//					if (g != null)
+		//					{
+		//						if (g.gridLinesParentSiblingIndex >= 0)
+		//						{
+		//							idx = g.gridLinesParentSiblingIndex + 1;
+		//							break;
+		//						}
+		//					}
+		//				}
+		//			}
+		//		}
+		//		parent = parent.Parent as FrameworkElement;
 
-			} while (true);
+		//	} while (true);
 
-			return idx;
-		}
+		//	return idx;
+		//}
 
-		private static bool IsDebugMode()
-		{
-			return System.Diagnostics.Debugger.IsAttached;
-		}
+		//private static bool IsDebugMode()
+		//{
+		//	return System.Diagnostics.Debugger.IsAttached;
+		//}
 
-		public enum GridLinesColorMixType
-		{
-			None,
-			Single,
-			Distinct,
-			HeatMap // blue outer, teal inner, then light green, green, yellow, orange, red
-		}
+		//public enum GridLinesColorMixType
+		//{
+		//	None,
+		//	Single,
+		//	Distinct,
+		//	HeatMap // blue outer, teal inner, then light green, green, yellow, orange, red
+		//}
 
-		private int gridLinesParentSiblingIndex = -1; // -1 means this isn't determined yet  - don't determine until necessary (before drawing the grid lines) ??? move this to other member vars. declarations - 
+		//private int gridLinesParentSiblingIndex = -1; // -1 means this isn't determined yet  - don't determine until necessary (before drawing the grid lines) ??? move this to other member vars. declarations - 
 
-		//??? these are distinct colors that can be used for different grid lines - could also look at visual studio colors
-		// vis. studio dash pattern is 3/3, a selection box (int Paint) dash pattern is 4 blue, 4 white
-		private static Color[] distinctColorArray = new Color[]
-		{
-			Color.FromArgb(255, 230, 25, 75), // redColor
-			Color.FromArgb(255, 60, 180, 75), // greenColor
-			Color.FromArgb(255, 0, 130, 200), // blueColor
+		////??? these are distinct colors that can be used for different grid lines - could also look at visual studio colors
+		//// vis. studio dash pattern is 3/3, a selection box (int Paint) dash pattern is 4 blue, 4 white
+		//private static Color[] distinctColorArray = new Color[]
+		//{
+		//	Color.FromArgb(255, 230, 25, 75), // redColor
+		//	Color.FromArgb(255, 60, 180, 75), // greenColor
+		//	Color.FromArgb(255, 0, 130, 200), // blueColor
 
-			Color.FromArgb(255, 245, 130, 48), // orangeColor
-			Color.FromArgb(255, 70, 240, 240), //cyanColor
-			Color.FromArgb(255, 240, 50, 230), // magentaColor
+		//	Color.FromArgb(255, 245, 130, 48), // orangeColor
+		//	Color.FromArgb(255, 70, 240, 240), //cyanColor
+		//	Color.FromArgb(255, 240, 50, 230), // magentaColor
 
-			Color.FromArgb(255, 255, 255, 25), // yellowColor
-			Color.FromArgb(255, 128, 0, 0), // maroonColor
-			Color.FromArgb(255, 0, 128, 128), // tealColor
+		//	Color.FromArgb(255, 255, 255, 25), // yellowColor
+		//	Color.FromArgb(255, 128, 0, 0), // maroonColor
+		//	Color.FromArgb(255, 0, 128, 128), // tealColor
 
-			Color.FromArgb(255, 0, 0, 128), // navyColor
-			Color.FromArgb(255, 170, 110, 40), // brownColor
-			Color.FromArgb(255, 250, 190, 190), // pinkColor
+		//	Color.FromArgb(255, 0, 0, 128), // navyColor
+		//	Color.FromArgb(255, 170, 110, 40), // brownColor
+		//	Color.FromArgb(255, 250, 190, 190), // pinkColor
 
-			Color.FromArgb(255, 255, 250, 200), // beigeColor
-			Color.FromArgb(255, 170, 255, 195), // mintColor
-			Color.FromArgb(255, 230, 190, 255), // lavendarColor
-		};
+		//	Color.FromArgb(255, 255, 250, 200), // beigeColor
+		//	Color.FromArgb(255, 170, 255, 195), // mintColor
+		//	Color.FromArgb(255, 230, 190, 255), // lavendarColor
+		//};
+
+		//private static void OnGridLinesColorMixPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		//{
+		//	LayoutGrid g = d as LayoutGrid;
+
+		//	if (g != null)
+		//	{
+		//		GridLinesColorMixType val = GridLinesColorMixType.None;
+		//		if (e.NewValue is GridLinesColorMixType)
+		//		{
+		//			val = (GridLinesColorMixType)e.NewValue;
+		//		}
+
+		//		if (val != GridLinesColorMixType.None)
+		//		{
+		//			g.gridLinesVisual = new LayoutGridLinesVisual();
+		//		}
+		//		g.InvalidateVisual();
+		//	}
+		//	//???
+		//}
+
+		//public static readonly DependencyProperty GridLinesColorMixProperty =
+		//	DependencyProperty.RegisterAttached("GridLinesColorMix", typeof(GridLinesColorMixType), typeof(LayoutGrid), new FrameworkPropertyMetadata(GridLinesColorMixType.None, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesColorMixPropertyChanged)));
+
+		//public GridLinesColorMixType GridLinesColorMix
+		//{
+		//	get
+		//	{
+		//		return (GridLinesColorMixType)GetValue(GridLinesColorMixProperty);
+		//	}
+
+		//	set
+		//	{
+		//		SetValue(GridLinesColorMixProperty, value);
+		//	}
+		//}
 
 		//??? i'm not sure that these properties affect both arrange and measure
 		//[CommonDependencyPropertyAttribute]
@@ -124,8 +161,17 @@ namespace Motvin.LayoutGrid
 		public static readonly DependencyProperty ShowGridLinesProperty =
 			DependencyProperty.RegisterAttached("ShowGridLines", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnShowGridLinesPropertyChanged)));
 
-		public static readonly DependencyProperty GridLinesColorMixProperty =
-			DependencyProperty.RegisterAttached("GridLinesColorMix", typeof(GridLinesColorMixType), typeof(LayoutGrid), new FrameworkPropertyMetadata(GridLinesColorMixType.None, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesColorMixPropertyChanged)));
+		public static readonly DependencyProperty ShowGridLinesOuterEdgeProperty =
+			DependencyProperty.RegisterAttached("ShowGridLinesOuterEdge", typeof(bool), typeof(LayoutGrid), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnShowGridLinesOuterEdgePropertyChanged)));
+
+		public static readonly DependencyProperty GridLinesColorProperty =
+			DependencyProperty.RegisterAttached("GridLinesColor", typeof(Color), typeof(LayoutGrid), new FrameworkPropertyMetadata(Color.FromRgb(255, 0, 0), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesColorPropertyChanged)));
+
+		public static readonly DependencyProperty GridLinesThicknessProperty =
+			DependencyProperty.RegisterAttached("GridLinesThickness", typeof(double), typeof(LayoutGrid), new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesThicknessPropertyChanged)));
+
+		public static readonly DependencyProperty GridLinesDashStyleProperty =
+			DependencyProperty.RegisterAttached(" GridLinesDashStyle", typeof(DashStyle), typeof(LayoutGrid), new FrameworkPropertyMetadata(new DashStyle(new double[] { 2.0, 3.0 }, 0), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesDashStylePropertyChanged)));
 
 		private static void OnShowGridLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -148,22 +194,45 @@ namespace Motvin.LayoutGrid
 			//???
 		}
 
-		private static void OnGridLinesColorMixPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		private static void OnShowGridLinesOuterEdgePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			LayoutGrid g = d as LayoutGrid;
 
 			if (g != null)
 			{
-				GridLinesColorMixType val = GridLinesColorMixType.None;
-				if (e.NewValue is GridLinesColorMixType)
-				{
-					val = (GridLinesColorMixType)e.NewValue;
-				}
+				g.InvalidateVisual();
+			}
+			//???
+		}
 
-				if (val != GridLinesColorMixType.None)
-				{
-					g.gridLinesVisual = new LayoutGridLinesVisual();
-				}
+		private static void OnGridLinesColorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			LayoutGrid g = d as LayoutGrid;
+
+			if (g != null)
+			{
+				g.InvalidateVisual();
+			}
+			//???
+		}
+
+		private static void OnGridLinesThicknessPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			LayoutGrid g = d as LayoutGrid;
+
+			if (g != null)
+			{
+				g.InvalidateVisual();
+			}
+			//???
+		}
+
+		private static void OnGridLinesDashStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			LayoutGrid g = d as LayoutGrid;
+
+			if (g != null)
+			{
 				g.InvalidateVisual();
 			}
 			//???
@@ -183,16 +252,55 @@ namespace Motvin.LayoutGrid
 			}
 		}
 
-		public GridLinesColorMixType GridLinesColorMix
+		public bool ShowGridLinesOuterEdge
 		{
 			get
 			{
-				return (GridLinesColorMixType)GetValue(GridLinesColorMixProperty);
+				return (bool)GetValue(ShowGridLinesOuterEdgeProperty);
 			}
 
 			set
 			{
-				SetValue(GridLinesColorMixProperty, value);
+				SetValue(ShowGridLinesOuterEdgeProperty, value);
+			}
+		}
+
+		public Color GridLinesColor
+		{
+			get
+			{
+				return (Color)GetValue(GridLinesColorProperty);
+			}
+
+			set
+			{
+				SetValue(GridLinesColorProperty, value);
+			}
+		}
+
+		public double GridLinesThickness
+		{
+			get
+			{
+				return (double)GetValue(GridLinesThicknessProperty);
+			}
+
+			set
+			{
+				SetValue(GridLinesThicknessProperty, value);
+			}
+		}
+
+		public DashStyle GridLinesDashStyle
+		{
+			get
+			{
+				return (DashStyle)GetValue(GridLinesDashStyleProperty);
+			}
+
+			set
+			{
+				SetValue(GridLinesDashStyleProperty, value);
 			}
 		}
 
@@ -266,102 +374,152 @@ namespace Motvin.LayoutGrid
 				{
 					if (gridLinesPen == null)
 					{
-						Color brushColor;
+						//Color brushColor;
 
-						bool isBrushColorSet = false;
-						GridLinesColorMixType mix = g.GridLinesColorMix;
-						if (mix == GridLinesColorMixType.None) // try to get the mix from a parent if none because any other value is passed on to the children
-						{
-							// if a parent has a non-None mix value, then it is inherited from the parent to the child
-							LayoutGrid gp = g;
-							do
-							{
-								if (gp.Parent == null)
-								{
-									break;
-								}
+						//bool isBrushColorSet = false;
+						//GridLinesColorMixType mix = g.GridLinesColorMix;
+						//if (mix == GridLinesColorMixType.None) // try to get the mix from a parent if none because any other value is passed on to the children
+						//{
+						//	// if a parent has a non-None mix value, then it is inherited from the parent to the child
+						//	LayoutGrid gp = g;
+						//	do
+						//	{
+						//		if (gp.Parent == null)
+						//		{
+						//			break;
+						//		}
 
-								gp = gp.Parent as LayoutGrid;
-								if (gp != null)
-								{
-									mix = gp.GridLinesColorMix;
-									if (mix != GridLinesColorMixType.None)
-									{
-										break;
-									}
-								}
+						//		gp = gp.Parent as LayoutGrid;
+						//		if (gp != null)
+						//		{
+						//			mix = gp.GridLinesColorMix;
+						//			if (mix != GridLinesColorMixType.None)
+						//			{
+						//				break;
+						//			}
+						//		}
 
-							} while (true);
-						}
+						//	} while (true);
+						//}
 
-						if (mix == GridLinesColorMixType.Distinct)
-						{
-							if (g.gridLinesParentSiblingIndex < 0)
-							{
-								g.gridLinesParentSiblingIndex = g.FindGridParentSiblingIndex();
-							}
+						//if (mix == GridLinesColorMixType.Distinct)
+						//{
+						//	if (g.gridLinesParentSiblingIndex < 0)
+						//	{
+						//		g.gridLinesParentSiblingIndex = g.FindGridParentSiblingIndex();
+						//	}
 
-							brushColor = distinctColorArray[g.gridLinesParentSiblingIndex % distinctColorArray.Length];
-							isBrushColorSet = true;
-						}
+						//	brushColor = distinctColorArray[g.gridLinesParentSiblingIndex % distinctColorArray.Length];
+						//	isBrushColorSet = true;
+						//}
 
-						if (!isBrushColorSet)
-						{
-							brushColor = distinctColorArray[0];
-						}
+						//if (!isBrushColorSet)
+						//{
+						//	brushColor = distinctColorArray[0];
+						//}
 
+						//gridLinesBrush = new SolidColorBrush(brushColor);
+
+						Color brushColor = g.GridLinesColor;
 						gridLinesBrush = new SolidColorBrush(brushColor);
 						gridLinesBrush.Freeze();
-						gridLinesPen = new Pen(gridLinesBrush, 1.0);
-						gridLinesPen.DashStyle = new DashStyle(new double[] { 2.0, 3.0 }, 0);
+						gridLinesPen = new Pen(gridLinesBrush, g.GridLinesThickness);
+						gridLinesPen.DashStyle = g.GridLinesDashStyle; //???new DashStyle(new double[] { 2.0, 3.0 }, 0);
 						gridLinesPen.StartLineCap = PenLineCap.Flat;
 						gridLinesPen.EndLineCap = PenLineCap.Flat;
 						gridLinesPen.Freeze();
 					}
 
-					g.SnapsToDevicePixels = true; //??? if not true originally, then set this back?
+					//g.SnapsToDevicePixels = true; //??? if not true originally, then set this back?
+
 					//RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
 					//SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
 					using (DrawingContext dc = RenderOpen())
 					{
 						double lastColPos = 0;
 						double lastRowPos = 0;
+						
+						double halfLineThickness = gridLinesPen.Thickness / 2.0; // for a thickness of 2.0, this should be 1.0, if thickness is 1.0, this should be .5
+
+						bool showOuterEdge = g.ShowGridLinesOuterEdge;
 
 						if (g.rowInfoArrayCount > 0)
 						{
-							lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength - 1.0) + 0.5;
+							lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength - 1.0, MidpointRounding.AwayFromZero);
 						}
 
-						for (int i = 1; ; i++)
+						GuidelineSet guidelines = new GuidelineSet();
+						guidelines.GuidelinesX.Add(0);
+						guidelines.GuidelinesY.Add(0);
+
+						double x;
+						double y;
+						int startIdx;
+						if (showOuterEdge)
+						{
+							startIdx = 0;
+						}
+						else
+						{
+							startIdx = 1;
+						}
+
+						for (int i = startIdx; ; i++)
 						{
 							ref GridColRowInfo cr = ref g.colInfoArray[i];
 
-							//Brush brush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
-							//Pen pen = new Pen(brush, 1.0);
-							//pen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
-							//pen.StartLineCap = PenLineCap.Flat;
-							//pen.EndLineCap = PenLineCap.Flat;
-							double x = Math.Round(cr.spanExtraLength_Or_Position) + 0.5;
-							dc.DrawLine(gridLinesPen, new Point(x, 0.5), new Point(x, lastRowPos));
+							x = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
+
+							guidelines.GuidelinesX[0] = (x + halfLineThickness);
+							guidelines.GuidelinesY[0] = (0 + halfLineThickness);
+
+							dc.PushGuidelineSet(guidelines);
+							dc.DrawLine(gridLinesPen, new Point(x, 0), new Point(x, lastRowPos)); // vertical line
+							dc.Pop();
 
 							if (i == g.colInfoArrayCount - 1)
 							{
-								lastColPos = Math.Round(cr.spanExtraLength_Or_Position + cr.constrainedLength - 1.0) + 0.5;
+								lastColPos = Math.Round(cr.spanExtraLength_Or_Position + cr.constrainedLength - 1.0, MidpointRounding.AwayFromZero);
+
+								if (showOuterEdge)
+								{
+									x = lastColPos;
+
+									guidelines.GuidelinesX[0] = (x + halfLineThickness);
+									guidelines.GuidelinesY[0] = (0 + halfLineThickness);
+
+									dc.PushGuidelineSet(guidelines);
+									dc.DrawLine(gridLinesPen, new Point(x, 0), new Point(x, lastRowPos)); // vertical line
+									dc.Pop();
+								}
 								break;
 							}
 						}
 
-						for (int i = 1; i < g.rowInfoArrayCount; i++)
+						for (int i = startIdx; i < g.rowInfoArrayCount; i++)
 						{
 							ref GridColRowInfo cr = ref g.rowInfoArray[i];
 
-							//Brush brush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)); // red
-							//Pen pen = new Pen(brush, 1.0);
-							//pen.DashStyle = new DashStyle(new double[] { 1, 3 }, 0);
-							//pen.StartLineCap = PenLineCap.Flat;
-							//pen.EndLineCap = PenLineCap.Flat;
-							double y = Math.Round(cr.spanExtraLength_Or_Position) + 0.5;
-							dc.DrawLine(gridLinesPen, new Point(0.5, y), new Point(lastColPos, y));
+							y = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
+
+							guidelines.GuidelinesX[0] = (0 + halfLineThickness);
+							guidelines.GuidelinesY[0] = (y + halfLineThickness);
+
+							dc.PushGuidelineSet(guidelines);
+							dc.DrawLine(gridLinesPen, new Point(0, y), new Point(lastColPos, y)); // horizontal line
+							dc.Pop();
+
+							if (showOuterEdge && i == g.rowInfoArrayCount - 1)
+							{
+								y = lastRowPos;
+
+								guidelines.GuidelinesX[0] = (0 + halfLineThickness);
+								guidelines.GuidelinesY[0] = (y + halfLineThickness);
+
+								dc.PushGuidelineSet(guidelines);
+								dc.DrawLine(gridLinesPen, new Point(0, y), new Point(lastColPos, y)); // horizontal line
+								dc.Pop();
+							}
 						}
 					}
 				}
