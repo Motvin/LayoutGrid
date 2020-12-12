@@ -171,7 +171,7 @@ namespace Motvin.LayoutGrid
 			DependencyProperty.RegisterAttached("GridLinesThickness", typeof(double), typeof(LayoutGrid), new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesThicknessPropertyChanged)));
 
 		public static readonly DependencyProperty GridLinesDashStyleProperty =
-			DependencyProperty.RegisterAttached(" GridLinesDashStyle", typeof(DashStyle), typeof(LayoutGrid), new FrameworkPropertyMetadata(new DashStyle(new double[] { 2.0, 3.0 }, 0), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesDashStylePropertyChanged)));
+			DependencyProperty.RegisterAttached("GridLinesDashStyle", typeof(DashStyle), typeof(LayoutGrid), new FrameworkPropertyMetadata(new DashStyle(new double[] { 2.0, 2.0 }, 0), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnGridLinesDashStylePropertyChanged)));
 
 		private static void OnShowGridLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -316,6 +316,269 @@ namespace Motvin.LayoutGrid
 
 		protected override int VisualChildrenCount { get { return base.VisualChildrenCount + (ShowGridLines ? 1 : 0); } } //??? maybe need to add in grid lines renderer if this is used, otherwise we don't have to override this at all
 
+		//??? maybe grid needs to implement these
+		// the base version supports zindex, but maybe need to override this to display the gridlines
+		protected override Visual GetVisualChild(int index)
+		{
+			if (ShowGridLines)
+			{
+				if (index == VisualChildrenCount - 1)
+				{
+					return gridLinesVisual; //??? return the Visual
+				}
+				else
+				{
+					return base.GetVisualChild(index);
+				}
+			}
+			else
+			{
+				return base.GetVisualChild(index);
+			}
+			//return Children[index];
+			//???return Children[(Children.Count - 1) - index];
+		}
+
+		//??? maybe grid needs to implement these
+		protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+		{
+
+		}
+
+		public static class DrawAliasedLine
+		{
+			// with a thickness = 3 and square caps, the length of the line will be drawn to be at least 3 (even if b1 and b2 are passed in as the same value)
+			// penThickness must be the unscaled thickness, while pen.Thickness will be thickness that takes scale into account (pen.Thickness should = penThickness / scale)
+			// penThickness must be an integer for the line to not be dithered
+			// the endpoint is not inclusive - it will not be part of the line (line from b1 = 1 to b2 = 2 is 1 pixel long)
+			// if odd thickness and a is passed in as an integer, then the extra thickness goes below/right - could pass in param so it goes above/left???
+			public static void DrawLineSquareCaps(DrawingContext dc, Pen pen, double penThickness, double scale, double a, double b1, double b2, bool isHorizontal)
+			{
+				int penThicknessInt = (int)penThickness;
+
+				double bPixelOffset;
+				double aPixelOffset;
+				double b1Adj;
+				double b2Adj;
+				double aAdj;
+
+				bPixelOffset = penThickness * .5;
+				if ((penThicknessInt & 0x01) == 1)
+				{
+					// odd thickness - this only works if penThickness is an integer
+					aPixelOffset = .5;
+				}
+				else
+				{
+					aPixelOffset = 0.0;
+				}
+
+				if (scale == 1.0)
+				{
+					aAdj = Math.Round(a, MidpointRounding.AwayFromZero);
+					if (aAdj > a)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+
+					b1Adj = Math.Round(b1, MidpointRounding.AwayFromZero) + bPixelOffset;
+					b2Adj = Math.Round(b2, MidpointRounding.AwayFromZero) - bPixelOffset;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+				else
+				{
+					double yScaled = a * scale;
+					double scaleInverse = 1.0 / scale; // multiply some values by this already divided by value to make things faster (multiply is typically faster than divide) - could pass this value in to make it even faster for many lines drawn
+					aAdj = Math.Round(yScaled, MidpointRounding.AwayFromZero);
+					if (aAdj > yScaled)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+					aAdj *= scaleInverse;
+
+					b1Adj = (Math.Round(b1 * scale, MidpointRounding.AwayFromZero) + bPixelOffset) * scaleInverse;
+					b2Adj = (Math.Round(b2 * scale, MidpointRounding.AwayFromZero) - bPixelOffset) * scaleInverse;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+
+				if (isHorizontal)
+				{
+					dc.DrawLine(pen, new Point(b1Adj, aAdj), new Point(b2Adj, aAdj));
+				}
+				else
+				{
+					dc.DrawLine(pen, new Point(aAdj, b1Adj), new Point(aAdj, b2Adj));
+				}
+			}
+
+			public static void DrawLineFlatCaps(DrawingContext dc, Pen pen, double penThickness, double scale, double a, double b1, double b2, bool isHorizontal)
+			{
+				int penThicknessInt = (int)penThickness;
+
+				double bPixelOffset;
+				double aPixelOffset;
+				double b1Adj;
+				double b2Adj;
+				double aAdj;
+
+				bPixelOffset = 0;
+				if ((penThicknessInt & 0x01) == 1)
+				{
+					// odd thickness - this only works if penThickness is an integer
+					aPixelOffset = .5;
+				}
+				else
+				{
+					aPixelOffset = 0.0;
+				}
+
+				if (scale == 1.0)
+				{
+					aAdj = Math.Round(a, MidpointRounding.AwayFromZero);
+					if (aAdj > a)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+
+					b1Adj = Math.Round(b1, MidpointRounding.AwayFromZero) + bPixelOffset;
+					b2Adj = Math.Round(b2, MidpointRounding.AwayFromZero) - bPixelOffset;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+				else
+				{
+					double yScaled = a * scale;
+					double scaleInverse = 1.0 / scale;
+					aAdj = Math.Round(yScaled, MidpointRounding.AwayFromZero);
+					if (aAdj > yScaled)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+					aAdj *= scaleInverse;
+
+					b1Adj = (Math.Round(b1 * scale, MidpointRounding.AwayFromZero) + bPixelOffset) * scaleInverse;
+					b2Adj = (Math.Round(b2 * scale, MidpointRounding.AwayFromZero) - bPixelOffset) * scaleInverse;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+
+				if (isHorizontal)
+				{
+					dc.DrawLine(pen, new Point(b1Adj, aAdj), new Point(b2Adj, aAdj));
+				}
+				else
+				{
+					dc.DrawLine(pen, new Point(aAdj, b1Adj), new Point(aAdj, b2Adj));
+				}
+			}
+
+			public static void DrawLineFlatCapsNoRound(DrawingContext dc, Pen pen, double penThickness, double scale, double a, double b1, double b2, bool isHorizontal)
+			{
+				int penThicknessInt = (int)penThickness;
+
+				double bPixelOffset;
+				double aPixelOffset;
+				double b1Adj;
+				double b2Adj;
+				double aAdj;
+
+				bPixelOffset = 0;
+				if ((penThicknessInt & 0x01) == 1)
+				{
+					// odd thickness - this only works if penThickness is an integer
+					aPixelOffset = .5;
+				}
+				else
+				{
+					aPixelOffset = 0.0;
+				}
+
+				if (scale == 1.0)
+				{
+					aAdj = a;
+					if (aAdj > a)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+
+					b1Adj = b1 + bPixelOffset;
+					b2Adj = b2 - bPixelOffset;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+				else
+				{
+					double yScaled = a * scale;
+					double scaleInverse = 1.0 / scale;
+					aAdj = Math.Round(yScaled, MidpointRounding.AwayFromZero);
+					if (aAdj > yScaled)
+					{
+						aAdj -= aPixelOffset;
+					}
+					else
+					{
+						aAdj += aPixelOffset;
+					}
+					aAdj *= scaleInverse;
+
+					b1Adj = (Math.Round(b1 * scale, MidpointRounding.AwayFromZero) + bPixelOffset) * scaleInverse;
+					b2Adj = (Math.Round(b2 * scale, MidpointRounding.AwayFromZero) - bPixelOffset) * scaleInverse;
+
+					if (b1Adj > b2Adj)
+					{
+						b2Adj = b1Adj;
+					}
+				}
+
+				if (isHorizontal)
+				{
+					dc.DrawLine(pen, new Point(b1Adj, aAdj), new Point(b2Adj, aAdj));
+				}
+				else
+				{
+					dc.DrawLine(pen, new Point(aAdj, b1Adj), new Point(aAdj, b2Adj));
+				}
+			}
+
+		}
+
 		// allow user to pass in the pen for grid lines drawing and to specify if outside border should be shown???
 		private class LayoutGridLinesVisual : DrawingVisual
 		{
@@ -365,13 +628,19 @@ namespace Motvin.LayoutGrid
 
 				//mainCanvas.Children.Add(gridLines);
 			}
-
+			
 			//??? why is this called at the end of ArrangeOverride
 			public void DrawGridLines(LayoutGrid g)
 			{
 				// this doesn't draw the outside grid border - maybe have an option to draw this???
-				if (g.ColumnDefinitions.Count > 1 || g.RowDefinitions.Count > 1)
+				//if (g.ColumnDefinitions.Count > 1 || g.RowDefinitions.Count > 1)
 				{
+					DpiScale dpi = VisualTreeHelper.GetDpi(this);
+
+					double scale = dpi.DpiScaleX; // x and y scale will always be the same, just use x
+
+					double gridLinesThickness = g.GridLinesThickness;
+
 					if (gridLinesPen == null)
 					{
 						//Color brushColor;
@@ -422,35 +691,66 @@ namespace Motvin.LayoutGrid
 
 						Color brushColor = g.GridLinesColor;
 						gridLinesBrush = new SolidColorBrush(brushColor);
-						gridLinesBrush.Freeze();
-						gridLinesPen = new Pen(gridLinesBrush, g.GridLinesThickness);
+						gridLinesBrush.Freeze();//??? what if the color is changed?
+						gridLinesPen = new Pen(gridLinesBrush, gridLinesThickness / scale);
 						gridLinesPen.DashStyle = g.GridLinesDashStyle; //???new DashStyle(new double[] { 2.0, 3.0 }, 0);
 						gridLinesPen.StartLineCap = PenLineCap.Flat;
 						gridLinesPen.EndLineCap = PenLineCap.Flat;
-						gridLinesPen.Freeze();
+						gridLinesPen.DashCap = PenLineCap.Flat;
+						gridLinesPen.Freeze();//??? what if the this is changed? - then need to reset the gridLinesPen/brush to null
 					}
 
-					//g.SnapsToDevicePixels = true; //??? if not true originally, then set this back?
+					double pos = -1.0;
+					double yOffset = 0;
+					if (g.Name == "bottom")
+					{
+						// the combo box shows differently when this grid is shown alone (26 pixels high) than when this is part of a parent grid, probably not at an integer position (25 pixels high)
+						// this causes the last row grid line to be +1 more than it should - not sure how to fix this???
+						if (g.Parent is LayoutGrid)
+						{
+							LayoutGrid gp = (LayoutGrid)g.Parent;
+							Point relativePoint = g.TransformToAncestor(gp).Transform(new Point(0, 0));
+							Point position = g.PointToScreen(new Point(0, 0));
+							Vector vector = VisualTreeHelper.GetOffset(g);
+							Vector offset = g.VisualOffset;
+							pos = gp.rowInfoArray[3].spanExtraLength_Or_Position;
+							yOffset = pos - (int)pos;
+							using (DrawingContext dc = RenderOpen())
+							{
+								Vector off = this.Offset;
+								Vector visOff = this.VisualOffset;
+								dc.DrawLine(gridLinesPen, new Point(0, 0), new Point(100, 0));
+								return;
+							}
+						}
+					}
+					else
+					{
+						return;
+					}
 
-					//RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
-					//SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
 					using (DrawingContext dc = RenderOpen())
 					{
+						// need to set guidlines to 0 so that a grid that isn't positioned at integer x/y device coordinates still acts like it is for drawing grid lines
+						GuidelineSet guidelines = new GuidelineSet();
+						guidelines.GuidelinesX.Add(0);
+						guidelines.GuidelinesY.Add(0);
+
+						//Point scPt = g.PointToScreen(new Point(0, 0));
+
+						//???dc.PushGuidelineSet(guidelines);
+
 						double lastColPos = 0;
 						double lastRowPos = 0;
 						
-						double halfLineThickness = gridLinesPen.Thickness / 2.0; // for a thickness of 2.0, this should be 1.0, if thickness is 1.0, this should be .5
-
 						bool showOuterEdge = g.ShowGridLinesOuterEdge;
 
 						if (g.rowInfoArrayCount > 0)
 						{
-							lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength - 1.0, MidpointRounding.AwayFromZero);
+							//lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position, MidpointRounding.AwayFromZero) + Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength, MidpointRounding.AwayFromZero);
+							//???lastRowPos = Math.Round(g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength - yOffset, MidpointRounding.AwayFromZero);
+							lastRowPos = g.rowInfoArray[g.rowInfoArrayCount - 1].spanExtraLength_Or_Position + g.rowInfoArray[g.rowInfoArrayCount - 1].constrainedLength - yOffset;
 						}
-
-						GuidelineSet guidelines = new GuidelineSet();
-						guidelines.GuidelinesX.Add(0);
-						guidelines.GuidelinesY.Add(0);
 
 						double x;
 						double y;
@@ -464,61 +764,53 @@ namespace Motvin.LayoutGrid
 							startIdx = 1;
 						}
 
-						for (int i = startIdx; ; i++)
+						if (startIdx < g.colInfoArrayCount)
 						{
-							ref GridColRowInfo cr = ref g.colInfoArray[i];
-
-							x = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
-
-							guidelines.GuidelinesX[0] = (x + halfLineThickness);
-							guidelines.GuidelinesY[0] = (0 + halfLineThickness);
-
-							dc.PushGuidelineSet(guidelines);
-							dc.DrawLine(gridLinesPen, new Point(x, 0), new Point(x, lastRowPos)); // vertical line
-							dc.Pop();
-
-							if (i == g.colInfoArrayCount - 1)
+							for (int i = startIdx; ; i++)
 							{
-								lastColPos = Math.Round(cr.spanExtraLength_Or_Position + cr.constrainedLength - 1.0, MidpointRounding.AwayFromZero);
+								ref GridColRowInfo cr = ref g.colInfoArray[i];
 
-								if (showOuterEdge)
+								x = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
+
+								DrawAliasedLine.DrawLineFlatCaps(dc, gridLinesPen, gridLinesThickness, scale, x, 0, lastRowPos, false); // vertical line
+
+								if (i == g.colInfoArrayCount - 1)
 								{
-									x = lastColPos;
+									//lastColPos = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero) + Math.Round(cr.constrainedLength, MidpointRounding.AwayFromZero);
+									lastColPos = Math.Round(cr.spanExtraLength_Or_Position + cr.constrainedLength, MidpointRounding.AwayFromZero);
 
-									guidelines.GuidelinesX[0] = (x + halfLineThickness);
-									guidelines.GuidelinesY[0] = (0 + halfLineThickness);
+									if (showOuterEdge)
+									{
+										x = lastColPos;
 
-									dc.PushGuidelineSet(guidelines);
-									dc.DrawLine(gridLinesPen, new Point(x, 0), new Point(x, lastRowPos)); // vertical line
-									dc.Pop();
+										DrawAliasedLine.DrawLineFlatCaps(dc, gridLinesPen, gridLinesThickness, scale, x, 0, lastRowPos, false); // vertical line
+									}
+									break;
 								}
-								break;
 							}
 						}
 
-						for (int i = startIdx; i < g.rowInfoArrayCount; i++)
+						if (startIdx < g.rowInfoArrayCount)
 						{
-							ref GridColRowInfo cr = ref g.rowInfoArray[i];
-
-							y = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
-
-							guidelines.GuidelinesX[0] = (0 + halfLineThickness);
-							guidelines.GuidelinesY[0] = (y + halfLineThickness);
-
-							dc.PushGuidelineSet(guidelines);
-							dc.DrawLine(gridLinesPen, new Point(0, y), new Point(lastColPos, y)); // horizontal line
-							dc.Pop();
-
-							if (showOuterEdge && i == g.rowInfoArrayCount - 1)
+							for (int i = startIdx; ; i++)
 							{
-								y = lastRowPos;
+								ref GridColRowInfo cr = ref g.rowInfoArray[i];
 
-								guidelines.GuidelinesX[0] = (0 + halfLineThickness);
-								guidelines.GuidelinesY[0] = (y + halfLineThickness);
+								y = Math.Round(cr.spanExtraLength_Or_Position, MidpointRounding.AwayFromZero);
+								y = cr.spanExtraLength_Or_Position - yOffset;
 
-								dc.PushGuidelineSet(guidelines);
-								dc.DrawLine(gridLinesPen, new Point(0, y), new Point(lastColPos, y)); // horizontal line
-								dc.Pop();
+								DrawAliasedLine.DrawLineFlatCapsNoRound(dc, gridLinesPen, gridLinesThickness, scale, y, 0, lastColPos, true); // horizontal line
+
+								if (i == g.rowInfoArrayCount - 1)
+								{
+									if (showOuterEdge)
+									{
+										y = lastRowPos;
+
+										DrawAliasedLine.DrawLineFlatCapsNoRound(dc, gridLinesPen, gridLinesThickness, scale, y, 0, lastColPos, true); // horizontal line
+									}
+									break;
+								}
 							}
 						}
 					}
@@ -526,35 +818,6 @@ namespace Motvin.LayoutGrid
 			}
 		}
 		LayoutGridLinesVisual gridLinesVisual;
-
-		//??? maybe grid needs to implement these
-		// the base version supports zindex, but maybe need to override this to display the gridlines
-		protected override Visual GetVisualChild(int index)
-		{
-			if (ShowGridLines)
-			{
-				if (index == VisualChildrenCount - 1)
-				{
-					return gridLinesVisual; //??? return the Visual
-				}
-				else
-				{
-					return base.GetVisualChild(index);
-				}
-			}
-			else
-			{
-				return base.GetVisualChild(index);
-			}
-			//return Children[index];
-			//???return Children[(Children.Count - 1) - index];
-		}
-
-		//??? maybe grid needs to implement these
-		protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-		{
-
-		}
 
 		//???protected override IEnumerator LogicalChildren { get; } // not sure why this is needed?
 
@@ -761,7 +1024,8 @@ namespace Motvin.LayoutGrid
 			Pixel = ChildFlag_SpanHasPixel
 		}
 
-		private struct GridColRowInfo
+		public struct GridColRowInfo
+		//???private struct GridColRowInfo
 		{
 			public double constrainedLength; // this can be set again in MeasureOverride and ArrangeOverride
 			public double spanExtraLength_Or_Position; // this has a dual purpose as auto spanExtraLength or star desired length (within MeasureOverride) and position (within ArrangeOverride)
@@ -922,7 +1186,8 @@ namespace Motvin.LayoutGrid
 		private GridColRowInfo[] colInfoArray;
 		private int colInfoArrayCount;
 
-		private GridColRowInfo[] rowInfoArray;
+		//???private GridColRowInfo[] rowInfoArray;
+		public GridColRowInfo[] rowInfoArray;
 		private int rowInfoArrayCount;
 
 		private StarMinMax[] starColMinArray;
@@ -2928,12 +3193,6 @@ namespace Motvin.LayoutGrid
 				colSpan = n.colSpan;
 				rowSpan = n.rowSpan;
 
-				Button btn = n.child as Button;
-				if (btn != null && btn.Name == "btn79")
-				{
-					int afs = 1;//???
-				}
-
 				if (colSpan > 1)
 				{
 					if ((n.colFlags & ChildFlag_SpanHasAutoNoStar) != 0)
@@ -3306,6 +3565,15 @@ namespace Motvin.LayoutGrid
 #endif
 			return retSize;
 		}
+
+		//??? do this to get the actual x and y position of the LayoutGrid
+		//public Rect finalRect;
+		//protected override void ArrangeCore(Rect finalRect)
+		//{
+		//	//Call base, it will set offset and RenderBounds to the finalRect:
+		//	base.ArrangeCore(finalRect);
+		//	this.finalRect = finalRect;
+		//}
 
 		protected override Size ArrangeOverride(Size finalSize)
 		{
@@ -3682,7 +3950,7 @@ namespace Motvin.LayoutGrid
 			return length;
 		}
 
-		#if DEBUG
+#if DEBUG
 		public int GetChildCellGroup(UIElement child)
 		{
 			int cellGroup = -1;
@@ -3697,7 +3965,7 @@ namespace Motvin.LayoutGrid
 			}
 			return cellGroup;
 		}
-		#endif
+#endif
 	}
 
 	public class LayoutGridRowDefinition : ColumnDefinition

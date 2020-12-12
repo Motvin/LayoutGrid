@@ -40,7 +40,7 @@
 		</p:LayoutGrid>
 		<p:LayoutGrid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="NameStuff" ShowGridLines="True" GridLinesColor="LightGreen" GridLinesThickness="2">
 			<p:LayoutGrid.GridLinesDashStyle>
-				<DashStyle Dashes="0"/>
+				<DashStyle Dashes="4,4"/>
 			</p:LayoutGrid.GridLinesDashStyle>
 
 			<p:LayoutGrid.ColumnDefinitions>
@@ -80,7 +80,7 @@
 				<ContentPresenter x:Name="contentPresenter2" Focusable="False" HorizontalAlignment="Center" Margin="3,2,3,3" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" Content="contentjgpq"/>
 			</Border>
 		</p:LayoutGrid>
-		<p:LayoutGrid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3" ShowGridLines="True" GridLinesColor="#6010FF10" ShowGridLinesOuterEdge="True">
+		<p:LayoutGrid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="grid3" ShowGridLines="True" GridLinesColor="Orange" ShowGridLinesOuterEdge="True">
 			<p:LayoutGrid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="1*" MinWidth="100" MaxWidth="500"/>
@@ -147,10 +147,11 @@
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 			</p:LayoutGrid.RowDefinitions>
-			<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,13,0,0"/>
+			<Line Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Stroke="Red" StrokeThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" X2="600" Y1="-.06" Y2="-.06" />
+			<!--<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,13,0,0"/>-->
 			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,8,0,0" Text="Bottom Header" HorizontalAlignment="Center" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" FontWeight="Bold"/>
 			<Label Grid.Row="1" Grid.Column="0" Content="Bottom 1:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
-			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"/>
+			<ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" VerticalAlignment="Stretch"/>
 			<Label Grid.Row="1" Grid.Column="3" Content="Bottom 2:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
 			<TextBox Grid.Row="1" Grid.Column="4" TextWrapping="NoWrap" AcceptsReturn="False" MaxLines="1" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
 			<Label Grid.Row="1" Grid.Column="6" Content="Bottom 3:" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>

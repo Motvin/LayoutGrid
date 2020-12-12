@@ -32,6 +32,9 @@
     <Compile Update="DiffSpanExpands_LayoutGrid.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="TestComplexLayout_LayoutGrid2.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="TestOverlappingControls_LayoutGrid.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -51,6 +54,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="DiffSpanExpands_LayoutGrid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="TestComplexLayout_LayoutGrid2.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="TestOverlappingControls_LayoutGrid.xaml">
