@@ -1859,15 +1859,15 @@ namespace LayoutGridTest
 						continue; // these are cases where we are correct and Grid is wrong
 					}
 				}
-				else if (
-					//seed == 609 || // distribute spans differently
+				//else if (
+				//	//seed == 609 || // distribute spans differently
 
-					1 == 2
-				)
-				{
-					seed++;
-					continue; // these are cases where we are correct and Grid is wrong
-				}
+				//	1 == 2
+				//)
+				//{
+				//	seed++;
+				//	continue; // these are cases where we are correct and Grid is wrong
+				//}
 
 				if (seed == 5_000)
 				{
@@ -2039,15 +2039,15 @@ namespace LayoutGridTest
 						continue; // these are cases where we are correct and Grid is wrong
 					}
 				}
-				else if (
-					//seed == 3015 || // off by .01
+				//else if (
+				//	//seed == 3015 || // off by .01
 
-					1 == 2
-				)
-				{
-					seed++;
-					continue; // these are cases where we are correct and Grid is wrong
-				}
+				//	1 == 2
+				//)
+				//{
+				//	seed++;
+				//	continue; // these are cases where we are correct and Grid is wrong
+				//}
 
 				if (seed == 5_000)
 				{
@@ -2490,7 +2490,7 @@ namespace LayoutGridTest
 
 		private void btnTestComplex_Click(object sender, RoutedEventArgs e)
 		{
-			int testCount = 1;
+			//int testCount = 1;
 			TestComplexLayout_LayoutGrid lgWin = new TestComplexLayout_LayoutGrid();
 			lgWin.Width = 800;
 			lgWin.Height = 500;
